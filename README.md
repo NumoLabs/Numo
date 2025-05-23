@@ -124,6 +124,7 @@ Numo/
 | --------------------- | -------------------------------------------- |
 | Yield en BTC/WBTC     | ✅ Todas las recompensas se convierten a WBTC |
 | Uso de Vesu/Ekubo     | ✅ Vault integra ambos protocolos             |
+| Uso de Pragma         | ✅ Integración sofisticada de Pragma          |
 | Uso de Starknet       | ✅ Desplegado en testnet Starknet             |
 | Repositorio abierto   | ✅ Disponible en GitHub                       |
 | Video demo            | ✅ Incluido                                   |
