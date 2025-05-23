@@ -1,32 +1,30 @@
 [package]
-name = "paystark"
+name = "example"
 version = "0.1.0"
-edition = "2023_01"
+edition = "2024_07"
 
 # See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
 
 [dependencies]
-starknet = ">=2.3.1"
-openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.8.0" }
+pragma_lib = { git = "https://github.com/astraly-labs/pragma-lib", rev = "c429179ed6153004b79657337c589548b73d5151" }
+starknet = "2.10.1"
 
 [dev-dependencies]
-snforge_std = "0.39.0"
-assert_macros = "2.9.2"
+snforge_std = "0.42.0"
+assert_macros = "2.10.1"
 
 [[target.starknet-contract]]
 sierra = true
-casm = true
 
 [scripts]
 test = "snforge test"
 
 [tool.scarb]
 allow-prebuilt-plugins = ["snforge_std"]
-cairo-version = "2.3.1"
 
 # Visit https://foundry-rs.github.io/starknet-foundry/appendix/scarb-toml.html for more information
 
-# [tool.snforge]                                             # Define `snforge` tool section
+# [tool.snforge]                                             # Define snforge tool section
 # exit_first = true                                          # Stop tests execution immediately upon the first failure
 # fuzzer_runs = 1234                                         # Number of runs of the random fuzzer
 # fuzzer_seed = 1111                                         # Seed for the random fuzzer
