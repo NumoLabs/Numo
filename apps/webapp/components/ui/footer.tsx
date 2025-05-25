@@ -1,63 +1,24 @@
-'use client';
+import Link from "next/link"
 
-import Link from 'next/link';
-import { Github, Twitter } from 'lucide-react';
-
-const navigation = {
-  main: [
-    { name: 'About', href: '/about' },
-    { name: 'Documentation', href: '/docs' },
-    { name: 'Terms', href: '/terms' },
-    { name: 'Privacy', href: '/privacy' },
-  ],
-  social: [
-    {
-      name: 'Twitter',
-      href: 'https://twitter.com/numo_finance',
-      icon: Twitter,
-    },
-    {
-      name: 'GitHub',
-      href: 'https://github.com/numo-finance',
-      icon: Github,
-    },
-  ],
-};
-
-export default function Footer() {
+export function Footer() {
   return (
-    <footer className="bg-[#212322] border-t border-[#8B9E93]">
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <nav className="flex flex-wrap justify-center -mx-5 -my-2" aria-label="Footer">
-          {navigation.main.map((item) => (
-            <div key={item.name} className="px-5 py-2">
-              <Link
-                href={item.href}
-                className="text-base text-gray-300 hover:text-white"
-              >
-                {item.name}
-              </Link>
-            </div>
-          ))}
-        </nav>
-        <div className="mt-8 flex justify-center space-x-6">
-          {navigation.social.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-gray-400 hover:text-gray-300"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="sr-only">{item.name}</span>
-              <item.icon className="h-6 w-6" aria-hidden="true" />
-            </Link>
-          ))}
+    <footer className="border-t py-6 md:py-0">
+      <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">© 2025 Numo. Construido en Starknet.</p>
         </div>
-        <p className="mt-8 text-center text-base text-gray-400">
-          &copy; {new Date().getFullYear()} Numo. All rights reserved.
-        </p>
+        <div className="flex gap-4">
+          <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            Documentación
+          </Link>
+          <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            GitHub
+          </Link>
+          <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            Twitter
+          </Link>
+        </div>
       </div>
     </footer>
-  );
-} 
+  )
+}
