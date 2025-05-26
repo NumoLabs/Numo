@@ -35,19 +35,6 @@ export function DepositOptions({ options, selectedOption, onSelectOption }: Depo
     return "border hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer transition-colors"
   }
 
-  const getBadgeStyle = (optionId: string) => {
-    switch (optionId) {
-      case "priority":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
-      case "standard":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-      case "scheduled":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
-    }
-  }
-
   return (
     <div className="space-y-4">
       <div>

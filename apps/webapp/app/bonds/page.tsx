@@ -50,6 +50,7 @@ export default function BondsPage() {
       // Reset form
       setAmount("")
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "There was a problem creating your bond. Please try again.",

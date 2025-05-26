@@ -38,7 +38,7 @@ export function BondActions({ isValid, isLoading = false, onLock }: BondActionsP
             <Checkbox
               id="confirm-lock"
               checked={confirmLock}
-              onCheckedChange={(checked) => setConfirmLock(checked as boolean)}
+              onCheckedChange={(checked: boolean | "indeterminate") => setConfirmLock(checked as boolean)}
             />
             <label htmlFor="confirm-lock" className="text-sm leading-relaxed cursor-pointer">
               I understand that my WBTC will be locked for the selected duration and cannot be withdrawn early.
@@ -49,7 +49,7 @@ export function BondActions({ isValid, isLoading = false, onLock }: BondActionsP
             <Checkbox
               id="confirm-terms"
               checked={confirmTerms}
-              onCheckedChange={(checked) => setConfirmTerms(checked as boolean)}
+              onCheckedChange={(checked: boolean | "indeterminate") => setConfirmTerms(checked as boolean)}
             />
             <label htmlFor="confirm-terms" className="text-sm leading-relaxed cursor-pointer">
               I accept the bond terms and understand the risks associated with locking my funds.

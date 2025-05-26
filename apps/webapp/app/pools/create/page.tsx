@@ -70,6 +70,7 @@ export default function CreateVaultPage() {
     } else {
       setErrors((prev) => {
         const { allocation, ...rest } = prev
+        console.log(allocation);
         return rest
       })
     }
@@ -180,6 +181,7 @@ export default function CreateVaultPage() {
         description: "Vault created successfully",
       })
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Failed to create vault",

@@ -1,18 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowRight, Settings, TrendingUp, Download, Plus, MoreVertical, Bitcoin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
 export function VaultHero() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   return (
     <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-gray-100 dark:bg-gray-900/20">
       <div className="container px-4 md:px-6">

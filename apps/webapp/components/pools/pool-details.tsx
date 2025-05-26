@@ -8,21 +8,6 @@ interface PoolDetailsProps {
 }
 
 export function PoolDetails({ pool }: PoolDetailsProps) {
-  const getRiskColor = (risk: string) => {
-    switch (risk.toLowerCase()) {
-      case "bajo":
-        return "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300"
-      case "medio":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-300"
-      case "medio-alto":
-      case "medio alto":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-800/30 dark:text-orange-300"
-      case "alto":
-        return "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-300"
-    }
-  }
 
   return (
     <Card>

@@ -19,18 +19,18 @@ export function HeroSection() {
                 <Wallet className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold">¡Bienvenido de vuelta!</h1>
-                <p className="text-blue-100">Tu vault está generando rendimientos automáticamente</p>
+                <h1 className="text-3xl md:text-4xl font-bold">Welcome back!</h1>
+                <p className="text-blue-100">Your vault is automatically generating returns</p>
               </div>
             </div>
             <div className="flex items-center gap-4 mb-6">
               <Badge className="bg-green-500/20 text-green-100 border-green-400/30 gap-1">
                 <CheckCircle2 className="h-3 w-3" />
-                Vault Activa
+                Active Vault
               </Badge>
               <Badge className="bg-blue-500/20 text-blue-100 border-blue-400/30 gap-1">
                 <Activity className="h-3 w-3" />
-                Auto-Rebalanceando
+                Auto-Rebalancing
               </Badge>
             </div>
           </div>
@@ -38,7 +38,7 @@ export function HeroSection() {
             <Link href="/app/deposit">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 gap-2 shadow-lg">
                 <Upload className="h-5 w-5" />
-                Depositar
+                Deposit
               </Button>
             </Link>
             <Link href="/app/withdraw">
@@ -48,7 +48,7 @@ export function HeroSection() {
                 className="border-white/50 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10 gap-2"
               >
                 <Download className="h-5 w-5" />
-                Retirar
+                Withdraw
               </Button>
             </Link>
           </div>

@@ -11,11 +11,13 @@ export default function PerformanceChart() {
   const [timeframe, setTimeframe] = useState<number>(30)
   const data = generateHistoricalData(timeframe)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold mb-2">{`Day ${label}`}</p>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {`${entry.name}: ${entry.value.toFixed(4)} BTC`}

@@ -20,7 +20,6 @@ export const calculateForecast = (amount: number, days: number): ForecastData =>
   const vaultAPY = 0.078 // 7.8% APY
   const vesuAPY = 0.052 // 5.2% APY
   const ekuboAPY = 0.089 // 8.9% APY
-  const hodlAPY = 0 // 0% APY (just holding)
 
   const dailyVaultRate = vaultAPY / 365
   const dailyVesuRate = vesuAPY / 365

@@ -63,8 +63,9 @@ export default function DepositPage() {
       toast({
         title: "Error",
         description: "Hubo un problema al procesar tu depósito. Inténtalo de nuevo.",
-        variant: "destructive",
+        variant: "destructive",    
       })
+      console.error(error);
     } finally {
       setIsLoading(false)
     }
