@@ -24,13 +24,13 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Confirmación</CardTitle>
+        <CardTitle className="text-lg">Confirmation</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
           <Wallet className="h-4 w-4" />
           <AlertDescription>
-            Asegúrate de tener suficiente ETH en tu wallet para cubrir las comisiones de gas de la transacción.
+            Make sure you have enough ETH in your wallet to cover the gas fees of the transaction.
           </AlertDescription>
         </Alert>
 
@@ -38,8 +38,8 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Tu BTC será convertido automáticamente a WBTC para operar en protocolos DeFi. Esta conversión puede tomar
-              unos minutos adicionales.
+              Your BTC will be automatically converted to WBTC for operating in DeFi protocols. This conversion may take
+              additional minutes.
             </AlertDescription>
           </Alert>
         )}
@@ -52,8 +52,7 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
               onCheckedChange={(checked: boolean) => setConfirmTerms(checked as boolean)}
             />
             <label htmlFor="confirm-terms" className="text-sm leading-relaxed cursor-pointer">
-              Entiendo que mis fondos se depositarán en una vault automatizada que invierte en protocolos DeFi y que
-              existe riesgo de pérdida de capital.
+              I understand that my funds will be deposited in an automated vault that invests in DeFi protocols and that there is a risk of capital loss.
             </label>
           </div>
 
@@ -64,8 +63,7 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
               onCheckedChange={(checked: boolean) => setConfirmStrategy(checked as boolean)}
             />
             <label htmlFor="confirm-strategy" className="text-sm leading-relaxed cursor-pointer">
-              Acepto que la vault rebalanceará automáticamente mis fondos entre diferentes estrategias para optimizar
-              rendimientos.
+              I accept that the vault will automatically rebalance my funds between different strategies to optimize returns.
             </label>
           </div>
         </div>
@@ -75,12 +73,12 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Procesando Depósito...
+                Processing Deposit...
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4 mr-2" />
-                Confirmar Depósito
+                Confirm Deposit
               </>
             )}
           </Button>
@@ -88,25 +86,25 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
           <div className="flex gap-2">
             <Link href="/dashboard" className="flex-1">
               <Button variant="outline" className="w-full">
-                Cancelar
+                Cancel
               </Button>
             </Link>
             <Link href="/pools" className="flex-1">
               <Button variant="ghost" className="w-full">
-                Ver Pools
+                View Pools
               </Button>
             </Link>
           </div>
         </div>
 
         <div className="text-xs text-muted-foreground text-center">
-          ¿Tienes dudas?{" "}
+          Have questions?{" "}
           <Link href="/learn/defi-basics" className="text-blue-600 hover:underline">
-            Aprende sobre DeFi
+            Learn about DeFi
           </Link>{" "}
-          o{" "}
+          or{" "}
           <Link href="/support" className="text-blue-600 hover:underline">
-            contacta soporte
+            contact support
           </Link>
         </div>
       </CardContent>

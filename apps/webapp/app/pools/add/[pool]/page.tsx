@@ -15,61 +15,61 @@ import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-// Mock data - en una aplicación real esto vendría de una API
+// Mock data - in a real application this would come from an API
 const poolsData = {
   "ekubo-btc-usdc": {
     name: "Ekubo BTC/USDC",
     protocol: "Ekubo",
     apy: "4.8%",
     tvl: "$2.4M",
-    risk: "Medio",
+    risk: "Medium",
     tokens: ["BTC", "USDC"],
-    description: "Pool de liquidez BTC/USDC en Ekubo DEX con rebalanceo automático",
+    description: "BTC/USDC liquidity pool on Ekubo DEX with automatic rebalancing",
   },
   "vesu-btc-lending": {
     name: "Vesu BTC Lending",
     protocol: "Vesu",
     apy: "5.8%",
     tvl: "$3.7M",
-    risk: "Bajo",
+    risk: "Low",
     tokens: ["BTC"],
-    description: "Pool de préstamos de BTC en Vesu Finance con garantías colateralizadas",
+    description: "BTC lending pool on Vesu Finance with collateralized guarantees",
   },
   "ekubo-btc-eth": {
     name: "Ekubo BTC/ETH",
     protocol: "Ekubo",
     apy: "5.2%",
     tvl: "$1.8M",
-    risk: "Medio",
+    risk: "Medium",
     tokens: ["BTC", "ETH"],
-    description: "Pool de liquidez BTC/ETH en Ekubo DEX para trading entre criptomonedas principales",
+    description: "BTC/ETH liquidity pool on Ekubo DEX for trading between major cryptocurrencies",
   },
   "vesu-btc-vault": {
     name: "Vesu BTC Vault",
     protocol: "Vesu",
     apy: "4.5%",
     tvl: "$5.2M",
-    risk: "Bajo",
+    risk: "Low",
     tokens: ["BTC"],
-    description: "Vault automatizada de BTC en Vesu Finance con estrategias optimizadas",
+    description: "Automated BTC vault on Vesu Finance with optimized strategies",
   },
   "ekubo-btc-usdt": {
     name: "Ekubo BTC/USDT",
     protocol: "Ekubo",
     apy: "4.6%",
     tvl: "$1.2M",
-    risk: "Medio-Alto",
+    risk: "Medium-High",
     tokens: ["BTC", "USDT"],
-    description: "Pool de liquidez BTC/USDT en Ekubo DEX con alta volatilidad",
+    description: "BTC/USDT liquidity pool on Ekubo DEX with high volatility",
   },
   "ekubo-btc-dai": {
     name: "Ekubo BTC/DAI",
     protocol: "Ekubo",
     apy: "4.3%",
     tvl: "$0.9M",
-    risk: "Medio",
+    risk: "Medium",
     tokens: ["BTC", "DAI"],
-    description: "Pool de liquidez BTC/DAI en Ekubo DEX con stablecoin descentralizada",
+    description: "BTC/DAI liquidity pool on Ekubo DEX with decentralized stablecoin",
   },
 }
 
@@ -77,26 +77,26 @@ const vaultsData = [
   {
     id: "conservative",
     name: "Conservative Vault",
-    description: "Estrategia conservadora con bajo riesgo",
+    description: "Conservative strategy with low risk",
     currentValue: "0.845 BTC",
     apy: "6.8%",
-    risk: "Bajo",
+    risk: "Low",
   },
   {
     id: "balanced",
     name: "Balanced Vault",
-    description: "Estrategia equilibrada riesgo-rendimiento",
+    description: "Balanced risk-return strategy",
     currentValue: "1.245 BTC",
     apy: "9.2%",
-    risk: "Medio",
+    risk: "Medium",
   },
   {
     id: "aggressive",
     name: "Aggressive Vault",
-    description: "Estrategia agresiva para máximo rendimiento",
+    description: "Aggressive strategy for maximum returns",
     currentValue: "0.567 BTC",
     apy: "15.4%",
-    risk: "Alto",
+    risk: "High",
   },
 ]
 
@@ -115,9 +115,9 @@ export default function AddPoolToVaultPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Pool no encontrado</h1>
+          <h1 className="text-2xl font-bold mb-4">Pool not found</h1>
           <Link href="/pools">
-            <Button>Volver a Pools</Button>
+            <Button>Back to Pools</Button>
           </Link>
         </div>
       </div>
@@ -129,22 +129,22 @@ export default function AddPoolToVaultPage() {
 
     setIsLoading(true)
 
-    // Simular llamada a API
+    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     setIsLoading(false)
 
-    // Redirigir al vault después de añadir
+    // Redirect to vault after adding
     router.push(`/pools/vault/${selectedVault}`)
   }
 
   const getRiskColor = (risk: string) => {
     switch (risk.toLowerCase()) {
-      case "bajo":
+      case "low":
         return "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300"
-      case "medio":
+      case "medium":
         return "bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-300"
-      case "alto":
+      case "high":
         return "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-300"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-300"
@@ -161,8 +161,8 @@ export default function AddPoolToVaultPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold">Añadir Pool a Vault</h1>
-          <p className="text-muted-foreground">Configura la asignación del pool en tu vault</p>
+          <h1 className="text-3xl font-bold">Add Pool to Vault</h1>
+          <p className="text-muted-foreground">Configure the pool allocation in your vault</p>
         </div>
       </div>
 
@@ -173,7 +173,7 @@ export default function AddPoolToVaultPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Información del Pool
+                Pool Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -208,8 +208,8 @@ export default function AddPoolToVaultPage() {
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              Al añadir este pool a tu vault, se ejecutará automáticamente según la estrategia configurada. Puedes
-              modificar la asignación en cualquier momento.
+              When adding this pool to your vault, it will automatically execute according to the configured strategy. You can
+              modify the allocation at any time.
             </AlertDescription>
           </Alert>
         </div>
@@ -220,17 +220,17 @@ export default function AddPoolToVaultPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
-                Configuración
+                Configuration
               </CardTitle>
-              <CardDescription>Selecciona el vault y configura la asignación</CardDescription>
+              <CardDescription>Select the vault and configure the allocation</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Vault Selection */}
               <div className="space-y-2">
-                <Label htmlFor="vault">Seleccionar Vault</Label>
+                <Label htmlFor="vault">Select Vault</Label>
                 <Select value={selectedVault} onValueChange={setSelectedVault}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Elige un vault" />
+                    <SelectValue placeholder="Choose a vault" />
                   </SelectTrigger>
                   <SelectContent>
                     {vaultsData.map((vault) => (
@@ -249,7 +249,7 @@ export default function AddPoolToVaultPage() {
 
               {/* Amount Input */}
               <div className="space-y-2">
-                <Label htmlFor="amount">Cantidad a Asignar</Label>
+                <Label htmlFor="amount">Amount to Allocate</Label>
                 <div className="relative">
                   <Input
                     id="amount"
@@ -266,14 +266,14 @@ export default function AddPoolToVaultPage() {
               {/* Allocation Percentage */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="allocation">Porcentaje de Asignación</Label>
+                  <Label htmlFor="allocation">Allocation Percentage</Label>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Info className="h-4 w-4 text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Porcentaje del vault que se asignará a este pool</p>
+                        <p>Percentage of the vault that will be allocated to this pool</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -298,7 +298,7 @@ export default function AddPoolToVaultPage() {
               {/* Selected Vault Info */}
               {selectedVault && (
                 <div className="space-y-3">
-                  <Label>Vault Seleccionado</Label>
+                  <Label>Selected Vault</Label>
                   {(() => {
                     const vault = vaultsData.find((v) => v.id === selectedVault)
                     return vault ? (
@@ -309,7 +309,7 @@ export default function AddPoolToVaultPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Valor Actual:</span>
+                            <span className="text-muted-foreground">Current Value:</span>
                             <p className="font-medium">{vault.currentValue}</p>
                           </div>
                           <div>
@@ -327,19 +327,19 @@ export default function AddPoolToVaultPage() {
               <div className="flex gap-3 pt-4">
                 <Link href="/pools" className="flex-1">
                   <Button variant="outline" className="w-full">
-                    Cancelar
+                    Cancel
                   </Button>
                 </Link>
                 <Button onClick={handleAddToVault} disabled={!selectedVault || !amount || isLoading} className="flex-1">
                   {isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Añadiendo...
+                      Adding...
                     </>
                   ) : (
                     <>
                       <Plus className="h-4 w-4 mr-2" />
-                      Añadir a Vault
+                      Add to Vault
                     </>
                   )}
                 </Button>

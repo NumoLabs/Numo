@@ -26,9 +26,9 @@ export default async function PoolDetailPage({
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Pool no encontrado</h1>
+          <h1 className="text-2xl font-bold mb-4">Pool not found</h1>
           <Link href="/pools">
-            <Button>Volver a Pools</Button>
+            <Button>Back to Pools</Button>
           </Link>
         </div>
       </div>
@@ -37,14 +37,13 @@ export default async function PoolDetailPage({
 
   const getRiskColor = (risk: string) => {
     switch (risk.toLowerCase()) {
-      case "bajo":
+      case "low":
         return "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300"
-      case "medio":
+      case "medium":
         return "bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-300"
-      case "medio-alto":
-      case "medio alto":
+      case "medium-high":
         return "bg-orange-100 text-orange-800 dark:bg-orange-800/30 dark:text-orange-300"
-      case "alto":
+      case "high":
         return "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-300"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-300"
@@ -60,7 +59,7 @@ export default async function PoolDetailPage({
             <Link href="/pools">
               <Button variant="ghost" size="sm" className="gap-1">
                 <ArrowLeft className="h-4 w-4" />
-                Volver a Pools
+                Back to Pools
               </Button>
             </Link>
           </div>
@@ -79,12 +78,12 @@ export default async function PoolDetailPage({
                         <Link href={pool.url} target="_blank">
                           <Button variant="outline" size="sm" className="gap-1">
                             <ExternalLink className="h-4 w-4" />
-                            Sitio Web
+                            Website
                           </Button>
                         </Link>
                       )}
                       <Link href={`/pools/add/${resolvedParams.pool}`}>
-                        <Button size="sm">Añadir a Vault</Button>
+                        <Button size="sm">Add to Vault</Button>
                       </Link>
                     </div>
                   </div>
@@ -102,9 +101,9 @@ export default async function PoolDetailPage({
 
               <Tabs defaultValue="overview" className="space-y-4">
                 <TabsList>
-                  <TabsTrigger value="overview">Resumen</TabsTrigger>
-                  <TabsTrigger value="performance">Rendimiento</TabsTrigger>
-                  <TabsTrigger value="risks">Riesgos</TabsTrigger>
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="performance">Performance</TabsTrigger>
+                  <TabsTrigger value="risks">Risks</TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="space-y-4">
                   <PoolDetails pool={pool} />
@@ -112,7 +111,7 @@ export default async function PoolDetailPage({
                 <TabsContent value="performance" className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <h2 className="text-xl font-bold">Rendimiento Histórico</h2>
+                      <h2 className="text-xl font-bold">Historical Performance</h2>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[300px]">
@@ -134,7 +133,7 @@ export default async function PoolDetailPage({
 
               <Card>
                 <CardHeader>
-                  <h3 className="text-lg font-semibold">Pools Similares</h3>
+                  <h3 className="text-lg font-semibold">Similar Pools</h3>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Link href="/pools/ekubo-btc-eth" className="block">
@@ -143,7 +142,7 @@ export default async function PoolDetailPage({
                         <span className="font-medium">Ekubo BTC/ETH</span>
                         <Badge variant="outline">5.2% APY</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">Pool de liquidez BTC/ETH en Ekubo DEX</p>
+                      <p className="text-xs text-muted-foreground">BTC/ETH liquidity pool on Ekubo DEX</p>
                     </div>
                   </Link>
                   <Link href="/pools/ekubo-btc-usdt" className="block">
@@ -152,7 +151,7 @@ export default async function PoolDetailPage({
                         <span className="font-medium">Ekubo BTC/USDT</span>
                         <Badge variant="outline">4.6% APY</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">Pool de liquidez BTC/USDT en Ekubo DEX</p>
+                      <p className="text-xs text-muted-foreground">BTC/USDT liquidity pool on Ekubo DEX</p>
                     </div>
                   </Link>
                   <Link href="/pools/vesu-btc-lending" className="block">
@@ -161,7 +160,7 @@ export default async function PoolDetailPage({
                         <span className="font-medium">Vesu BTC Lending</span>
                         <Badge variant="outline">5.8% APY</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">Préstamos de BTC en la plataforma Vesu</p>
+                      <p className="text-xs text-muted-foreground">BTC lending on Vesu platform</p>
                     </div>
                   </Link>
                 </CardContent>

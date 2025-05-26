@@ -38,7 +38,7 @@ export function VaultInfoCard({ vaultInfo }: VaultInfoCardProps) {
           <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
             <Target className="h-5 w-5 text-white" />
           </div>
-          Información de la Vault
+          Information about the Vault
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -47,7 +47,7 @@ export function VaultInfoCard({ vaultInfo }: VaultInfoCardProps) {
           <div className="text-center p-3 bg-white/50 dark:bg-gray-900/50 rounded-lg">
             <div className="flex items-center justify-center gap-1 mb-1">
               <TrendingUp className="h-4 w-4 text-green-600" />
-              <p className="text-xs text-muted-foreground">APY Actual</p>
+              <p className="text-xs text-muted-foreground">Current APY</p>
             </div>
             <p className="text-2xl font-bold text-green-600">{vaultInfo.currentAPY}</p>
           </div>
@@ -55,7 +55,7 @@ export function VaultInfoCard({ vaultInfo }: VaultInfoCardProps) {
           <div className="text-center p-3 bg-white/50 dark:bg-gray-900/50 rounded-lg">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Shield className="h-4 w-4 text-blue-600" />
-              <p className="text-xs text-muted-foreground">TVL Total</p>
+              <p className="text-xs text-muted-foreground">Total TVL</p>
             </div>
             <p className="text-2xl font-bold text-blue-600">{vaultInfo.totalTVL}</p>
           </div>
@@ -66,7 +66,7 @@ export function VaultInfoCard({ vaultInfo }: VaultInfoCardProps) {
         {/* Strategy Information */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-semibold">Estrategia Actual</h4>
+            <h4 className="font-semibold">Current Strategy</h4>
             <Badge className={getRiskColor(vaultInfo.riskLevel)}>{vaultInfo.riskLevel}</Badge>
           </div>
 
@@ -94,16 +94,16 @@ export function VaultInfoCard({ vaultInfo }: VaultInfoCardProps) {
         {/* Additional Info */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Depósito mínimo</span>
+            <span className="text-muted-foreground">Minimum Deposit</span>
             <span className="font-medium">{vaultInfo.minimumDeposit}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Comisión de gestión</span>
-            <span className="font-medium">0.5% anual</span>
+            <span className="text-muted-foreground">Management Fee</span>
+            <span className="font-medium">0.5% annual</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Rebalanceo</span>
-            <span className="font-medium">Automático</span>
+            <span className="text-muted-foreground">Rebalancing</span>
+            <span className="font-medium">Automatic</span>
           </div>
         </div>
 
@@ -111,10 +111,9 @@ export function VaultInfoCard({ vaultInfo }: VaultInfoCardProps) {
           <div className="flex items-start gap-2">
             <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">¿Cómo funciona?</p>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">How it works</p>
               <p className="text-xs text-blue-800 dark:text-blue-200">
-                Tu depósito se distribuirá automáticamente según la estrategia actual. La vault rebalancea
-                automáticamente para maximizar rendimientos.
+                Your deposit will be automatically distributed according to the current strategy. The vault automatically rebalances to maximize returns.
               </p>
             </div>
           </div>

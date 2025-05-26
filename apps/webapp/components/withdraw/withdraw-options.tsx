@@ -38,9 +38,9 @@ export function WithdrawOptions({ options, selectedOption, onSelectOption }: Wit
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Opciones de Retiro</h3>
+        <h3 className="text-lg font-semibold mb-2">Withdrawal Options</h3>
         <p className="text-sm text-muted-foreground">
-          Selecciona el tipo de retiro que mejor se adapte a tus necesidades
+          Select the withdrawal type that best suits your needs
         </p>
       </div>
 
@@ -62,40 +62,40 @@ export function WithdrawOptions({ options, selectedOption, onSelectOption }: Wit
                 </div>
                 <div className="flex items-center gap-2">
                   {selectedOption === option.id && <CheckCircle className="h-5 w-5 text-blue-500" />}
-                  {!option.available && <Badge variant="secondary">Próximamente</Badge>}
+                  {!option.available && <Badge variant="secondary">Coming Soon</Badge>}
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Tiempo</p>
+                  <p className="text-muted-foreground">Time</p>
                   <p className="font-medium">{option.estimatedTime}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Comisión</p>
+                  <p className="text-muted-foreground">Fee</p>
                   <p className="font-medium">{option.fees}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Gas estimado</p>
+                  <p className="text-muted-foreground">Estimated gas</p>
                   <p className="font-medium">{option.gasEstimate}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Mínimo</p>
+                  <p className="text-muted-foreground">Minimum</p>
                   <p className="font-medium">{option.minAmount}</p>
                 </div>
               </div>
               {option.id === "instant" && (
                 <div className="mt-3 p-2 bg-orange-50 dark:bg-orange-950/20 rounded border border-orange-200 dark:border-orange-800">
                   <p className="text-xs text-orange-700 dark:text-orange-300">
-                    ⚡ Retiro inmediato con comisión adicional por prioridad
+                    ⚡ Immediate withdrawal with additional priority fee
                   </p>
                 </div>
               )}
               {option.id === "standard" && (
                 <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
                   <p className="text-xs text-blue-700 dark:text-blue-300">
-                    ⭐ Opción recomendada - Balance entre velocidad y costo
+                    ⭐ Recommended option - Balance between speed and cost
                   </p>
                 </div>
               )}

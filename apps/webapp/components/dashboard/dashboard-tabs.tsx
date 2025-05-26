@@ -19,25 +19,25 @@ export function DashboardTabs() {
         <TabsList className="grid w-full md:w-auto grid-cols-3 h-12">
           <TabsTrigger value="overview" className="gap-2">
             <PieChart className="h-4 w-4" />
-            Resumen
+            Overview
           </TabsTrigger>
           <TabsTrigger value="analytics" className="gap-2">
             <BarChart3 className="h-4 w-4" />
-            Analítica
+            Analytics
           </TabsTrigger>
           <TabsTrigger value="transactions" className="gap-2">
             <Activity className="h-4 w-4" />
-            Transacciones
+            Transactions
           </TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="gap-2">
             <RefreshCw className="h-4 w-4" />
-            Actualizar
+            Refresh
           </Button>
           <Button variant="outline" size="sm" className="gap-2">
             <Settings className="h-4 w-4" />
-            Configurar
+            Configure
           </Button>
         </div>
       </div>
@@ -54,14 +54,14 @@ export function DashboardTabs() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <LineChart className="h-5 w-5 text-blue-500" />
-                    Rendimiento Histórico
+                    Historical Performance
                   </CardTitle>
-                  <CardDescription>Evolución de tu inversión en los últimos meses</CardDescription>
+                  <CardDescription>Evolution of your investment over the last months</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="gap-1">
                     <TrendingUp className="h-3 w-3" />
-                    Tendencia alcista
+                    Upward trend
                   </Badge>
                 </div>
               </div>
@@ -88,15 +88,15 @@ export function DashboardTabs() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <LineChart className="h-5 w-5 text-orange-500" />
-                Rendimiento por Estrategia
+                Strategy Performance
               </CardTitle>
-              <CardDescription>Comparación de rendimientos entre Ekubo y Vesu</CardDescription>
+              <CardDescription>Performance comparison between Ekubo and Vesu</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px] flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                 <div className="text-center">
                   <BarChart3 className="h-12 w-12 text-orange-500 mx-auto mb-2" />
-                  <p className="text-muted-foreground">Gráfico de rendimiento por estrategia</p>
+                  <p className="text-muted-foreground">Strategy performance chart</p>
                   <p className="text-sm text-muted-foreground">(Ekubo vs Vesu)</p>
                 </div>
               </div>
@@ -107,16 +107,16 @@ export function DashboardTabs() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-500" />
-                Historial de APY
+                APY History
               </CardTitle>
-              <CardDescription>Evolución del APY a lo largo del tiempo</CardDescription>
+              <CardDescription>APY evolution over time</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px] flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border border-green-200 dark:border-green-800">
                 <div className="text-center">
                   <LineChart className="h-12 w-12 text-green-500 mx-auto mb-2" />
-                  <p className="text-muted-foreground">Gráfico de APY histórico</p>
-                  <p className="text-sm text-muted-foreground">(Últimos 6 meses)</p>
+                  <p className="text-muted-foreground">Historical APY chart</p>
+                  <p className="text-sm text-muted-foreground">(Last 6 months)</p>
                 </div>
               </div>
             </CardContent>
@@ -134,14 +134,14 @@ export function DashboardTabs() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-blue-500" />
-                  Historial de Transacciones
+                  Transaction History
                 </CardTitle>
-                <CardDescription>Historial completo de depósitos, retiros y rebalanceos</CardDescription>
+                <CardDescription>Complete history of deposits, withdrawals, and rebalancing</CardDescription>
               </div>
               <Link href="/app/history">
                 <Button className="gap-2">
                   <Eye className="h-4 w-4" />
-                  Ver Historial Completo
+                  View Full History
                 </Button>
               </Link>
             </div>

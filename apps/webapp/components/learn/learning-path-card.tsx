@@ -49,7 +49,7 @@ export function LearningPathCard({
           ))}
         </ul>
         <Button className="w-full mt-4" size="sm" variant={isDisabled ? "outline" : "default"} disabled={isDisabled}>
-          {isDisabled ? "Próximamente" : "Comenzar"}
+          {isDisabled ? "Coming Soon" : "Start"}
         </Button>
       </CardContent>
     </Card>

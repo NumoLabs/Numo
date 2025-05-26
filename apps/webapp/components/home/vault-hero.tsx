@@ -14,20 +14,20 @@ export function VaultHero() {
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">Numo</h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Maximiza tu rendimiento en BTC sin complicaciones. Deposita BTC y deja que nuestra vault encuentre
-                automáticamente la mejor estrategia.
+                Maximize your BTC returns without complications. Deposit BTC and let our vault automatically find
+                the best strategy.
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Link href="/app">
                 <Button size="lg" className="gap-1">
-                  Comenzar ahora
+                  Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="#features">
                 <Button size="lg" variant="outline">
-                  Cómo funciona
+                  How it Works
                 </Button>
               </Link>
             </div>
@@ -76,7 +76,7 @@ export function VaultHero() {
                 {/* Vault value */}
                 <div className="px-5 pt-4">
                   <div className="text-gray-400 text-sm flex items-center">
-                    Valor total de la vault
+                    Total Vault Value
                     <div className="w-4 h-4 ml-1 rounded-full border border-gray-400 flex items-center justify-center">
                       <span className="text-xs">i</span>
                     </div>
@@ -95,11 +95,11 @@ export function VaultHero() {
                 <div className="flex px-5 mt-6 space-x-3">
                   <button className="flex-1 bg-gray-800 rounded-full py-3 flex items-center justify-center">
                     <Plus className="w-5 h-5 mr-2" />
-                    <span>Depositar</span>
+                    <span>Deposit</span>
                   </button>
                   <button className="flex-1 bg-gray-800 rounded-full py-3 flex items-center justify-center">
                     <Download className="w-5 h-5 mr-2" />
-                    <span>Retirar</span>
+                    <span>Withdraw</span>
                   </button>
                   <button className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
                     <MoreVertical className="w-5 h-5" />
@@ -108,8 +108,8 @@ export function VaultHero() {
 
                 {/* Tabs */}
                 <div className="flex border-b border-gray-800 mt-6">
-                  <button className="flex-1 text-center py-3 border-b-2 border-white font-medium">Estrategias</button>
-                  <button className="flex-1 text-center py-3 text-gray-500">Historial</button>
+                  <button className="flex-1 text-center py-3 border-b-2 border-white font-medium">Strategies</button>
+                  <button className="flex-1 text-center py-3 text-gray-500">History</button>
                 </div>
 
                 {/* Strategies list */}
@@ -135,7 +135,7 @@ export function VaultHero() {
                       ></div>
                     </div>
                     <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <div>Asignación: 65%</div>
+                      <div>Allocation: 65%</div>
                       <div>APY: 12.4%</div>
                     </div>
                   </div>
@@ -166,14 +166,14 @@ export function VaultHero() {
                       ></div>
                     </div>
                     <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <div>Asignación: 35%</div>
+                      <div>Allocation: 35%</div>
                       <div>APY: 8.7%</div>
                     </div>
                   </div>
 
                   <button className="w-full py-3 border border-dashed border-gray-700 rounded-lg text-gray-400 mt-2 flex items-center justify-center">
                     <Plus className="w-4 h-4 mr-2" />
-                    Añadir nueva estrategia
+                    Add New Strategy
                   </button>
                 </div>
               </div>

@@ -66,16 +66,16 @@ export const vaultInfo: VaultInfo = {
     { name: "Ekubo BTC/USDC", allocation: 70, apy: "4.8%" },
     { name: "Vesu BTC Lending", allocation: 30, apy: "5.8%" },
   ],
-  riskLevel: "Bajo-Medio",
+  riskLevel: "Low-Medium",
   minimumDeposit: "0.001 BTC",
 }
 
 export const depositOptions: DepositOption[] = [
   {
     id: "standard",
-    name: "Depósito Estándar",
-    description: "Depósito optimizado con confirmación rápida",
-    estimatedTime: "~5 minutos",
+    name: "Standard Deposit",
+    description: "Optimized deposit with quick confirmation",
+    estimatedTime: "~5 minutes",
     gasEstimate: "~0.0002 ETH",
     minAmount: "0.001 BTC",
     maxAmount: "10 BTC",
@@ -85,9 +85,9 @@ export const depositOptions: DepositOption[] = [
   },
   {
     id: "priority",
-    name: "Depósito Prioritario",
-    description: "Depósito con prioridad alta para confirmación inmediata",
-    estimatedTime: "~2 minutos",
+    name: "Priority Deposit",
+    description: "High-priority deposit for immediate confirmation",
+    estimatedTime: "~2 minutes",
     gasEstimate: "~0.0004 ETH",
     minAmount: "0.001 BTC",
     maxAmount: "10 BTC",
@@ -96,9 +96,9 @@ export const depositOptions: DepositOption[] = [
   },
   {
     id: "scheduled",
-    name: "Depósito Programado",
-    description: "Programa tu depósito para optimizar costos de gas",
-    estimatedTime: "1-24 horas",
+    name: "Scheduled Deposit",
+    description: "Schedule your deposit to optimize gas costs",
+    estimatedTime: "1-24 hours",
     gasEstimate: "~0.0001 ETH",
     minAmount: "0.01 BTC",
     maxAmount: "10 BTC",
