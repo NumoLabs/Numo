@@ -116,6 +116,33 @@ export function Header({ variant = "auto" }: HeaderProps) {
                   Custom Pools
                 </Link>
                 <Link 
+                  href="/bonds" 
+                  className={cn(
+                    "hover:text-foreground",
+                    pathname === "/bonds" ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  Bonds
+                </Link>
+                <Link 
+                  href="/forecast" 
+                  className={cn(
+                    "hover:text-foreground",
+                    pathname === "/forecast" ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  Forecast
+                </Link>
+                <Link 
+                  href="/marketplace" 
+                  className={cn(
+                    "hover:text-foreground",
+                    pathname === "/marketplace" ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  Marketplace
+                </Link>
+                <Link 
                   href="/learn" 
                   className={cn(
                     "hover:text-foreground",
@@ -184,6 +211,33 @@ export function Header({ variant = "auto" }: HeaderProps) {
               )}
             >
               Pools
+            </Link>
+            <Link 
+              href="/bonds" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/bonds" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Bonds
+            </Link>
+            <Link 
+              href="/forecast" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/forecast" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Forecast
+            </Link>
+            <Link 
+              href="/marketplace" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/marketplace" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Marketplace
             </Link>
             <Link 
               href="/learn" 
