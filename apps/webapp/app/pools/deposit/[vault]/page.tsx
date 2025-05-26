@@ -66,8 +66,15 @@ const getVaultData = (vaultSlug: string): VaultData => {
   return vaults[vaultSlug] || vaults["btc-conservative"]
 }
 
-export default function VaultDepositPage({ params }: { params: { vault: string } }) {
-  const vaultData = getVaultData(params.vault)
+type Props = {
+  params: Promise<{ vault: string }>
+}
+
+export default async function VaultDepositPage({
+  params,
+}: Props) {
+  const resolvedParams = await params
+  const vaultData = getVaultData(resolvedParams.vault)
 
   const getRiskColor = (risk: string) => {
     switch (risk.toLowerCase()) {
@@ -230,7 +237,7 @@ export default function VaultDepositPage({ params }: { params: { vault: string }
                       Cancelar
                     </Button>
                   </Link>
-                  <Link href={`/pools/vault/${params.vault}`} className="flex-1">
+                  <Link href={`/pools/vault/${resolvedParams.vault}`} className="flex-1">
                     <Button variant="ghost" className="w-full">
                       Ver Detalles
                     </Button>

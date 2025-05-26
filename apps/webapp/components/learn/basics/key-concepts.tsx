@@ -60,7 +60,7 @@ export function KeyConcepts() {
       </CardHeader>
       <CardContent>
         <div className="grid md:grid-cols-2 gap-6">
-          {concepts.map((concept, index) => (
+          {concepts.map((concept) => (
             <div key={concept.title} className={`${concept.bgColor} rounded-lg p-4 border ${concept.borderColor}`}>
               <div className="flex items-center gap-3 mb-3">
                 <div className={`h-8 w-8 rounded-full ${concept.iconBg} flex items-center justify-center`}>

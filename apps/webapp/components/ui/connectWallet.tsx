@@ -2,9 +2,7 @@
 'use client';
 import {
 	ARGENT_WEBWALLET_URL,
-	getProvider,
 	getChainId,
-	getNodeUrl,
 } from '@/constants';
 import { walletStarknetkitLatestAtom } from '@/app/state/connectedWallet';
 import { useAtom } from 'jotai';
@@ -17,8 +15,6 @@ export default function WalletConnector() {
 	const handleConnect = async () => {
 		try {
 			const chainId = getChainId();
-			const nodeUrl = getNodeUrl();
-			const provider = getProvider(nodeUrl !== undefined ? nodeUrl : '');
 			const { wallet: connectedWallet } = await connect({
 				modalMode: 'alwaysAsk',
 				webWalletUrl: ARGENT_WEBWALLET_URL,
@@ -53,6 +49,7 @@ export default function WalletConnector() {
 			{wallet ? (
 				<div className="flex items-center gap-4">
 					<span className="text-sm font-medium text-gray-200">
+						{/* @ts-expect-error - Starknet wallet type definition is incomplete */}
 						{wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
 					</span>
 					<Button 

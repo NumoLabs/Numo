@@ -53,6 +53,7 @@ export default function WithdrawPage() {
       // Redirect to history
       router.push('/history')
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Hubo un problema al procesar tu retiro. Inténtalo de nuevo.",

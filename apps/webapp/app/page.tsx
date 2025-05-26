@@ -1,7 +1,3 @@
-import Link from "next/link"
-import { ArrowRight, Clock, Plus, Search, Shield } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
 import { VaultStats } from "@/components/home/vault-stats"
 import { VaultHero } from "@/components/home/vault-hero"
 import { VaultFeatures } from "@/components/home/vault-features"

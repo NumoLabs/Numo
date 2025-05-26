@@ -12,8 +12,8 @@ import { historyStats } from "@/lib/history-data"
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedType, setSelectedType] = useState("all")
-  const [selectedPeriod, setSelectedPeriod] = useState("all")
+  const [, setSelectedType] = useState("all")
+  const [, setSelectedPeriod] = useState("all")
 
   return (
     <div className="flex min-h-screen flex-col">

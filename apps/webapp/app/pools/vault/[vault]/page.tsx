@@ -6,16 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Header } from "@/components/header"
-import { PoolDetailChart } from "@/components/pool-detail-chart"
+import { Header } from "@/components/ui/header"
+import { PoolDetailChart } from "@/components/pools/pool-detail-chart"
 
-export default function VaultDetailPage({ params }: { params: { vault: string } }) {
+type Props = {
+  params: Promise<{ vault: string }>
+}
+
+export default async function VaultDetailPage({
+  params,
+}: Props) {
+  const resolvedParams = await params
   // In a real application, we would get vault data from an API
   // Here we use example data based on the URL parameter
-  const vaultName = params.vault
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
 
   // Example data for a custom vault
   const vaultData = {
@@ -56,13 +59,13 @@ export default function VaultDetailPage({ params }: { params: { vault: string } 
                       <CardDescription className="text-base">{vaultData.description}</CardDescription>
                     </div>
                     <div className="flex gap-2">
-                      <Link href={`/pools/edit/${params.vault}`}>
+                      <Link href={`/pools/edit/${resolvedParams.vault}`}>
                         <Button variant="outline" size="sm" className="gap-1">
                           <Edit className="h-4 w-4" />
                           Edit
                         </Button>
                       </Link>
-                      <Link href={`/pools/deposit/${params.vault}`}>
+                      <Link href={`/pools/deposit/${resolvedParams.vault}`}>
                         <Button size="sm">Deposit</Button>
                       </Link>
                     </div>
@@ -216,15 +219,15 @@ export default function VaultDetailPage({ params }: { params: { vault: string } 
                   <CardTitle>Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Link href={`/pools/deposit/${params.vault}`}>
+                  <Link href={`/pools/deposit/${resolvedParams.vault}`}>
                     <Button className="w-full">Deposit</Button>
                   </Link>
-                  <Link href={`/pools/withdraw/${params.vault}`}>
+                  <Link href={`/pools/withdraw/${resolvedParams.vault}`}>
                     <Button variant="outline" className="w-full">
                       Withdraw
                     </Button>
                   </Link>
-                  <Link href={`/pools/edit/${params.vault}`}>
+                  <Link href={`/pools/edit/${resolvedParams.vault}`}>
                     <Button variant="outline" className="w-full">
                       Edit Vault
                     </Button>

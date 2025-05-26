@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 import WalletConnector from "@/components/ui/connectWallet"
 import { Button } from "@/components/ui/button"
 

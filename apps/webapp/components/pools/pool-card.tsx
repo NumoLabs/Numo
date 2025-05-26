@@ -52,7 +52,7 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">
-                  Haz clic en "Ver Detalles" para obtener más información sobre este pool, incluyendo riesgos,
+                  Click on &quot;View Details&quot; to get more information about this pool, including risks,
                   estrategias y rendimiento histórico.
                 </p>
               </TooltipContent>

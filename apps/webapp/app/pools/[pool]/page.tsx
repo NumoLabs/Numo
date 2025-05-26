@@ -12,8 +12,15 @@ import { PoolRisks } from "@/components/pools/pool-risks"
 import { AddToVaultActions } from "@/components/pools/vault-actions"
 import { getPoolBySlug } from "@/lib/pools-data"
 
-export default function PoolDetailPage({ params }: { params: { pool: string } }) {
-  const pool = getPoolBySlug(params.pool)
+type Props = {
+  params: Promise<{ pool: string }>
+}
+
+export default async function PoolDetailPage({
+  params,
+}: Props) {
+  const resolvedParams = await params
+  const pool = await getPoolBySlug(resolvedParams.pool)
 
   if (!pool) {
     return (
@@ -76,7 +83,7 @@ export default function PoolDetailPage({ params }: { params: { pool: string } })
                           </Button>
                         </Link>
                       )}
-                      <Link href={`/pools/add/${params.pool}`}>
+                      <Link href={`/pools/add/${resolvedParams.pool}`}>
                         <Button size="sm">Añadir a Vault</Button>
                       </Link>
                     </div>
@@ -122,7 +129,7 @@ export default function PoolDetailPage({ params }: { params: { pool: string } })
             </div>
 
             <div className="space-y-6">
-              <AddToVaultActions poolSlug={params.pool} />
+              <AddToVaultActions poolSlug={resolvedParams.pool} />
               <PoolStatistics pool={pool} />
 
               <Card>
