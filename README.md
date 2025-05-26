@@ -1,143 +1,146 @@
-# Numo - Starknet BTC Yield Vault
+# Numo – Modular BTC Finance on Starknet
 
-Numo es una aplicación DeFi sobre Starknet que permite a los usuarios depositar BTC (o WBTC) y obtener rendimiento (“yield”) sin gestionar manualmente su estrategia. La vault mueve automáticamente los fondos entre plataformas DeFi como Vesu y Ekubo, buscando siempre el mejor APY disponible. Todo el yield se mantiene en BTC/WBTC, cumpliendo con los criterios del BTCfi Season Track.
+**Numo** is a modular DeFi platform built on Starknet that helps users grow their BTC (WBTC) safely, automatically, and transparently. Numo offers a full BTC-first experience, including auto-rebalancing vaults, fixed-term bonds, strategy sharing, forecasting tools, and an integrated DeFi learning section.
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
-### 🏦 Vault BTC/WBTC
-- Depósito y retiro flexible de WBTC
-- Exposición 100% en BTC/WBTC
-- Yield siempre denominado en BTC/WBTC
+### 🏦 BTC Savings+ (Auto-Rebalancing Vault)
 
-### 🤖 Estrategia Automática y Manual
-- **Modo Automático:** El contrato selecciona la mejor estrategia según datos de Pragma (APY, volatilidad, etc.)
-- **Modo Manual:** El usuario elige en qué pool participar (Ekubo BTC/USDC, vaults de Vesu, etc.)
-- **Modo Híbrido:** Distribución personalizada y rebalanceo automático solo entre pools seleccionados
+* Deposit and withdraw WBTC flexibly
+* 100% BTC/WBTC exposure
+* Yield always denominated in WBTC
+* `rbBTC` token as proof of participation
 
-### 🔄 Rebalanceo Inteligente
-- Basado en condiciones de mercado y umbrales de APY
-- Optimización para minimizar costos y slippage
-- Conversión automática de recompensas a WBTC
+### 🔐 BTC Bonds
 
-### 📊 Dashboard y UX
-- Visualización de APY, pools y estrategias
-- Opciones sugeridas: "Mayor rendimiento", "Menor riesgo"
-- Interfaz simple y amigable para cualquier usuario
+* Lock BTC for 7, 30, or 90 days
+* Earn extra yield based on lock duration
+* Ideal for long-term BTC holders
 
-## 🏗 Stack Tecnológico
+### 🧠 Strategy Modes
 
-- **Frontend:** Next.js 14 (App Router)
-- **Smart Contracts:** Cairo (StarkNet)
-- **Oráculos:** Pragma
-- **DeFi Integración:** Vesu, Ekubo
-- **Estilos:** Tailwind CSS & shadcn/ui
-- **Animaciones:** Framer Motion
-- **Build:** Bun
+* **Auto Mode**: Contract selects the best pool using Pragma (APY, volatility)
+* **Manual Mode**: User chooses between Ekubo, Vesu, or custom pools
+* **Hybrid Mode**: Custom allocation + rebalance only within selected strategies
 
-## 📂 Estructura del Proyecto
+### 📈 Vault Marketplace
+
+* Discover and follow community-created vault strategies
+* Each strategy shows its risk level, APY, and composition
+* Users can publish and track performance of their own strategies
+
+### 📊 Forecasting & Insights
+
+* Simulate gains based on amount and time
+* Compare performance: vault vs. hodling vs. single protocol
+* Visual charts and yield estimators
+
+### 📚 Learn DeFi
+
+* Educational section built into the app
+* Helps users understand vaults, liquidity, risk, and key DeFi concepts
+* Designed to onboard non-technical users
+
+### 🧠 Intelligent Rebalancing
+
+* Based on market conditions, TWAPs, and APY thresholds
+* Optimized to reduce costs and slippage
+* Rewards are auto-converted to WBTC
+
+## 🏗 Tech Stack
+
+* **Frontend:** Next.js 14 (App Router)
+* **Smart Contracts:** Cairo (Starknet)
+* **Oracles:** Pragma
+* **DeFi Integration:** Vesu, Ekubo
+* **Styling:** Tailwind CSS & shadcn/ui
+* **Build Tool:** Bun
+
+## 📂 Project Structure
 
 ```
 Numo/
 ├── apps/
 │   ├── webapp/
-│   │   ├── app/            # Páginas App Router, layout, estado global, estilos
-│   │   ├── components/     # Componentes React (ui/, home/, test/)
-│   │   ├── constants/      # Constantes globales
-│   │   ├── lib/            # Utilidades, helpers, cache, mock-data, schemas
-│   │   ├── types/          # Tipos TypeScript compartidos
-│   │   └── public/         # Assets estáticos
+│   │   ├── app/            # App Router pages, layout, global state, styles
+│   │   ├── components/     # React components (ui/, vault/, bonds/, etc.)
+│   │   ├── constants/      # Global constants
+│   │   ├── lib/            # Utilities, helpers, cache, mock-data, schemas
+│   │   ├── types/          # Shared TypeScript types
+│   │   └── public/         # Static assets
 │   └── contracts/
-│       ├── src/            # Código fuente Cairo
-│       ├── tests/          # Pruebas de contratos
-│       ├── Scarb.toml      # Configuración de Scarb
-│       └── snfoundry.toml  # Configuración de pruebas
+│       ├── src/            # Cairo smart contracts
+│       ├── tests/          # Contract unit tests
+│       ├── Scarb.toml      # Scarb config
+│       └── snfoundry.toml  # Testing config
 ├── package.json
 ├── bun.lock
 ├── tsconfig.json
 └── README.md
 ```
 
-## 🏃 Comenzando
+## 🏃 Getting Started
 
-### Prerrequisitos
+### Prerequisites
 
-- Node.js (v18 o superior)
-- Bun
-- Git
+* Node.js (v18+)
+* Bun
+* Git
 
-### Instalación
+### Installation
 
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/your-username/numo.git
-   cd numo
-   ```
+1. Clone the repository:
 
-2. Instalar dependencias:
-   ```bash
-   bun install
-   ```
+```bash
+git clone https://github.com/your-username/numo.git
+cd numo
+```
 
-3. Configurar variables de entorno:
-   ```bash
-   cp .env.sample .env.local
-   ```
+2. Install dependencies:
 
-4. Iniciar servidor de desarrollo:
-   ```bash
-   bun dev
-   ```
+```bash
+bun install
+```
 
-## 💡 Casos de Uso
+3. Start the development server:
 
-### Vault BTC Yield
-- Usuarios que buscan rendimiento en BTC sin gestionar estrategias
-- Delegación total o parcial de la estrategia de yield
-- Retiro flexible y transparente
+```bash
+cd apps/webapp && bun dev
+```
 
-### Estrategia Personalizada
-- Usuarios avanzados que desean elegir pools y definir rebalanceo
-- Combinación de pools Ekubo y Vesu según preferencia
+## 💡 Use Cases
 
-## 🔒 Seguridad
+### BTC Yield Vault
 
-- Contratos auditados y open source
-- Validación de direcciones y depósitos
-- Protección contra ataques comunes DeFi
-- Uso de oráculos robustos para decisiones de rebalanceo
+* For BTC holders who want passive yield without managing strategies
+* Trustless rebalancing and exposure control
+* Withdraw at any time
 
-## 📊 Comparativa de Características
+### Custom Strategies
 
-| Característica           | Vault Tradicional | DeFi Manual | Numo Vault |
-|-------------------------|-------------------|-------------|------------|
-| Yield en BTC/WBTC       | ❌                | ⚠️          | ✅         |
-| Estrategia Automática   | ❌                | ❌          | ✅         |
-| Rebalanceo Inteligente  | ❌                | ❌          | ✅         |
-| Integración Multi-Prot. | ❌                | ⚠️          | ✅         |
-| UX Simple               | ✅                | ❌          | ✅         |
-| Retiro Flexible         | ⚠️                | ✅          | ✅         |
-| Open Source             | ⚠️                | ✅          | ✅         |
+* Power users can define preferred pools and thresholds
+* Composable with Vesu, Ekubo, and other integrations
 
-## 🔍 Criterios del BTCfi Track
+### Educational Onboarding
 
-| Requisito             | Cumplimiento                                 |
-| --------------------- | -------------------------------------------- |
-| Yield en BTC/WBTC     | ✅ Todas las recompensas se convierten a WBTC |
-| Uso de Vesu/Ekubo     | ✅ Vault integra ambos protocolos             |
-| Uso de Pragma         | ✅ Integración sofisticada de Pragma          |
-| Uso de Starknet       | ✅ Desplegado en testnet Starknet             |
-| Repositorio abierto   | ✅ Disponible en GitHub                       |
-| Video demo            | ✅ Incluido                                   |
-| Hilo explicativo en X | ✅ Incluye explicación técnica y menciones    |
+* Newcomers can learn and use DeFi tools in the same place
+* Ideal for DAO-based onboarding or BTC-focused communities
 
-## 📜 Licencia
+## 🔒 Security
 
-Este proyecto es open source bajo la [MIT License](LICENSE).
+* Parameter validation and safe external calls
+* Trusted price feeds via Pragma oracles
 
-## 🤝 Contribuciones
+## 📊 Feature Comparison
 
-Las contribuciones son bienvenidas. Por favor, revisa nuestras guías de contribución antes de enviar un pull request.
+| Feature                    | Traditional Vault | Manual DeFi | Numo Vault |
+| -------------------------- | ----------------- | ----------- | ---------- |
+| Yield in BTC/WBTC          | ❌                 | ⚠️          | ✅          |
+| Auto Strategy              | ❌                 | ❌           | ✅          |
+| Intelligent Rebalancing    | ❌                 | ❌           | ✅          |
+| Multi-protocol Integration | ❌                 | ⚠️          | ✅          |
+| Simple UX                  | ✅                 | ❌           | ✅          |
+| Flexible Withdrawal        | ⚠️                | ✅           | ✅          |
+| Open Source                | ⚠️                | ✅           | ✅          |
 
----
 
-Desarrollado con ❤️ por el Equipo Numo
