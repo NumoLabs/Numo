@@ -8,16 +8,16 @@ export function VaultCTA() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Comienza a Generar Rendimiento</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Start Generating Returns</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Deposita BTC hoy y deja que nuestra vault maximice tu rendimiento automáticamente.
+              Deposit BTC today and let our vault maximize your returns automatically.
             </p>
           </div>
           <div className="flex flex-col gap-2 min-[400px]:flex-row">
             <WalletConnector />
             <Link href="/dashboard">
               <Button size="lg" variant="outline">
-                Ver Dashboard
+                View Dashboard
               </Button>
             </Link>
           </div>

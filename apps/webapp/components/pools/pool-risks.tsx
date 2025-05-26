@@ -11,17 +11,16 @@ export function PoolRisks({ pool }: PoolRisksProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Análisis de Riesgos</CardTitle>
+        <CardTitle>Risk Analysis</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="rounded-lg border p-4 bg-blue-50 dark:bg-blue-950/20">
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-medium">Nivel de Riesgo: {pool.risk}</p>
+              <p className="font-medium">Risk Level: {pool.risk}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Este pool tiene un nivel de riesgo {pool.risk.toLowerCase()}. Asegúrate de entender los riesgos antes de
-                invertir.
+                This pool has a {pool.risk.toLowerCase()} risk level. Make sure you understand the risks before investing.
               </p>
             </div>
           </div>
@@ -29,11 +28,10 @@ export function PoolRisks({ pool }: PoolRisksProps) {
         {pool.risks && (
           <>
             <div>
-              <h4 className="font-medium mb-2">Riesgos Principales</h4>
+              <h4 className="font-medium mb-2">Main Risks</h4>
               <ul className="list-disc pl-5 space-y-2">
                 {pool.risks.map((risk, index) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<li key={index}>{risk}</li>
+                  <li key={index}>{risk}</li>
                 ))}
               </ul>
             </div>
@@ -41,11 +39,9 @@ export function PoolRisks({ pool }: PoolRisksProps) {
           </>
         )}
         <div>
-          <h4 className="font-medium mb-2">Mitigación de Riesgos</h4>
+          <h4 className="font-medium mb-2">Risk Mitigation</h4>
           <p>
-            Para mitigar estos riesgos, considera diversificar tus inversiones entre diferentes pools y protocolos. La
-            vault automática puede ayudarte a gestionar estos riesgos al rebalancear automáticamente entre diferentes
-            estrategias.
+            To mitigate these risks, consider diversifying your investments across different pools and protocols. The automatic vault can help you manage these risks by automatically rebalancing between different strategies.
           </p>
         </div>
       </CardContent>

@@ -60,12 +60,12 @@ export function AmountInput({ amount, onAmountChange, selectedToken, onTokenChan
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Cantidad a Depositar</CardTitle>
+        <CardTitle className="text-lg">Amount to Deposit</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Token Selection */}
         <div className="space-y-2">
-          <Label>Seleccionar Token</Label>
+          <Label>Select Token</Label>
           <Tabs value={selectedToken} onValueChange={(value) => onTokenChange(value as "btc" | "wbtc")}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="btc" className="gap-2">
@@ -80,14 +80,14 @@ export function AmountInput({ amount, onAmountChange, selectedToken, onTokenChan
             <TabsContent value="btc" className="mt-3">
               <div className="p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                 <p className="text-sm text-orange-800 dark:text-orange-200">
-                  <strong>Bitcoin nativo</strong> - Se convertirá automáticamente a WBTC para operar en la vault
+                  <strong>Native Bitcoin</strong> - Will be automatically converted to WBTC to operate in the vault
                 </p>
               </div>
             </TabsContent>
             <TabsContent value="wbtc" className="mt-3">
               <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>Wrapped Bitcoin</strong> - Listo para usar directamente en protocolos DeFi
+                  <strong>Wrapped Bitcoin</strong> - Ready to use directly in DeFi protocols
                 </p>
               </div>
             </TabsContent>
@@ -96,7 +96,7 @@ export function AmountInput({ amount, onAmountChange, selectedToken, onTokenChan
 
         {/* Amount Input */}
         <div className="space-y-2">
-          <Label htmlFor="amount">Cantidad</Label>
+          <Label htmlFor="amount">Amount</Label>
           <div className="relative">
             <Input
               id="amount"
@@ -115,16 +115,16 @@ export function AmountInput({ amount, onAmountChange, selectedToken, onTokenChan
             </div>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Balance disponible: {getMaxAmountString()}</span>
+            <span>Available balance: {getMaxAmountString()}</span>
             <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMaxClick}>
-              Usar máximo
+              Use max
             </Button>
           </div>
         </div>
 
         {/* Quick Amount Buttons */}
         <div className="space-y-2">
-          <Label>Cantidades Rápidas</Label>
+          <Label>Quick Amounts</Label>
           <div className="grid grid-cols-4 gap-2">
             {quickAmounts.map((quick) => (
               <Button
@@ -142,8 +142,7 @@ export function AmountInput({ amount, onAmountChange, selectedToken, onTokenChan
 
         <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
           <p className="text-xs text-green-700 dark:text-green-300">
-            💡 <strong>Consejo:</strong> Los depósitos no tienen comisiones de entrada. Solo pagas el gas de la
-            transacción. Tus fondos comenzarán a generar rendimientos inmediatamente.
+            💡 <strong>Tip:</strong> Deposits have no entry fees. You only pay for the transaction gas. Your funds will start generating returns immediately.
           </p>
         </div>
       </CardContent>

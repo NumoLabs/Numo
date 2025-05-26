@@ -36,7 +36,7 @@ export const vaultBalance: VaultBalance = {
   totalBalanceUSD: "$78,435.67",
   accumulatedYield: "+0.078 BTC",
   accumulatedYieldUSD: "+$4,875.32",
-  timeInVault: "32 días",
+  timeInVault: "32 days",
   initialDeposit: "1.167 BTC",
   currentAPY: "5.8%",
 }
@@ -44,9 +44,9 @@ export const vaultBalance: VaultBalance = {
 export const withdrawOptions: WithdrawOption[] = [
   {
     id: "instant",
-    name: "Retiro Instantáneo",
-    description: "Retiro inmediato con comisión adicional",
-    estimatedTime: "~2 minutos",
+    name: "Instant Withdrawal",
+    description: "Immediate withdrawal with additional fee",
+    estimatedTime: "~2 minutes",
     gasEstimate: "~0.0003 ETH",
     minAmount: "0.001 BTC",
     maxAmount: "1.245 BTC",
@@ -55,9 +55,9 @@ export const withdrawOptions: WithdrawOption[] = [
   },
   {
     id: "standard",
-    name: "Retiro Estándar",
-    description: "Retiro optimizado con menor comisión",
-    estimatedTime: "~10 minutos",
+    name: "Standard Withdrawal",
+    description: "Optimized withdrawal with lower fee",
+    estimatedTime: "~10 minutes",
     gasEstimate: "~0.0002 ETH",
     minAmount: "0.001 BTC",
     maxAmount: "1.245 BTC",
@@ -66,9 +66,9 @@ export const withdrawOptions: WithdrawOption[] = [
   },
   {
     id: "scheduled",
-    name: "Retiro Programado",
-    description: "Programa tu retiro para optimizar costos",
-    estimatedTime: "1-24 horas",
+    name: "Scheduled Withdrawal",
+    description: "Schedule your withdrawal to optimize costs",
+    estimatedTime: "1-24 hours",
     gasEstimate: "~0.0001 ETH",
     minAmount: "0.01 BTC",
     maxAmount: "1.245 BTC",

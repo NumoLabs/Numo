@@ -10,21 +10,21 @@ export function VaultActions({ vaultSlug }: VaultActionsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Acciones</CardTitle>
-        <CardDescription>Gestiona tu vault personalizada</CardDescription>
+        <CardTitle>Actions</CardTitle>
+        <CardDescription>Manage your custom vault</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Link href={`/pools/deposit/${vaultSlug}`}>
-          <Button className="w-full">Depositar</Button>
+          <Button className="w-full">Deposit</Button>
         </Link>
         <Link href={`/pools/withdraw/${vaultSlug}`}>
           <Button variant="outline" className="w-full">
-            Retirar
+            Withdraw
           </Button>
         </Link>
         <Link href={`/pools/edit/${vaultSlug}`}>
           <Button variant="outline" className="w-full">
-            Editar Vault
+            Edit Vault
           </Button>
         </Link>
       </CardContent>
@@ -36,24 +36,24 @@ export function AddToVaultActions({ poolSlug }: { poolSlug: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Añadir a Vault</CardTitle>
-        <CardDescription>Añade este pool a una vault personalizada o crea una nueva.</CardDescription>
+        <CardTitle>Add to Vault</CardTitle>
+        <CardDescription>Add this pool to a custom vault or create a new one.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Link href={`/pools/add/${poolSlug}`}>
-          <Button className="w-full">Añadir a Vault Existente</Button>
+          <Button className="w-full">Add to Existing Vault</Button>
         </Link>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">O</span>
+            <span className="bg-background px-2 text-muted-foreground">Or</span>
           </div>
         </div>
         <Link href="/pools/create">
           <Button variant="outline" className="w-full">
-            Crear Nueva Vault
+            Create New Vault
           </Button>
         </Link>
       </CardContent>

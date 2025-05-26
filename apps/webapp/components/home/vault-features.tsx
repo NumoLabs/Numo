@@ -9,11 +9,11 @@ export function VaultFeatures() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div className="inline-block rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 px-3 py-1 text-sm text-white font-medium shadow-lg shadow-blue-500/50 animate-pulse">
-              Características
+              Features
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">¿Por qué elegir nuestra Vault?</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Why Choose Our Vault?</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Diseñada para maximizar tu rendimiento en BTC sin complicaciones.
+              Designed to maximize your BTC returns without complications.
             </p>
           </div>
         </div>
@@ -21,46 +21,43 @@ export function VaultFeatures() {
           <Card>
             <CardHeader>
               <Bitcoin className="w-8 h-8 text-orange-500 dark:text-orange-400 mb-4" />
-              <CardTitle>100% Exposición a BTC</CardTitle>
+              <CardTitle>100% BTC Exposure</CardTitle>
               <CardDescription>
-                Todo el rendimiento se mantiene en BTC o WBTC, asegurando que tu exposición sea siempre al activo que
-                deseas.
+                All returns are maintained in BTC or WBTC, ensuring your exposure is always to the asset you want.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
               <ArrowUpDown className="w-8 h-8 text-blue-500 dark:text-blue-400 mb-4" />
-              <CardTitle>Rebalanceo Automático</CardTitle>
+              <CardTitle>Automatic Rebalancing</CardTitle>
               <CardDescription>
-                La vault mueve automáticamente los fondos entre Vesu y Ekubo para encontrar el mejor rendimiento
-                disponible.
+                The vault automatically moves funds between Vesu and Ekubo to find the best available returns.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
               <Shield className="w-8 h-8 text-green-500 dark:text-green-400 mb-4" />
-              <CardTitle>Seguridad Descentralizada</CardTitle>
+              <CardTitle>Decentralized Security</CardTitle>
               <CardDescription>
-                Construido sobre Starknet con contratos inteligentes auditados para garantizar la seguridad de tus
-                fondos.
+                Built on Starknet with audited smart contracts to ensure the security of your funds.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
               <Clock className="w-8 h-8 text-purple-500 dark:text-purple-400 mb-4" />
-              <CardTitle>Disponibilidad Inmediata</CardTitle>
+              <CardTitle>Instant Availability</CardTitle>
               <CardDescription>
-                Retira tus fondos en cualquier momento junto con el rendimiento acumulado en WBTC.
+                Withdraw your funds at any time along with accumulated returns in WBTC.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card className="md:col-span-2 lg:col-span-2">
             <CardHeader>
-              <CardTitle>Cómo Funciona</CardTitle>
-              <CardDescription>Un proceso simple y automatizado para maximizar tu rendimiento.</CardDescription>
+              <CardTitle>How It Works</CardTitle>
+              <CardDescription>A simple and automated process to maximize your returns.</CardDescription>
             </CardHeader>
             <CardContent>
               <ol className="space-y-4">
@@ -69,7 +66,7 @@ export function VaultFeatures() {
                     1
                   </div>
                   <div className="text-left">
-                    <strong>Depósito:</strong> Deposita WBTC en el contrato de la vault.
+                    <strong>Deposit:</strong> Deposit WBTC into the vault contract.
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -77,8 +74,7 @@ export function VaultFeatures() {
                     2
                   </div>
                   <div className="text-left">
-                    <strong>Análisis:</strong> La vault consulta oráculos de Pragma para obtener precios, volatilidad y
-                    APYs estimados.
+                    <strong>Analysis:</strong> The vault queries Pragma oracles to obtain prices, volatility, and estimated APYs.
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -86,8 +82,7 @@ export function VaultFeatures() {
                     3
                   </div>
                   <div className="text-left">
-                    <strong>Asignación:</strong> Los fondos se mueven automáticamente hacia la estrategia con mayor
-                    rendimiento.
+                    <strong>Allocation:</strong> Funds are automatically moved to the strategy with the highest returns.
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -95,8 +90,7 @@ export function VaultFeatures() {
                     4
                   </div>
                   <div className="text-left">
-                    <strong>Rebalanceo:</strong> Periódicamente se evalúan las estrategias y se ajustan para maximizar
-                    el rendimiento.
+                    <strong>Rebalancing:</strong> Strategies are periodically evaluated and adjusted to maximize returns.
                   </div>
                 </li>
               </ol>

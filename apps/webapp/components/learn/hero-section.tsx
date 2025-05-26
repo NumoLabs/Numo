@@ -20,22 +20,21 @@ export function HeroSection() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="h-8 w-8" />
-              <Badge className="bg-white/20 text-white border-white/30">Guía Completa</Badge>
+              <Badge className="bg-white/20 text-white border-white/30">Complete Guide</Badge>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Domina las Finanzas
+              Master Decentralized
               <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                Descentralizadas
+                Finance
               </span>
             </h1>
             <p className="text-xl text-blue-100 mb-6">
-              Aprende los conceptos fundamentales de DeFi, pools de liquidez y estrategias de inversión de manera simple
-              y práctica.
+              Learn the fundamental concepts of DeFi, liquidity pools, and investment strategies in a simple and practical way.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 gap-2">
                 <Play className="h-5 w-5" />
-                Comenzar Ahora
+                Start Now
               </Button>
               <Button
                 size="lg"
@@ -43,7 +42,7 @@ export function HeroSection() {
                 className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 backdrop-blur-sm gap-2"
               >
                 <Clock className="h-5 w-5" />
-                15 min de lectura
+                15 min read
               </Button>
             </div>
           </div>

@@ -18,17 +18,16 @@ interface PoolCardProps {
 }
 
 export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, poolId }: PoolCardProps) {
-  // Función para determinar el color del badge de riesgo
+  // Function to determine risk badge color
   const getRiskColor = (risk: string) => {
     switch (risk.toLowerCase()) {
-      case "bajo":
+      case "low":
         return "bg-green-100 text-green-800 hover:bg-green-100/80 dark:bg-green-800/30 dark:text-green-300"
-      case "medio":
+      case "medium":
         return "bg-amber-100 text-amber-800 hover:bg-amber-100/80 dark:bg-amber-800/30 dark:text-amber-300"
-      case "medio-alto":
-      case "medio alto":
+      case "medium-high":
         return "bg-orange-100 text-orange-800 hover:bg-orange-100/80 dark:bg-orange-800/30 dark:text-orange-300"
-      case "alto":
+      case "high":
         return "bg-red-100 text-red-800 hover:bg-red-100/80 dark:bg-red-800/30 dark:text-red-300"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-100/80 dark:bg-gray-800/30 dark:text-gray-300"
@@ -47,13 +46,13 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Info className="h-4 w-4" />
-                  <span className="sr-only">Información</span>
+                  <span className="sr-only">Information</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">
                   Click on &quot;View Details&quot; to get more information about this pool, including risks,
-                  estrategias y rendimiento histórico.
+                  strategies and historical performance.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -85,11 +84,11 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
       <CardFooter className="flex justify-between">
         <Link href={`/pools/${slug}`}>
           <Button variant="outline" size="sm">
-            Ver Detalles
+            View Details
           </Button>
         </Link>
         <Link href={`/pools/add/${slug}`}>
-          <Button size="sm">Añadir a Vault</Button>
+          <Button size="sm">Add to Vault</Button>
         </Link>
       </CardFooter>
     </Card>

@@ -234,25 +234,25 @@ export default function CreateVaultPage() {
               <div className="md:col-span-2 space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Información Básica</CardTitle>
-                    <CardDescription>Define el nombre y la descripción de tu vault personalizada.</CardDescription>
+                    <CardTitle>Basic Information</CardTitle>
+                    <CardDescription>Define the name and description of your custom vault.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="vault-name">Nombre de la Vault</Label>
+                      <Label htmlFor="vault-name">Vault Name</Label>
                       <Input
                         id="vault-name"
-                        placeholder="Ej: Mi Estrategia BTC"
+                        placeholder="Ex: My BTC Strategy"
                         value={vaultName}
                         onChange={handleVaultNameChange}
                       />
                       {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="vault-description">Descripción (opcional)</Label>
+                      <Label htmlFor="vault-description">Description (optional)</Label>
                       <Input
                         id="vault-description"
-                        placeholder="Ej: Estrategia balanceada para rendimiento a largo plazo"
+                        placeholder="Ex: Balanced strategy for long-term returns"
                         value={vaultDescription}
                         onChange={handleVaultDescriptionChange}
                       />

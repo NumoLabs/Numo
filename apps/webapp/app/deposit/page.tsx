@@ -53,8 +53,8 @@ export default function DepositPage() {
       await new Promise((resolve) => setTimeout(resolve, 3000))
 
       toast({
-        title: "Depósito exitoso",
-        description: `Tu depósito de ${amount} ${selectedToken.toUpperCase()} ha sido procesado exitosamente.`,
+        title: "Successful Deposit",
+        description: `Your deposit of ${amount} ${selectedToken.toUpperCase()} has been processed successfully.`,
       })
 
       // Redirect to dashboard
@@ -62,7 +62,7 @@ export default function DepositPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Hubo un problema al procesar tu depósito. Inténtalo de nuevo.",
+        description: "There was a problem processing your deposit. Please try again.",
         variant: "destructive",    
       })
       console.error(error);
@@ -80,13 +80,13 @@ export default function DepositPage() {
             <Link href="/dashboard">
               <Button variant="ghost" size="sm" className="gap-1">
                 <ArrowLeft className="h-4 w-4" />
-                Volver al Dashboard
+                Back to Dashboard
               </Button>
             </Link>
             <div className="ml-4">
-              <h1 className="text-3xl font-bold">Depositar BTC</h1>
+              <h1 className="text-3xl font-bold">Deposit BTC</h1>
               <p className="text-muted-foreground mt-1">
-                Deposita BTC o WBTC en la vault para comenzar a generar rendimientos automáticamente
+                Deposit BTC or WBTC into the vault to start generating returns automatically
               </p>
             </div>
           </div>

@@ -25,22 +25,22 @@ export default function HistoryPage() {
             <Link href="/dashboard">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                Volver al Dashboard
+                Back to Dashboard
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold">Historial de Transacciones</h1>
-              <p className="text-muted-foreground mt-1">Seguimiento completo de tu actividad en la vault</p>
+              <h1 className="text-3xl font-bold">Transaction History</h1>
+              <p className="text-muted-foreground mt-1">Complete tracking of your vault activity</p>
             </div>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" size="sm" className="gap-2">
               <Calendar className="h-4 w-4" />
-              Filtrar por Fecha
+              Filter by Date
             </Button>
             <Button variant="outline" size="sm" className="gap-2">
               <Download className="h-4 w-4" />
-              Exportar CSV
+              Export CSV
             </Button>
           </div>
         </div>

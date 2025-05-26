@@ -10,11 +10,11 @@ export function VaultStrategies() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div className="inline-block rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 px-3 py-1 text-sm text-white font-medium shadow-lg shadow-blue-500/50 animate-pulse">
-              Estrategias
+              Strategies
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Estrategias Optimizadas</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Optimized Strategies</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Nuestra vault utiliza múltiples estrategias para maximizar el rendimiento de tu BTC.
+              Our vault uses multiple strategies to maximize your BTC returns.
             </p>
           </div>
         </div>
@@ -32,20 +32,20 @@ export function VaultStrategies() {
               </div>
             </div>
             <CardHeader>
-              <CardTitle>Estrategia Ekubo</CardTitle>
-              <CardDescription>Proveer liquidez en pools BTC/USDC para generar comisiones de trading.</CardDescription>
+              <CardTitle>Ekubo Strategy</CardTitle>
+              <CardDescription>Provide liquidity in BTC/USDC pools to generate trading fees.</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Aprovecha la arquitectura AMM optimizada de Ekubo</li>
-                <li>Genera rendimiento a través de comisiones de trading</li>
-                <li>Ideal en mercados con alto volumen de operaciones</li>
-                <li>Todas las comisiones se convierten automáticamente a WBTC</li>
+                <li>Takes advantage of Ekubo&apos;s optimized AMM architecture</li>
+                <li>Generates returns through trading fees</li>
+                <li>Ideal in markets with high trading volume</li>
+                <li>All fees are automatically converted to WBTC</li>
               </ul>
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full">
-                APY Actual: 4.8%
+                Current APY: 4.8%
               </Button>
             </CardFooter>
           </Card>
@@ -62,20 +62,20 @@ export function VaultStrategies() {
               </div>
             </div>
             <CardHeader>
-              <CardTitle>Estrategia Vesu</CardTitle>
-              <CardDescription>Participar en vaults o préstamos con BTC para generar intereses.</CardDescription>
+              <CardTitle>Vesu Strategy</CardTitle>
+              <CardDescription>Participate in vaults or loans with BTC to generate interest.</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Utiliza la plataforma de préstamos descentralizados Vesu</li>
-                <li>Genera rendimiento a través de intereses de préstamos</li>
-                <li>Ideal en mercados con alta demanda de préstamos de BTC</li>
-                <li>Todos los intereses se acumulan directamente en WBTC</li>
+                <li>Uses the decentralized lending platform Vesu</li>
+                <li>Generates returns through loan interest</li>
+                <li>Ideal in markets with high BTC loan demand</li>
+                <li>All interest accumulates directly in WBTC</li>
               </ul>
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full">
-                APY Actual: 5.8%
+                Current APY: 5.8%
               </Button>
             </CardFooter>
           </Card>

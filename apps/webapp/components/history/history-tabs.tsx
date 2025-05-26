@@ -29,27 +29,27 @@ export function HistoryTabs({ searchTerm }: HistoryTabsProps) {
       <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="all" className="gap-2">
           <div className="h-2 w-2 rounded-full bg-gray-500" />
-          Todas
+          All
         </TabsTrigger>  
         <TabsTrigger value="deposits" className="gap-2">
           <div className="h-2 w-2 rounded-full bg-green-500" />
-          Depósitos
+          Deposits
         </TabsTrigger>
         <TabsTrigger value="withdrawals" className="gap-2">
           <div className="h-2 w-2 rounded-full bg-red-500" />
-          Retiros
+          Withdrawals
         </TabsTrigger>
         <TabsTrigger value="rebalances" className="gap-2">
           <div className="h-2 w-2 rounded-full bg-blue-500" />
-          Rebalanceos
+          Rebalances
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="all">
         <TransactionList
           transactions={allTransactions}
-          title="Todas las Transacciones"
-          description="Historial completo de tu actividad en la vault"
+          title="All Transactions"
+          description="Complete history of your vault activity"
           showLoadMore={true}
         />
       </TabsContent>
@@ -57,24 +57,24 @@ export function HistoryTabs({ searchTerm }: HistoryTabsProps) {
       <TabsContent value="deposits">
         <TransactionList
           transactions={deposits}
-          title="Historial de Depósitos"
-          description="Todos tus depósitos en la vault"
+          title="Deposit History"
+          description="All your vault deposits"
         />
       </TabsContent>
 
       <TabsContent value="withdrawals">
         <TransactionList
           transactions={withdrawals}
-          title="Historial de Retiros"
-          description="Todos tus retiros de la vault"
+          title="Withdrawal History"
+          description="All your vault withdrawals"
         />
       </TabsContent>
 
       <TabsContent value="rebalances">
         <TransactionList
           transactions={rebalances}
-          title="Historial de Rebalanceos"
-          description="Todos los rebalanceos automáticos de la vault"
+          title="Rebalance History"
+          description="All automatic vault rebalances"
         />
       </TabsContent>
     </Tabs>

@@ -13,9 +13,9 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-700 dark:text-green-300">Total Depositado</p>
+              <p className="text-sm font-medium text-green-700 dark:text-green-300">Total Deposited</p>
               <p className="text-2xl font-bold text-green-900 dark:text-green-100">{stats.totalDeposited.amount}</p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-1">{stats.totalDeposited.count} depósitos</p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">{stats.totalDeposited.count} deposits</p>
             </div>
             <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center">
               <Upload className="h-6 w-6 text-green-600" />
@@ -28,9 +28,9 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-red-700 dark:text-red-300">Total Retirado</p>
+              <p className="text-sm font-medium text-red-700 dark:text-red-300">Total Withdrawn</p>
               <p className="text-2xl font-bold text-red-900 dark:text-red-100">{stats.totalWithdrawn.amount}</p>
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1">{stats.totalWithdrawn.count} retiro</p>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">{stats.totalWithdrawn.count} withdrawal</p>
             </div>
             <div className="h-12 w-12 rounded-full bg-red-500/20 flex items-center justify-center">
               <Download className="h-6 w-6 text-red-600" />
@@ -43,10 +43,10 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Rebalanceos</p>
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Rebalances</p>
               <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{stats.totalRebalances.count}</p>
               <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                Último {stats.totalRebalances.lastRebalance}
+                Last {stats.totalRebalances.lastRebalance}
               </p>
             </div>
             <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center">
@@ -60,10 +60,10 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Rendimiento Total</p>
+              <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Total Returns</p>
               <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{stats.totalYield.amount}</p>
               <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                {stats.totalYield.percentage} desde inicio
+                {stats.totalYield.percentage} since start
               </p>
             </div>
             <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center">

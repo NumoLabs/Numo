@@ -46,8 +46,8 @@ export default function WithdrawPage() {
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       toast({
-        title: "Retiro iniciado",
-        description: `Tu retiro de ${amount} BTC ha sido procesado exitosamente.`,
+        title: "Withdrawal Initiated",
+        description: `Your withdrawal of ${amount} BTC has been processed successfully.`,
       })
 
       // Redirect to history
@@ -56,7 +56,7 @@ export default function WithdrawPage() {
       console.error(error);
       toast({
         title: "Error",
-        description: "Hubo un problema al procesar tu retiro. Inténtalo de nuevo.",
+        description: "There was a problem processing your withdrawal. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -73,12 +73,12 @@ export default function WithdrawPage() {
             <Link href="/dashboard">
               <Button variant="ghost" size="sm" className="gap-1">
                 <ArrowLeft className="h-4 w-4" />
-                Volver al Dashboard
+                Back to Dashboard
               </Button>
             </Link>
             <div className="ml-4">
-              <h1 className="text-3xl font-bold">Retirar BTC</h1>
-              <p className="text-muted-foreground mt-1">Retira tus fondos de la vault en cualquier momento</p>
+              <h1 className="text-3xl font-bold">Withdraw BTC</h1>
+              <p className="text-muted-foreground mt-1">Withdraw your funds from the vault at any time</p>
             </div>
           </div>
 

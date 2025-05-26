@@ -12,9 +12,9 @@ export function StrategyDistribution() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <PieChart className="h-5 w-5 text-purple-500" />
-          Distribución de Estrategias
+          Strategy Distribution
         </CardTitle>
-        <CardDescription>Asignación actual de tus fondos</CardDescription>
+        <CardDescription>Current allocation of your funds</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -45,10 +45,9 @@ export function StrategyDistribution() {
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Razón del Rebalanceo Actual</h4>
+                <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Current Rebalancing Reason</h4>
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  La estrategia Ekubo está generando mayor rendimiento debido al aumento en el volumen de trading en el
-                  par BTC/USDC.
+                  The Ekubo strategy is generating higher returns due to increased trading volume in the BTC/USDC pair.
                 </p>
               </div>
             </div>
