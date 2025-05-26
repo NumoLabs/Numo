@@ -1,16 +1,18 @@
-# PayStark - Next.js Application
+# Numo
 
-PayStark es una aplicación minimalista y moderna que permite a los usuarios generar APIs personalizadas para recibir fondos en Starknet y crear pasarelas de pago, todo sin necesidad de gestionar la complejidad de contratos inteligentes.
+## ✨ Descripción General
+
+Numo es una aplicación DeFi construida sobre Starknet que permite a usuarios depositar BTC (o WBTC) y obtener rendimiento (“yield”) sin tener que gestionar manualmente su estrategia. La vault se encarga de mover automáticamente los fondos entre distintas plataformas DeFi como Vesu y Ekubo, buscando siempre la mejor estrategia de rendimiento disponible. Todo el yield se mantiene en BTC o WBTC para cumplir con los criterios del BTCfi Season Track.
 
 ## 🚀 Características Principales
 
-- **Conexión de Wallet**: Integración con wallets Starknet (Argent X, Braavos)
-- **API Personalizada**: Generación de endpoints únicos para recibir pagos
-- **Pasarela de Pago**: Configuración de wallets destino para plataformas
-- **Dashboard**: Visualización y gestión de APIs generadas
-- **Documentación Integrada**: Guías para desarrolladores
-- **Validación de Wallets**: Verificación automática de direcciones Starknet
-- **Soporte Multi-token**: STRK, tokens compatibles y BTC
+- **Depósito de WBTC**: Los usuarios pueden depositar WBTC en la vault de Numo.
+- **Modo Automático y Manual**: Elige entre delegar la estrategia o seleccionar pools manualmente.
+- **Rebalanceo Inteligente**: El contrato ajusta la estrategia según datos de Pragma (APY, volatilidad, etc.).
+- **Integración Multi-Protocolo**: Utiliza Vesu y Ekubo para maximizar el rendimiento.
+- **Yield en BTC/WBTC**: Todas las recompensas se convierten automáticamente a WBTC.
+- **Retiro Flexible**: El usuario puede retirar su capital y yield en cualquier momento.
+- **UI Simple y Amigable**: Experiencia pensada para usuarios sin experiencia en DeFi.
 
 ## 🏃 Comenzando
 
@@ -27,8 +29,8 @@ Asegúrate de tener instalado:
 1. Clonar el repositorio:
 
    ```bash
-   git clone https://github.com/your-username/paystark.git
-   cd paystark/apps/webapp
+   git clone https://github.com/your-username/numo.git
+   cd numo/apps/webapp
    ```
 
 2. Instalar dependencias:
@@ -54,21 +56,69 @@ La aplicación web sigue un enfoque estructurado basado en componentes:
 - **Componentes de Sección**: Secciones específicas de página (`components/sections/`)
 - **Componentes UI**: Bloques básicos de UI (`components/ui/`)
 
-### Características Técnicas
+### Tecnologías y Protocolos
 
+- **Starknet**: Blockchain L2 sobre Ethereum
+- **Vesu**: Plataforma de préstamos y vaults descentralizados
+- **Ekubo**: DEX con arquitectura AMM optimizada
+- **Pragma**: Oráculo para precios en tiempo real y decisiones de rebalanceo
+- **Cairo**: Lenguaje para los contratos inteligentes en Starknet
 - **Next.js 14** con App Router
-- **Supabase** para autenticación y almacenamiento
-- **Integración Wallet** con starknetkit
-- **Contratos Inteligentes** en Cairo
 - **Tailwind CSS & shadcn/ui** para componentes modernos
 - **Framer Motion** para animaciones fluidas
 - **Optimización de Build** usando Bun
 
-### Despliegue
+## 📊 Funcionamiento
 
-La forma más sencilla de desplegar tu aplicación Next.js es usar la [Plataforma Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+1. El usuario deposita WBTC en el contrato de la vault.
+2. Puede elegir entre dos modos:
+   - **Modo Automático**: El contrato decide la mejor estrategia según datos de Pragma (APY, volatilidad, etc.).
+   - **Modo Manual**: El usuario selecciona en cuál de los pools disponibles desea participar (por ejemplo: Ekubo BTC/USDC o un vault de Vesu).
+3. El contrato consulta los oráculos de **Pragma** para obtener:
+   - Precios actuales de BTC/USDC
+   - Indicadores de mercado como volatilidad
+   - APYs estimados en Vesu y Ekubo
+4. La vault distribuye los fondos según la estrategia elegida:
+   - ✨ Ekubo: proveer liquidez en pool BTC/USDC
+   - ✨ Vesu: participar en vaults o préstamos con BTC
+5. Cualquier recompensa generada en tokens distintos a BTC se convierte automáticamente a WBTC dentro del protocolo.
+6. El usuario puede retirar sus fondos en cualquier momento junto con el rendimiento acumulado en WBTC.
 
-Consulta nuestra [documentación de despliegue de Next.js](https://nextjs.org/docs/app/building-your-application/deploying) para más detalles.
+## 🔄 Rebalanceo Automático
+
+- Se ejecuta periódicamente o al alcanzar ciertos umbrales de cambio en el APY.
+- Basado en condiciones del mercado obtenidas a través de Pragma.
+- Puede optimizarse para minimizar costos y slippage.
+- En el modo manual, el usuario puede definir una distribución fija o habilitar rebalanceo dentro de los pools seleccionados.
+
+### 🎁 Bonus: modo híbrido
+
+El usuario puede seleccionar múltiples pools manualmente (por ejemplo, 60% Ekubo, 40% Vesu) y habilitar el rebalanceo automático **solo dentro de esos pools elegidos**. Esto permite aprovechar automatización sin perder control.
+
+## ❓ ¿Por qué es útil para usuarios sin experiencia en DeFi?
+
+- Presenta estrategias con nombres y descripciones simples.
+- Permite ver opciones sugeridas como "Mayor rendimiento" o "Menor riesgo".
+- Evita que el usuario tenga que entender contratos o protocolos complejos.
+- Permite delegar completamente las decisiones con el modo automático.
+
+## 🔍 Criterios del BTCfi Track
+
+| Requisito             | Cumplimiento                                 |
+| --------------------- | -------------------------------------------- |
+| Yield en BTC/WBTC     | ✅ Todas las recompensas se convierten a WBTC |
+| Uso de Vesu/Ekubo     | ✅ Vault integra ambos protocolos             |
+| Uso de Starknet       | ✅ Desplegado en testnet Starknet             |
+| Repositorio abierto   | ✅ Disponible en GitHub                       |
+| Video demo            | ✅ Incluido                                   |
+| Hilo explicativo en X | ✅ Incluye explicación técnica y menciones    |
+
+## ✏️ Futuras Expansiones
+
+- Integración con nuevas estrategias (staking, NFTs con utilidad)
+- Token de representación (`rbBTC`) para hacer composable la participación
+- Dashboard analítico con APYs históricos y rebalanceos automáticos
+- Sistema de recomendaciones en la UI basado en el perfil del usuario o estado del mercado
 
 ## 📜 Licencia
 
@@ -80,4 +130,4 @@ Este proyecto es open-source y está disponible bajo la [MIT License](LICENSE).
 
 ---
 
-Desarrollado con ❤️ por el Equipo PayStark
+Desarrollado con ❤️ por el Equipo Numo
