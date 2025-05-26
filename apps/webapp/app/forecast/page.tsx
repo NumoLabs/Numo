@@ -2,10 +2,12 @@ import ForecastHero from "@/components/forecast/forecast-hero"
 import YieldSimulator from "@/components/forecast/yield-simulator"
 import PerformanceChart from "@/components/forecast/performance-chart"
 import InsightsDashboard from "@/components/forecast/insights-dashboard"
+import { Header } from "@/components/ui/header"
 
 export default function ForecastPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
       <ForecastHero />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
