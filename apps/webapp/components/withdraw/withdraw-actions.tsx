@@ -29,7 +29,7 @@ export function WithdrawActions({ isValid, isLoading = false, onWithdraw }: With
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Once you start the withdrawal, you won't be able to cancel the operation. Make sure all the data is
+            Once you start the withdrawal, you won&apos;t be able to cancel the operation. Make sure all the data is
             correct.
           </AlertDescription>
         </Alert>
