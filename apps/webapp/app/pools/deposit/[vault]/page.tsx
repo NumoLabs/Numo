@@ -194,12 +194,12 @@ export default async function VaultDepositPage({
                   <div className="flex items-start gap-3">
                     <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">Información del Depósito</p>
+                      <p className="text-sm font-medium">Deposit Information</p>
                       <ul className="text-xs text-muted-foreground space-y-1">
-                        <li>• Tus fondos se distribuirán automáticamente según la estrategia del vault</li>
-                        <li>• Los rendimientos se reinvierten automáticamente</li>
-                        <li>• Puedes retirar tus fondos en cualquier momento</li>
-                        <li>• No hay comisiones de entrada, solo gas de transacción</li>
+                        <li>• Your funds will be automatically distributed according to the vault's strategy</li>
+                        <li>• Returns are automatically reinvested</li>
+                        <li>• You can withdraw your funds at any time</li>
+                        <li>• No entry fees, only transaction gas</li>
                       </ul>
                     </div>
                   </div>

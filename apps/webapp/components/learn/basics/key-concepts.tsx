@@ -6,7 +6,7 @@ export function KeyConcepts() {
     {
       title: "Smart Contracts",
       description:
-        "Programas que se ejecutan automáticamente cuando se cumplen condiciones específicas. Son como contratos tradicionales, pero escritos en código y ejecutados por la blockchain.",
+        "Programs that automatically execute when specific conditions are met. They are like traditional contracts, but written in code and executed by the blockchain.",
       icon: Zap,
       bgColor: "bg-orange-50 dark:bg-orange-950/20",
       borderColor: "border-orange-200 dark:border-orange-800",
@@ -17,7 +17,7 @@ export function KeyConcepts() {
     {
       title: "Tokens",
       description:
-        "Activos digitales que representan valor, derechos o utilidades dentro del ecosistema DeFi. Pueden ser criptomonedas, stablecoins o tokens de gobernanza.",
+        "Digital assets that represent value, rights, or utilities within the DeFi ecosystem. They can be cryptocurrencies, stablecoins, or governance tokens.",
       icon: Coins,
       bgColor: "bg-blue-50 dark:bg-blue-950/20",
       borderColor: "border-blue-200 dark:border-blue-800",
@@ -26,9 +26,9 @@ export function KeyConcepts() {
       textColor: "text-blue-800 dark:text-blue-200",
     },
     {
-      title: "Liquidez",
+      title: "Liquidity",
       description:
-        "La facilidad con la que un activo puede convertirse en otro sin afectar significativamente su precio. Mayor liquidez = mejores precios y menos deslizamiento.",
+        "The ease with which an asset can be converted into another without significantly affecting its price. Higher liquidity = better prices and less slippage.",
       icon: BarChart3,
       bgColor: "bg-green-50 dark:bg-green-950/20",
       borderColor: "border-green-200 dark:border-green-800",
@@ -39,7 +39,7 @@ export function KeyConcepts() {
     {
       title: "Yield Farming",
       description:
-        "Estrategia para maximizar rendimientos moviendo activos entre diferentes protocolos DeFi para capturar las mejores oportunidades de retorno.",
+        "Strategy to maximize returns by moving assets between different DeFi protocols to capture the best return opportunities.",
       icon: TrendingUp,
       bgColor: "bg-purple-50 dark:bg-purple-950/20",
       borderColor: "border-purple-200 dark:border-purple-800",
@@ -54,9 +54,9 @@ export function KeyConcepts() {
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
           <Target className="h-6 w-6 text-orange-500" />
-          Conceptos Fundamentales
+          Fundamental Concepts
         </CardTitle>
-        <CardDescription>Los pilares que sostienen el ecosistema DeFi</CardDescription>
+        <CardDescription>The pillars that support the DeFi ecosystem</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid md:grid-cols-2 gap-6">

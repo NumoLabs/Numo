@@ -5,24 +5,24 @@ import { Separator } from "@/components/ui/separator"
 export function StarknetSection() {
   const advantages = [
     {
-      title: "Transacciones Rápidas",
-      description: "Procesamiento de miles de transacciones por segundo con confirmaciones casi instantáneas.",
+      title: "Fast Transactions",
+      description: "Processing thousands of transactions per second with near-instant confirmations.",
       icon: Zap,
       bgColor: "bg-indigo-500",
       textColor: "text-indigo-900 dark:text-indigo-100",
       descColor: "text-indigo-700 dark:text-indigo-300",
     },
     {
-      title: "Comisiones Bajas",
-      description: "Costos de transacción mínimos que hacen viable el trading y farming de pequeñas cantidades.",
+      title: "Low Fees",
+      description: "Minimal transaction costs that make trading and farming viable even with small amounts.",
       icon: Coins,
       bgColor: "bg-green-500",
       textColor: "text-green-900 dark:text-green-100",
       descColor: "text-green-700 dark:text-green-300",
     },
     {
-      title: "Seguridad Ethereum",
-      description: "Hereda la seguridad de Ethereum mientras ofrece escalabilidad y eficiencia mejoradas.",
+      title: "Ethereum Security",
+      description: "Inherits Ethereum's security while offering improved scalability and efficiency.",
       icon: Shield,
       bgColor: "bg-purple-500",
       textColor: "text-purple-900 dark:text-purple-100",
@@ -33,14 +33,14 @@ export function StarknetSection() {
   const protocols = [
     {
       name: "Ekubo",
-      description: "DEX con arquitectura AMM optimizada para trading eficiente y provisión de liquidez.",
+      description: "DEX with AMM architecture optimized for efficient trading and liquidity provision.",
       icon: BarChart3,
       bgColor: "bg-orange-100 dark:bg-orange-900/30",
       iconColor: "text-orange-600",
     },
     {
       name: "Vesu",
-      description: "Plataforma de préstamos y vaults descentralizados con estrategias automatizadas.",
+      description: "Decentralized lending and vault platform with automated strategies.",
       icon: Lock,
       bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
       iconColor: "text-emerald-600",
@@ -52,9 +52,9 @@ export function StarknetSection() {
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
           <Award className="h-6 w-6 text-indigo-600" />
-          DeFi en Starknet: La Ventaja Competitiva
+          DeFi on Starknet: The Competitive Advantage
         </CardTitle>
-        <CardDescription>Por qué Starknet es ideal para aplicaciones DeFi</CardDescription>
+        <CardDescription>Why Starknet is ideal for DeFi applications</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid md:grid-cols-3 gap-6">
@@ -75,7 +75,7 @@ export function StarknetSection() {
 
         <div className="bg-white/50 dark:bg-gray-900/50 rounded-lg p-6">
           <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-4">
-            Protocolos DeFi Destacados en Starknet
+            Featured DeFi Protocols on Starknet
           </h4>
           <div className="grid md:grid-cols-2 gap-4">
             {protocols.map((protocol) => (

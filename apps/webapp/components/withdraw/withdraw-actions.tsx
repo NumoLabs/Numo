@@ -23,14 +23,14 @@ export function WithdrawActions({ isValid, isLoading = false, onWithdraw }: With
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Confirmación</CardTitle>
+        <CardTitle className="text-lg">Confirmation</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Una vez iniciado el retiro, no podrás cancelar la operación. Asegúrate de que todos los datos sean
-            correctos.
+            Once you start the withdrawal, you won't be able to cancel the operation. Make sure all the data is
+            correct.
           </AlertDescription>
         </Alert>
 
@@ -42,8 +42,8 @@ export function WithdrawActions({ isValid, isLoading = false, onWithdraw }: With
               onCheckedChange={(checked: boolean) => setConfirmRisks(checked as boolean)}
             />
             <label htmlFor="confirm-risks" className="text-sm leading-relaxed cursor-pointer">
-              Entiendo que al retirar fondos, estos dejarán de generar rendimientos en la vault y que las comisiones
-              mostradas son estimadas.
+              I understand that once I withdraw funds, they will no longer generate returns in the vault and that the
+              commissions shown are estimated.
             </label>
           </div>
 
@@ -54,7 +54,7 @@ export function WithdrawActions({ isValid, isLoading = false, onWithdraw }: With
               onCheckedChange={(checked: boolean) => setConfirmAmount(checked as boolean)}
             />
             <label htmlFor="confirm-amount" className="text-sm leading-relaxed cursor-pointer">
-              He verificado que la cantidad y la dirección de destino son correctas.
+              I have verified that the amount and destination address are correct.
             </label>
           </div>
         </div>
@@ -64,12 +64,12 @@ export function WithdrawActions({ isValid, isLoading = false, onWithdraw }: With
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Procesando Retiro...
+                Processing Withdrawal...
               </>
             ) : (
               <>
                 <Download className="h-4 w-4 mr-2" />
-                Confirmar Retiro
+                Confirm Withdrawal
               </>
             )}
           </Button>
@@ -77,21 +77,21 @@ export function WithdrawActions({ isValid, isLoading = false, onWithdraw }: With
           <div className="flex gap-2">
             <Link href="/dashboard" className="flex-1">
               <Button variant="outline" className="w-full">
-                Cancelar
+                Cancel
               </Button>
             </Link>
             <Link href="/app/history" className="flex-1">
               <Button variant="ghost" className="w-full">
-                Ver Historial
+                View History
               </Button>
             </Link>
           </div>
         </div>
 
         <div className="text-xs text-muted-foreground text-center">
-          ¿Necesitas ayuda?{" "}
+          Need help?{" "}
           <Link href="/support" className="text-blue-600 hover:underline">
-            Contacta soporte
+            Contact support
           </Link>
         </div>
       </CardContent>

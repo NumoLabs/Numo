@@ -55,11 +55,10 @@ export function AnalyticsMetrics() {
                   <span className={`font-semibold ${colors.text}`}>{item.value}</span>
                 </div>
               ))}
-              {metric.title === "Eficiencia de Estrategia" && (
+              {metric.title === "Strategy Efficiency" && (
                 <div className="space-y-2">
                   {metric.items.map((item, itemIndex) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<div key={itemIndex}>
+                    <div key={itemIndex}>
                       <div className="flex justify-between text-sm mb-1">
                         <span>{item.label}</span>
                         <span className="font-medium">{item.value}</span>
@@ -69,10 +68,10 @@ export function AnalyticsMetrics() {
                   ))}
                 </div>
               )}
-              {metric.title === "Comparación de APY" && (
+              {metric.title === "APY Comparison" && (
                 <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>+38%</strong> mejor que el promedio DeFi
+                    <strong>+38%</strong> better than DeFi average
                   </p>
                 </div>
               )}

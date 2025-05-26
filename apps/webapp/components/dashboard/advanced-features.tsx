@@ -40,19 +40,19 @@ export function AdvancedFeatures() {
                     <Badge variant="secondary">{stat.value}</Badge>
                   </div>
                 ))}
-                {feature.title === "Aprende sobre DeFi" && (
+                {feature.title === "Learn about DeFi" && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Conceptos Básicos</span>
-                      <span>0/3 completados</span>
+                      <span>Basic Concepts</span>
+                      <span>0/3 completed</span>
                     </div>
                     <Progress value={0} className="h-2" />
                   </div>
                 )}
                 <p className="text-sm text-muted-foreground">
-                  {feature.title === "Pools Personalizados"
-                    ? "Selecciona manualmente los pools de liquidez y asigna porcentajes específicos según tu estrategia de inversión."
-                    : "Guías paso a paso, explicaciones de conceptos y estrategias para maximizar tus rendimientos mientras minimizas riesgos."}
+                  {feature.title === "Custom Pools"
+                    ? "Manually select liquidity pools and assign specific percentages according to your investment strategy."
+                    : "Step-by-step guides, concept explanations, and strategies to maximize your returns while minimizing risks."}
                 </p>
               </div>
             </CardContent>

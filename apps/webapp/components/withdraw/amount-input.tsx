@@ -30,11 +30,11 @@ export function AmountInput({ amount, onAmountChange, maxAmount, onMaxClick }: A
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Cantidad a Retirar</CardTitle>
+        <CardTitle className="text-lg">Amount to Withdraw</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="amount">Cantidad</Label>
+          <Label htmlFor="amount">Amount</Label>
           <div className="relative">
             <Input
               id="amount"
@@ -53,15 +53,15 @@ export function AmountInput({ amount, onAmountChange, maxAmount, onMaxClick }: A
             </div>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Balance disponible: {maxAmount}</span>
+            <span>Available balance: {maxAmount}</span>
             <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={onMaxClick}>
-              Usar máximo
+              Use max
             </Button>
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label>Cantidades Rápidas</Label>
+          <Label>Quick Amounts</Label>
           <div className="grid grid-cols-4 gap-2">
             {quickAmounts.map((quick) => (
               <Button
@@ -79,8 +79,7 @@ export function AmountInput({ amount, onAmountChange, maxAmount, onMaxClick }: A
 
         <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
           <p className="text-xs text-amber-700 dark:text-amber-300">
-            💡 <strong>Consejo:</strong> Considera dejar una pequeña cantidad en la vault para seguir generando
-            rendimientos. Puedes retirar el resto cuando lo necesites.
+            💡 <strong>Tip:</strong> Consider leaving a small amount in the vault to continue generating returns. You can withdraw the rest when needed.
           </p>
         </div>
       </CardContent>

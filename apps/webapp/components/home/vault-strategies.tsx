@@ -10,11 +10,11 @@ export function VaultStrategies() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div className="inline-block rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 px-3 py-1 text-sm text-white font-medium shadow-lg shadow-blue-500/50 animate-pulse">
-              Estrategias
+              Strategies
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Estrategias Optimizadas</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Optimized Strategies</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Nuestra vault utiliza múltiples estrategias para maximizar el rendimiento de tu BTC.
+              Our vault uses multiple strategies to maximize your BTC returns.
             </p>
           </div>
         </div>

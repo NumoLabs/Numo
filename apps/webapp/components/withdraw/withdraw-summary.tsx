@@ -41,7 +41,7 @@ export function WithdrawSummary({ estimate, option }: WithdrawSummaryProps) {
         {/* Amount Summary */}
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Cantidad a retirar</span>
+            <span className="text-sm text-muted-foreground">Amount to withdraw</span>
             <div className="text-right">
               <span className="font-medium">{estimate.amount}</span>
               <p className="text-xs text-muted-foreground">{estimate.amountUSD}</p>
@@ -49,7 +49,7 @@ export function WithdrawSummary({ estimate, option }: WithdrawSummaryProps) {
           </div>
 
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Comisión ({option.fees})</span>
+            <span className="text-sm text-muted-foreground">Fee ({option.fees})</span>
             <div className="text-right">
               <span className="font-medium text-red-600">-{estimate.fees}</span>
               <p className="text-xs text-muted-foreground">-{estimate.feesUSD}</p>
@@ -59,7 +59,7 @@ export function WithdrawSummary({ estimate, option }: WithdrawSummaryProps) {
           <Separator />
 
           <div className="flex justify-between">
-            <span className="font-medium">Cantidad neta</span>
+            <span className="font-medium">Net amount</span>
             <div className="text-right">
               <span className="text-lg font-bold text-green-600">{estimate.netAmount}</span>
               <p className="text-sm text-muted-foreground">{estimate.netAmountUSD}</p>
@@ -74,7 +74,7 @@ export function WithdrawSummary({ estimate, option }: WithdrawSummaryProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-blue-500" />
-              <span className="text-sm text-muted-foreground">Tiempo estimado</span>
+              <span className="text-sm text-muted-foreground">Estimated time</span>
             </div>
             <span className="font-medium">{estimate.estimatedTime}</span>
           </div>
@@ -82,7 +82,7 @@ export function WithdrawSummary({ estimate, option }: WithdrawSummaryProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-purple-500" />
-              <span className="text-sm text-muted-foreground">Gas estimado</span>
+              <span className="text-sm text-muted-foreground">Estimated gas</span>
             </div>
             <span className="font-medium">{estimate.gasEstimate}</span>
           </div>
@@ -92,12 +92,12 @@ export function WithdrawSummary({ estimate, option }: WithdrawSummaryProps) {
           <div className="flex items-start gap-2">
             <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Información importante</p>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Important information</p>
               <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
-                <li>• Los fondos se retirarán automáticamente de las estrategias activas</li>
-                <li>• El tiempo puede variar según las condiciones de la red</li>
-                <li>• Las comisiones incluyen costos de desinversión y gas</li>
-                <li>• Recibirás una confirmación una vez completado el retiro</li>
+                <li>• Funds will be automatically withdrawn from active strategies</li>
+                <li>• Time may vary depending on network conditions</li>
+                <li>• Fees include divestment costs and gas</li>
+                <li>• You will receive a confirmation once the withdrawal is completed</li>
               </ul>
             </div>
           </div>
