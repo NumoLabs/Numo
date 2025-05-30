@@ -1,8 +1,8 @@
-# Numo
+# Numo – Finanzas BTC Modulares en Starknet
 
 ## ✨ Descripción General
 
-Numo es una aplicación DeFi construida sobre Starknet que permite a usuarios depositar BTC (o WBTC) y obtener rendimiento (“yield”) sin tener que gestionar manualmente su estrategia. La vault se encarga de mover automáticamente los fondos entre distintas plataformas DeFi como Vesu y Ekubo, buscando siempre la mejor estrategia de rendimiento disponible. Todo el yield se mantiene en BTC o WBTC para cumplir con los criterios del BTCfi Season Track.
+Numo es una plataforma DeFi modular construida sobre Starknet que permite a usuarios hacer crecer su BTC (WBTC) de manera segura, automática y transparente. Numo ofrece una experiencia completa centrada en BTC, incluyendo vaults de auto-rebalanceo, bonos a plazo fijo, compartición de estrategias, herramientas de pronóstico y una sección integrada de aprendizaje DeFi.
 
 ## 🚀 Características Principales
 
@@ -13,6 +13,10 @@ Numo es una aplicación DeFi construida sobre Starknet que permite a usuarios de
 - **Yield en BTC/WBTC**: Todas las recompensas se convierten automáticamente a WBTC.
 - **Retiro Flexible**: El usuario puede retirar su capital y yield en cualquier momento.
 - **UI Simple y Amigable**: Experiencia pensada para usuarios sin experiencia en DeFi.
+- **Bonos BTC**: Bloquea BTC por 7, 30 o 90 días para obtener yield extra.
+- **Marketplace de Vaults**: Descubre y sigue estrategias creadas por la comunidad.
+- **Herramientas de Pronóstico**: Simula ganancias y compara rendimientos.
+- **Sección Educativa**: Aprende sobre DeFi directamente en la aplicación.
 
 ## 🏃 Comenzando
 
@@ -71,9 +75,10 @@ La aplicación web sigue un enfoque estructurado basado en componentes:
 ## 📊 Funcionamiento
 
 1. El usuario deposita WBTC en el contrato de la vault.
-2. Puede elegir entre dos modos:
+2. Puede elegir entre tres modos:
    - **Modo Automático**: El contrato decide la mejor estrategia según datos de Pragma (APY, volatilidad, etc.).
-   - **Modo Manual**: El usuario selecciona en cuál de los pools disponibles desea participar (por ejemplo: Ekubo BTC/USDC o un vault de Vesu).
+   - **Modo Manual**: El usuario selecciona en cuál de los pools disponibles desea participar.
+   - **Modo Híbrido**: Asignación personalizada + rebalanceo solo dentro de las estrategias seleccionadas.
 3. El contrato consulta los oráculos de **Pragma** para obtener:
    - Precios actuales de BTC/USDC
    - Indicadores de mercado como volatilidad
@@ -112,6 +117,8 @@ El usuario puede seleccionar múltiples pools manualmente (por ejemplo, 60% Ekub
 | Repositorio abierto   | ✅ Disponible en GitHub                       |
 | Video demo            | ✅ Incluido                                   |
 | Hilo explicativo en X | ✅ Incluye explicación técnica y menciones    |
+| Token de Representación| ✅ rbBTC como prueba de participación         |
+| Bonos a Plazo Fijo    | ✅ Opciones de 7, 30 y 90 días                |
 
 ## ✏️ Futuras Expansiones
 
