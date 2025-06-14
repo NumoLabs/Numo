@@ -55,16 +55,16 @@ export default function WalletConnector() {
 					<Button 
 						onClick={handleDisconnect} 
 						variant="outline"
-						className="border-gray-600 hover:bg-gray-800 hover:text-white transition-colors"
+						className="border-gray-600 hover:bg-gray-800 hover:text-white transition-colors transition-all duration-200 shadow hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
 					>
 						Disconnect
 					</Button>
 				</div>
 			) : (
-				<Button 
-					onClick={handleConnect} 
+				<Button
+					onClick={handleConnect}
 					variant="default"
-					className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+					className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
 				>
 					Connect Wallet
 				</Button>

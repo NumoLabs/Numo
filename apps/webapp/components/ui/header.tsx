@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Menu, LayoutDashboard } from "lucide-react"
 import { useAtom } from "jotai"
 import { walletStarknetkitLatestAtom } from "@/app/state/connectedWallet"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -29,28 +30,31 @@ export function Header({ variant = "auto" }: HeaderProps) {
 
   if (currentVariant === "landing") {
     return (
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-bold">Numo</span>
+      <header className="sticky top-0 z-50 mx-auto mt-6 max-w-3xl rounded-2xl bg-background/80 border shadow-xl transition-all animate-float animate-header-fadein">
+        <div className="container flex h-16 items-center justify-between px-6">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center group cursor-pointer">
+              <Image src="/numo-logo.png" alt="Numo Logo" width={40} height={40} className="h-14 w-14 transition-transform duration-300 group-hover:scale-110 animate-logo-bounce" />
+              <span className="text-lg font-bold -ml-1 transition-transform duration-300 group-hover:scale-110 animate-logo-bounce">umo</span>
+            </Link>
           </div>
-          <nav className="hidden md:flex gap-6 ml-16">
-            <Link href="#stats" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+          <nav className="hidden md:flex gap-8 ml-12">
+            <Link href="#stats" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300">
               Statistics
             </Link>
-            <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link href="#features" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300">
               Features
             </Link>
-            <Link href="#strategies" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link href="#strategies" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300">
               Strategies
             </Link>
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6 ml-auto pl-12">
             {wallet && (
               <Link href="/dashboard">
                 <Button 
                   variant="default"
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/20 flex items-center gap-2"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow hover:shadow-lg focus-visible:shadow-lg transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2"
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
@@ -65,9 +69,9 @@ export function Header({ variant = "auto" }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-50 mx-auto max-w-3xl rounded-2xl bg-background/80 border shadow-xl transition-all animate-float animate-header-fadein">
+      <div className="container flex h-16 items-center justify-between px-6">
+        <div className="flex items-center gap-4">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden">
@@ -78,6 +82,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
             <SheetContent side="left" className="w-[240px] sm:w-[280px]">
               <nav className="grid gap-6 text-lg font-medium">
                 <Link href="/" className="flex items-center gap-2 text-lg font-bold">
+                  <Image src="/numo-logo.png" alt="Numo Logo" width={40} height={40} className="h-14 w-14" />
                   <span>Numo</span>
                 </Link>
                 {wallet && (
@@ -177,98 +182,95 @@ export function Header({ variant = "auto" }: HeaderProps) {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold">
-            <span className="hidden md:inline">Numo</span>
+          <Link href="/" className="flex items-center group cursor-pointer">
+            <Image src="/numo-logo.png" alt="Numo Logo" width={40} height={40} className="h-14 w-14 transition-transform duration-300 group-hover:scale-110 animate-logo-bounce" />
+            <span className="text-lg font-bold -ml-1 transition-transform duration-300 group-hover:scale-110 animate-logo-bounce">umo</span>
           </Link>
-          <nav className="hidden md:flex gap-6 ml-6">
-            {wallet && (
-              <>
-                <Link 
-                  href="/dashboard" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/dashboard" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  href="/deposit" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/deposit" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Deposit
-                </Link>
-                <Link 
-                  href="/withdraw" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Withdraw
-                </Link>
-                <Link 
-                  href="/history" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/history" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  History
-                </Link>
-                <Link 
-                  href="/pools" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/pools" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Pools
-                </Link>
-                <Link 
-                  href="/bonds" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/bonds" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Bonds
-                </Link>
-                <Link 
-                  href="/forecast" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/forecast" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Forecast
-                </Link>
-                <Link 
-                  href="/marketplace" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/marketplace" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Marketplace
-                </Link>
-                <Link 
-                  href="/learn" 
-                  className={cn(
-                    "text-sm font-medium",
-                    pathname === "/learn" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Learn
-                </Link>
-              </>
-            )}
+          <nav className="hidden md:flex gap-8 ml-10">
+            <Link 
+              href="/dashboard" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/dashboard" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Dashboard
+            </Link>
+            <Link 
+              href="/deposit" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/deposit" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Deposit
+            </Link>
+            <Link 
+              href="/withdraw" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Withdraw
+            </Link>
+            <Link 
+              href="/history" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/history" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              History
+            </Link>
+            <Link 
+              href="/pools" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/pools" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Pools
+            </Link>
+            <Link 
+              href="/bonds" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/bonds" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Bonds
+            </Link>
+            <Link 
+              href="/forecast" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/forecast" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Forecast
+            </Link>
+            <Link 
+              href="/marketplace" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/marketplace" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Marketplace
+            </Link>
+            <Link 
+              href="/learn" 
+              className={cn(
+                "text-sm font-medium",
+                pathname === "/learn" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Learn
+            </Link>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6 ml-auto pl-12">
           <WalletConnector />
         </div>
       </div>

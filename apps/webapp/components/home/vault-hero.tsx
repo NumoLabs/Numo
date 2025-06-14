@@ -7,32 +7,74 @@ import { Button } from "@/components/ui/button"
 
 export function VaultHero() {
   return (
-    <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-gray-100 dark:bg-gray-900/20">
-      <div className="container px-4 md:px-6">
+    <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
+      <div className="container px-4 md:px-6 relative z-10">
         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-          <div className="flex flex-col justify-center space-y-4">
+          <div className="flex flex-col justify-center space-y-4 animate-fade-in">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">Numo</h1>
-              <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Maximize your BTC returns without complications. Deposit BTC and let our vault automatically find
-                the best strategy.
+              {/* Badge with enhanced styling */}
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg shadow-blue-500/25 animate-bounce-in mb-4">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                Live on Starknet
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              </div>
+
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-slide-up-fade-in bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+                Modular BTC Finance on Starknet
+              </h1>
+              <p
+                className="max-w-[600px] text-muted-foreground md:text-xl animate-slide-up-fade-in"
+                style={{ animationDelay: "0.2s" }}
+              >
+                Grow your BTC with automated vaults, fixed-term bonds, strategy marketplace, forecasting tools, and DeFi
+                learning—all in one open platform.
               </p>
             </div>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row">
+
+            {/* Stats preview */}
+            <div className="flex items-center gap-6 py-4 animate-slide-up-fade-in" style={{ animationDelay: "0.3s" }}>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">127.45</div>
+                <div className="text-xs text-muted-foreground">BTC Locked</div>
+              </div>
+              <div className="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">5.8%</div>
+                <div className="text-xs text-muted-foreground">Current APY</div>
+              </div>
+              <div className="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">4,400+</div>
+                <div className="text-xs text-muted-foreground">Active Users</div>
+              </div>
+            </div>
+
+            <div
+              className="flex flex-col gap-2 min-[400px]:flex-row animate-slide-up-fade-in"
+              style={{ animationDelay: "0.4s" }}
+            >
               <Link href="/app">
-                <Button size="lg" className="gap-1">
-                  Get Started
-                  <ArrowRight className="h-4 w-4" />
+                <Button
+                  size="lg"
+                  className="gap-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 focus:scale-105 focus:shadow-lg focus:-translate-y-1 shadow-lg shadow-blue-500/25"
+                >
+                  Start Earning BTC
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
               </Link>
               <Link href="#features">
-                <Button size="lg" variant="outline">
-                  How it Works
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-gray-800 focus:scale-105 focus:shadow-lg focus:-translate-y-1 border-2"
+                >
+                  Explore Features
                 </Button>
               </Link>
             </div>
           </div>
-          <div className="flex items-center justify-center">
+
+          <div className="flex items-center justify-center relative">
             <div className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-8 border-black bg-black shadow-2xl">
               {/* Phone frame */}
               <div className="absolute top-0 left-0 right-0 h-6 bg-black z-10 flex justify-center">
@@ -92,12 +134,12 @@ export function VaultHero() {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex px-5 mt-6 space-x-3">
-                  <button className="flex-1 bg-gray-800 rounded-full py-3 flex items-center justify-center">
+                <div className="flex pl-2 pr-5 mt-6 space-x-4">
+                  <button className="flex-2 min-w-[115px] bg-gray-800 rounded-full py-3 flex items-center justify-center">
                     <Plus className="w-5 h-5 mr-2" />
                     <span>Deposit</span>
                   </button>
-                  <button className="flex-1 bg-gray-800 rounded-full py-3 flex items-center justify-center">
+                  <button className="flex-2 min-w-[115px] bg-gray-800 rounded-full py-3 flex items-center justify-center">
                     <Download className="w-5 h-5 mr-2" />
                     <span>Withdraw</span>
                   </button>
@@ -121,7 +163,7 @@ export function VaultHero() {
                       </div>
                       <div className="flex-1">
                         <div className="font-medium">BTC-ETH Pool</div>
-                        <div className="text-sm text-gray-400">Ekubo DEX</div>
+                        <div className="text-sm text-gray-400">Vesu DEX</div>
                       </div>
                       <div className="text-right">
                         <div className="font-medium">$1,245.32</div>
