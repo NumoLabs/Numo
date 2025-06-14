@@ -1,41 +1,53 @@
-# PayStark - Contratos Inteligentes Cairo
+# Numo - Cairo Smart Contracts
 
-Este directorio contiene los contratos inteligentes en Cairo que gestionan la lógica de pagos y APIs en Starknet.
+This directory contains the Cairo smart contracts that manage payment logic, APIs, and yield strategies on Starknet.
 
-## 📁 Estructura
+## 📁 Structure
 
 ```
 contracts/
 ├── src/
-│   ├── payment_gateway.cairo    # Contrato principal de pasarela de pagos
-│   ├── api_endpoint.cairo       # Contrato para gestión de endpoints
-│   └── interfaces/             # Interfaces y tipos compartidos
-├── tests/                      # Tests de contratos
-├── Scarb.toml                  # Configuración de Scarb
-├── snfoundry.toml              # Herramienta de desarrollo y testing para contratos en StarkNet
-└── README.md                   # Este archivo
+│   ├── payment_gateway.cairo    # Main payment gateway contract
+│   ├── api_endpoint.cairo       # API endpoint management contract
+│   ├── strategies/             # Yield strategies and vaults
+│   │   ├── ekubo.cairo        # Ekubo liquidity provision strategy
+│   │   └── vesu.cairo         # Vesu lending strategy
+│   └── interfaces/            # Shared interfaces and types
+├── tests/                     # Contract tests
+├── Scarb.toml                # Scarb configuration
+├── snfoundry.toml            # StarkNet development and testing tool
+└── README.md                 # This file
 ```
 
-## 🎯 Contratos Principales
+## 🎯 Main Contracts
 
 ### Payment Gateway (`payment_gateway.cairo`)
-- Gestiona la lógica de pagos y transferencias
-- Valida direcciones de wallet
-- Maneja diferentes tipos de tokens (STRK, ERC20, etc.)
+- Manages payment and transfer logic
+- Validates wallet addresses
+- Handles different token types (STRK, ERC20, WBTC)
+- Integration with multiple yield strategies
 
 ### API Endpoint (`api_endpoint.cairo`)
-- Genera y gestiona endpoints únicos
-- Almacena configuraciones de API
-- Maneja la validación de permisos
+- Generates and manages unique endpoints
+- Stores API configurations
+- Handles permission validation
+- External service integration
 
-## 🛠 Desarrollo
+### Yield Strategies
+- **Ekubo Strategy**: BTC/USDC pool liquidity provision
+- **Vesu Strategy**: BTC lending and borrowing
+- Position auto-rebalancing
+- Automatic fee conversion to WBTC
 
-### Prerrequisitos
+## 🛠 Development
 
-- [Scarb](https://docs.swmansion.com/scarb/) - Gestor de paquetes de Cairo
-- [Starknet CLI](https://docs.starknet.io/documentation/tools/cli/) - Herramientas de desarrollo
+### Prerequisites
 
-### Compilación
+- [Scarb](https://docs.swmansion.com/scarb/) - Cairo package manager
+- [Starknet CLI](https://docs.starknet.io/documentation/tools/cli/) - Development tools
+- [Foundry](https://book.getfoundry.sh/) - Testing framework
+
+### Build
 
 ```bash
 scarb build
@@ -47,23 +59,40 @@ scarb build
 scarb test
 ```
 
-### Despliegue
+### Deployment
 
 ```bash
-starknet deploy --contract target/dev/paystark_payment_gateway.sierra.json
+starknet deploy --contract target/dev/numo_payment_gateway.sierra.json
 ```
 
-## 🔒 Seguridad
+## 🔒 Security
 
-- Validación exhaustiva de inputs
-- Manejo seguro de tokens
-- Protección contra reentrancia
-- Verificación de permisos
+- Comprehensive input validation
+- Secure token and balance management
+- Reentrancy protection
+- Permission and role verification
+- Regular security audits
+- Event and log monitoring
+- Emergency pause system
 
-## 📝 Documentación
+## 📊 Metrics and Monitoring
 
-Para más detalles sobre la implementación y uso de los contratos, consulta la [documentación técnica](./docs/).
+- Real-time APY tracking
+- TVL monitoring per strategy
+- Performance and gas metrics
+- Security alerts
+
+## 🤝 Integrations
+
+- **Ekubo**: AMM and liquidity pools
+- **Vesu**: Lending protocol
+- **Starknet**: Base infrastructure
+- **WBTC**: Primary token
+
+## 📝 Documentation
+
+For more details about contract implementation and usage, check the [technical documentation](./docs/).
 
 ---
 
-Desarrollado con ❤️ por el Equipo PayStark 
+Developed with ❤️ by the Numo Team 

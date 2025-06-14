@@ -1,140 +1,140 @@
-# Numo – Finanzas BTC Modulares en Starknet
+# Numo – Modular BTC Finance on Starknet
 
-## ✨ Descripción General
+## ✨ Overview
 
-Numo es una plataforma DeFi modular construida sobre Starknet que permite a usuarios hacer crecer su BTC (WBTC) de manera segura, automática y transparente. Numo ofrece una experiencia completa centrada en BTC, incluyendo vaults de auto-rebalanceo, bonos a plazo fijo, compartición de estrategias, herramientas de pronóstico y una sección integrada de aprendizaje DeFi.
+Numo is a modular DeFi platform built on Starknet that enables users to grow their BTC (WBTC) safely, automatically, and transparently. Numo offers a complete BTC-centric experience, including auto-rebalancing vaults, fixed-term bonds, strategy sharing, forecasting tools, and an integrated DeFi learning section.
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
-- **Depósito de WBTC**: Los usuarios pueden depositar WBTC en la vault de Numo.
-- **Modo Automático y Manual**: Elige entre delegar la estrategia o seleccionar pools manualmente.
-- **Rebalanceo Inteligente**: El contrato ajusta la estrategia según datos de Pragma (APY, volatilidad, etc.).
-- **Integración Multi-Protocolo**: Utiliza Vesu y Ekubo para maximizar el rendimiento.
-- **Yield en BTC/WBTC**: Todas las recompensas se convierten automáticamente a WBTC.
-- **Retiro Flexible**: El usuario puede retirar su capital y yield en cualquier momento.
-- **UI Simple y Amigable**: Experiencia pensada para usuarios sin experiencia en DeFi.
-- **Bonos BTC**: Bloquea BTC por 7, 30 o 90 días para obtener yield extra.
-- **Marketplace de Vaults**: Descubre y sigue estrategias creadas por la comunidad.
-- **Herramientas de Pronóstico**: Simula ganancias y compara rendimientos.
-- **Sección Educativa**: Aprende sobre DeFi directamente en la aplicación.
+- **WBTC Deposits**: Users can deposit WBTC into Numo's vault.
+- **Automatic and Manual Modes**: Choose between delegating strategy or manually selecting pools.
+- **Smart Rebalancing**: Contract adjusts strategy based on Pragma data (APY, volatility, etc.).
+- **Multi-Protocol Integration**: Uses Vesu and Ekubo to maximize returns.
+- **BTC/WBTC Yield**: All rewards are automatically converted to WBTC.
+- **Flexible Withdrawals**: Users can withdraw capital and yield at any time.
+- **Simple and User-Friendly UI**: Experience designed for users new to DeFi.
+- **BTC Bonds**: Lock BTC for 7, 30, or 90 days for extra yield.
+- **Vault Marketplace**: Discover and follow community-created strategies.
+- **Forecasting Tools**: Simulate gains and compare returns.
+- **Educational Section**: Learn about DeFi directly in the application.
 
-## 🏃 Comenzando
+## 🏃 Getting Started
 
-### Prerrequisitos
+### Prerequisites
 
-Asegúrate de tener instalado:
+Make sure you have installed:
 
-- [Node.js (v18 o superior)](https://nodejs.org/)
+- [Node.js (v18 or higher)](https://nodejs.org/)
 - [Bun](https://bun.sh/)
 - [Git](https://git-scm.com/)
 
-### Clonar y Configurar
+### Clone and Setup
 
-1. Clonar el repositorio:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/your-username/numo.git
    cd numo/apps/webapp
    ```
 
-2. Instalar dependencias:
+2. Install dependencies:
 
    ```bash
    bun install
    ```
 
-3. Iniciar servidor de desarrollo:
+3. Start development server:
 
    ```bash
    bun dev
    ```
 
-4. Abrir [http://localhost:3000](http://localhost:3000) en tu navegador para ver el resultado.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-## 🏗 Arquitectura
+## 🏗 Architecture
 
-La aplicación web sigue un enfoque estructurado basado en componentes:
+The web application follows a structured component-based approach:
 
-- **Componentes de Layout**: Estructura base del layout (`components/layout/`)
-- **Componentes Compartidos**: Elementos UI reutilizables (`components/shared/`)
-- **Componentes de Sección**: Secciones específicas de página (`components/sections/`)
-- **Componentes UI**: Bloques básicos de UI (`components/ui/`)
+- **Layout Components**: Base layout structure (`components/layout/`)
+- **Shared Components**: Reusable UI elements (`components/shared/`)
+- **Section Components**: Page-specific sections (`components/sections/`)
+- **UI Components**: Basic UI building blocks (`components/ui/`)
 
-### Tecnologías y Protocolos
+### Technologies and Protocols
 
-- **Starknet**: Blockchain L2 sobre Ethereum
-- **Vesu**: Plataforma de préstamos y vaults descentralizados
-- **Ekubo**: DEX con arquitectura AMM optimizada
-- **Pragma**: Oráculo para precios en tiempo real y decisiones de rebalanceo
-- **Cairo**: Lenguaje para los contratos inteligentes en Starknet
-- **Next.js 14** con App Router
-- **Tailwind CSS & shadcn/ui** para componentes modernos
-- **Framer Motion** para animaciones fluidas
-- **Optimización de Build** usando Bun
+- **Starknet**: L2 blockchain on Ethereum
+- **Vesu**: Decentralized lending and vault platform
+- **Ekubo**: DEX with optimized AMM architecture
+- **Pragma**: Oracle for real-time prices and rebalancing decisions
+- **Cairo**: Smart contract language for Starknet
+- **Next.js 14** with App Router
+- **Tailwind CSS & shadcn/ui** for modern components
+- **Framer Motion** for fluid animations
+- **Build Optimization** using Bun
 
-## 📊 Funcionamiento
+## 📊 How It Works
 
-1. El usuario deposita WBTC en el contrato de la vault.
-2. Puede elegir entre tres modos:
-   - **Modo Automático**: El contrato decide la mejor estrategia según datos de Pragma (APY, volatilidad, etc.).
-   - **Modo Manual**: El usuario selecciona en cuál de los pools disponibles desea participar.
-   - **Modo Híbrido**: Asignación personalizada + rebalanceo solo dentro de las estrategias seleccionadas.
-3. El contrato consulta los oráculos de **Pragma** para obtener:
-   - Precios actuales de BTC/USDC
-   - Indicadores de mercado como volatilidad
-   - APYs estimados en Vesu y Ekubo
-4. La vault distribuye los fondos según la estrategia elegida:
-   - ✨ Ekubo: proveer liquidez en pool BTC/USDC
-   - ✨ Vesu: participar en vaults o préstamos con BTC
-5. Cualquier recompensa generada en tokens distintos a BTC se convierte automáticamente a WBTC dentro del protocolo.
-6. El usuario puede retirar sus fondos en cualquier momento junto con el rendimiento acumulado en WBTC.
+1. User deposits WBTC into the vault contract.
+2. Can choose between three modes:
+   - **Automatic Mode**: Contract decides best strategy based on Pragma data (APY, volatility, etc.).
+   - **Manual Mode**: User selects which available pools to participate in.
+   - **Hybrid Mode**: Custom allocation + rebalancing only within selected strategies.
+3. Contract queries **Pragma** oracles to obtain:
+   - Current BTC/USDC prices
+   - Market indicators like volatility
+   - Estimated APYs in Vesu and Ekubo
+4. Vault distributes funds according to chosen strategy:
+   - ✨ Ekubo: provide liquidity in BTC/USDC pool
+   - ✨ Vesu: participate in vaults or loans with BTC
+5. Any rewards generated in tokens other than BTC are automatically converted to WBTC within the protocol.
+6. User can withdraw funds at any time along with accumulated returns in WBTC.
 
-## 🔄 Rebalanceo Automático
+## 🔄 Automatic Rebalancing
 
-- Se ejecuta periódicamente o al alcanzar ciertos umbrales de cambio en el APY.
-- Basado en condiciones del mercado obtenidas a través de Pragma.
-- Puede optimizarse para minimizar costos y slippage.
-- En el modo manual, el usuario puede definir una distribución fija o habilitar rebalanceo dentro de los pools seleccionados.
+- Runs periodically or when certain APY change thresholds are reached.
+- Based on market conditions obtained through Pragma.
+- Can be optimized to minimize costs and slippage.
+- In manual mode, user can define fixed distribution or enable rebalancing within selected pools.
 
-### 🎁 Bonus: modo híbrido
+### 🎁 Bonus: hybrid mode
 
-El usuario puede seleccionar múltiples pools manualmente (por ejemplo, 60% Ekubo, 40% Vesu) y habilitar el rebalanceo automático **solo dentro de esos pools elegidos**. Esto permite aprovechar automatización sin perder control.
+User can manually select multiple pools (e.g., 60% Ekubo, 40% Vesu) and enable automatic rebalancing **only within those chosen pools**. This allows leveraging automation without losing control.
 
-## ❓ ¿Por qué es útil para usuarios sin experiencia en DeFi?
+## ❓ Why is it useful for users new to DeFi?
 
-- Presenta estrategias con nombres y descripciones simples.
-- Permite ver opciones sugeridas como "Mayor rendimiento" o "Menor riesgo".
-- Evita que el usuario tenga que entender contratos o protocolos complejos.
-- Permite delegar completamente las decisiones con el modo automático.
+- Presents strategies with simple names and descriptions.
+- Allows viewing suggested options like "Highest return" or "Lowest risk".
+- Prevents users from having to understand complex contracts or protocols.
+- Enables complete delegation of decisions with automatic mode.
 
-## 🔍 Criterios del BTCfi Track
+## 🔍 BTCfi Track Criteria
 
-| Requisito             | Cumplimiento                                 |
-| --------------------- | -------------------------------------------- |
-| Yield en BTC/WBTC     | ✅ Todas las recompensas se convierten a WBTC |
-| Uso de Vesu/Ekubo     | ✅ Vault integra ambos protocolos             |
-| Uso de Starknet       | ✅ Desplegado en testnet Starknet             |
-| Repositorio abierto   | ✅ Disponible en GitHub                       |
-| Video demo            | ✅ Incluido                                   |
-| Hilo explicativo en X | ✅ Incluye explicación técnica y menciones    |
-| Token de Representación| ✅ rbBTC como prueba de participación         |
-| Bonos a Plazo Fijo    | ✅ Opciones de 7, 30 y 90 días                |
+| Requirement          | Compliance                                    |
+| -------------------- | --------------------------------------------- |
+| BTC/WBTC Yield       | ✅ All rewards converted to WBTC              |
+| Vesu/Ekubo Usage     | ✅ Vault integrates both protocols            |
+| Starknet Usage       | ✅ Deployed on Starknet testnet               |
+| Open Repository      | ✅ Available on GitHub                        |
+| Demo Video           | ✅ Included                                   |
+| X Thread             | ✅ Includes technical explanation and mentions |
+| Representation Token | ✅ rbBTC as participation proof               |
+| Fixed-Term Bonds     | ✅ 7, 30, and 90-day options                  |
 
-## ✏️ Futuras Expansiones
+## ✏️ Future Expansions
 
-- Integración con nuevas estrategias (staking, NFTs con utilidad)
-- Token de representación (`rbBTC`) para hacer composable la participación
-- Dashboard analítico con APYs históricos y rebalanceos automáticos
-- Sistema de recomendaciones en la UI basado en el perfil del usuario o estado del mercado
+- Integration with new strategies (staking, utility NFTs)
+- Representation token (`rbBTC`) to make participation composable
+- Analytical dashboard with historical APYs and automatic rebalancing
+- UI recommendation system based on user profile or market state
 
-## 📜 Licencia
+## 📜 License
 
-Este proyecto es open-source y está disponible bajo la [MIT License](LICENSE).
+This project is open-source and available under the [MIT License](LICENSE).
 
-## 🚀 Contribuciones
+## 🚀 Contributions
 
-¡Las contribuciones son bienvenidas! Siéntete libre de enviar pull requests o abrir issues.
+Contributions are welcome! Feel free to submit pull requests or open issues.
 
 ---
 
-Desarrollado con ❤️ por el Equipo Numo
+Developed with ❤️ by the Numo Team
