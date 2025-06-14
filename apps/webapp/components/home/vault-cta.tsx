@@ -35,7 +35,6 @@ export function VaultCTA() {
                 e.preventDefault()
                 const form = e.currentTarget
                 const email = form.email.value.trim()
-                const handle = form.handle.value.trim()
                 if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
                   setStatus("Please enter a valid email.")
                   return

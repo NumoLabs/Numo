@@ -16,6 +16,7 @@ export function VaultStrategies() {
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               Our vault uses multiple strategies to maximize your BTC returns.
             </p>
+            <p className="text-sm text-muted-foreground">Don&apos;t let your BTC sit idle. Put it to work with our advanced yield strategies.</p>
           </div>
         </div>
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-2">
@@ -47,7 +48,7 @@ export function VaultStrategies() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Takes advantage of Ekubo's optimized AMM architecture
+                      Takes advantage of Ekubo&apos;s optimized AMM architecture
                     </span>
                   </div>
                   <div className="flex items-start gap-3">

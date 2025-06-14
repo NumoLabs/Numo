@@ -37,7 +37,7 @@ export function VaultFeatures() {
                   <CardDescription className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                     Auto-rebalancing vault designed for WBTC with{" "}
                     <span className="font-semibold text-gray-900 dark:text-white">100% BTC exposure</span>. Enjoy
-                    flexible deposits and withdrawals while earning yield that's always paid in WBTC.
+                    flexible deposits and withdrawals while earning yield that&apos;s always paid in WBTC.
                   </CardDescription>
                 </div>
                 <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
