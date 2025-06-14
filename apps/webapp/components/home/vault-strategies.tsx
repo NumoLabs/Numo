@@ -18,10 +18,11 @@ export function VaultStrategies() {
             </p>
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2">
-          <Card className="overflow-hidden">
-            <div className="h-48 w-full bg-black flex items-center justify-center overflow-hidden">
-              <div className="w-4/5 max-w-[300px] py-6">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-2">
+          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-purple-500 dark:hover:border-purple-400">
+            <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-purple-600/10"></div>
+              <div className="relative w-4/5 max-w-[300px] py-6 transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src="/ekubo-logo.png"
                   alt="Ekubo Logo"
@@ -30,28 +31,61 @@ export function VaultStrategies() {
                   className="object-contain w-full"
                 />
               </div>
+              <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                Active
+              </div>
             </div>
-            <CardHeader>
-              <CardTitle>Ekubo Strategy</CardTitle>
-              <CardDescription>Provide liquidity in BTC/USDC pools to generate trading fees.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Takes advantage of Ekubo&apos;s optimized AMM architecture</li>
-                <li>Generates returns through trading fees</li>
-                <li>Ideal in markets with high trading volume</li>
-                <li>All fees are automatically converted to WBTC</li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                Current APY: 4.8%
-              </Button>
-            </CardFooter>
+            <div className="p-6">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ekubo Strategy</CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
+                  Provide liquidity in BTC/USDC pools to generate trading fees.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0 mb-6">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Takes advantage of Ekubo's optimized AMM architecture
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Generates returns through trading fees
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Ideal in markets with high trading volume
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      All fees are automatically converted to WBTC
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="p-0">
+                <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Current APY</span>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">4.8%</div>
+                  </div>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">Learn More</Button>
+                </div>
+              </CardFooter>
+            </div>
           </Card>
-          <Card className="overflow-hidden">
-            <div className="h-48 w-full bg-black flex items-center justify-center overflow-hidden">
-              <div className="w-3/4 max-w-[250px] py-6">
+
+          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 dark:hover:border-blue-400">
+            <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-pink-600/10"></div>
+              <div className="relative w-3/4 max-w-[250px] py-6 transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src="/vesu-logo.png"
                   alt="Vesu Logo"
@@ -60,24 +94,55 @@ export function VaultStrategies() {
                   className="object-contain w-full"
                 />
               </div>
+              <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                Active
+              </div>
             </div>
-            <CardHeader>
-              <CardTitle>Vesu Strategy</CardTitle>
-              <CardDescription>Participate in vaults or loans with BTC to generate interest.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Uses the decentralized lending platform Vesu</li>
-                <li>Generates returns through loan interest</li>
-                <li>Ideal in markets with high BTC loan demand</li>
-                <li>All interest accumulates directly in WBTC</li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                Current APY: 5.8%
-              </Button>
-            </CardFooter>
+            <div className="p-6">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-white mb-2">Vesu Strategy</CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
+                  Participate in vaults or loans with BTC to generate interest.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0 mb-6">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Uses the decentralized lending platform Vesu
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Generates returns through loan interest
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Ideal in markets with high BTC loan demand
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      All interest accumulates directly in WBTC
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="p-0">
+                <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Current APY</span>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">5.8%</div>
+                  </div>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">Learn More</Button>
+                </div>
+              </CardFooter>
+            </div>
           </Card>
         </div>
       </div>

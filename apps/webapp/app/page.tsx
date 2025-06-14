@@ -8,10 +8,11 @@ import { Footer } from "@/components/ui/footer"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col">
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gray-100 dark:bg-gray-900/20 -z-10" />
       <Header />
+      <VaultHero />
       <main className="flex-1">
-        <VaultHero />
         <VaultStats />
         <VaultFeatures />
         <VaultStrategies />
