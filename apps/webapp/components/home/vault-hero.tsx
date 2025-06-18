@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { ArrowRight, Settings, TrendingUp, Download, Plus, MoreVertical, Bitcoin } from "lucide-react"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 
@@ -13,10 +14,10 @@ export function VaultHero() {
           <div className="flex flex-col justify-center space-y-4 animate-fade-in">
             <div className="space-y-2">
               {/* Badge with enhanced styling */}
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg shadow-blue-500/25 animate-bounce-in mb-4">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                Live on Starknet
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-800 via-gray-900 to-black hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg shadow-gray-800/40 animate-bounce-in mb-4 transition-all duration-200 border border-gray-600/30">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Live Beta on Starknet
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               </div>
 
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-slide-up-fade-in bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
@@ -56,7 +57,7 @@ export function VaultHero() {
               <Link href="/app">
                 <Button
                   size="lg"
-                  className="gap-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 focus:scale-105 focus:shadow-lg focus:-translate-y-1 shadow-lg shadow-blue-500/25"
+                  className="gap-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
                 >
                   Start Earning BTC
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -75,7 +76,8 @@ export function VaultHero() {
           </div>
 
           <div className="flex items-center justify-center relative">
-            <div className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-8 border-black bg-black shadow-2xl">
+            {/* Phone frame */}
+            <div className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-8 border-black bg-black shadow-2xl transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-3xl group">
               {/* Phone frame */}
               <div className="absolute top-0 left-0 right-0 h-6 bg-black z-10 flex justify-center">
                 <div className="w-32 h-5 bg-black rounded-b-xl"></div>
@@ -107,8 +109,14 @@ export function VaultHero() {
                 {/* User profile */}
                 <div className="flex justify-between items-center px-5 py-3">
                   <div className="flex items-center space-x-2">
-                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                      <span className="text-sm font-bold">N</span>
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                      <Image
+                        src="/user-avatar.jpg"
+                        alt="User Avatar"
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover rounded-full"
+                      />
                     </div>
                     <span className="font-medium">@numo_user</span>
                   </div>
