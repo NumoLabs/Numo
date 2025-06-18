@@ -35,6 +35,7 @@ export function VaultCTA() {
                 e.preventDefault()
                 const form = e.currentTarget
                 const email = form.email.value.trim()
+                const handle = form.handle.value.trim()
                 if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
                   setStatus("Please enter a valid email.")
                   return
@@ -67,7 +68,7 @@ export function VaultCTA() {
                     <input
                       type="text"
                       name="handle"
-                      placeholder="@username (Twitter/X)"
+                      placeholder="@username (optional)"
                       className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-purple-500"
                     />
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500 transition-transform group-focus-within:scale-110" />
@@ -78,7 +79,7 @@ export function VaultCTA() {
               <div className="flex flex-col sm:flex-row gap-4 items-center">
                 <button
                   type="submit"
-                  className="group relative w-full sm:flex-1 overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 text-white font-bold rounded-xl py-4 px-8 text-lg shadow-xl transition-all transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/50 bg-size-200 hover:bg-pos-100 animate-gradient-x"
+                  className="group relative w-full sm:flex-1 overflow-hidden bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white font-bold rounded-xl py-4 px-8 text-lg shadow-xl shadow-cyan-500/50 transition-all transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-400/60 focus:outline-none focus:ring-4 focus:ring-cyan-500/50"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     Join Beta Waitlist
