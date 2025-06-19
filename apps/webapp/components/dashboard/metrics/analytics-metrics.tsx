@@ -37,8 +37,7 @@ export function AnalyticsMetrics() {
         const colors = colorMap[metric.color as keyof typeof colorMap]
 
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<Card key={index} className={`border-0 shadow-lg ${colors.bg}`}>
+          <Card key={index} className={`border-0 shadow-lg ${colors.bg}`}>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <div className={`h-8 w-8 rounded-full ${colors.icon} flex items-center justify-center`}>
@@ -49,8 +48,7 @@ export function AnalyticsMetrics() {
             </CardHeader>
             <CardContent className="space-y-4">
               {metric.items.map((item, itemIndex) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<div key={itemIndex} className="flex justify-between items-center">
+                <div key={itemIndex} className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">{item.label}</span>
                   <span className={`font-semibold ${colors.text}`}>{item.value}</span>
                 </div>

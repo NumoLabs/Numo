@@ -44,8 +44,7 @@ export function PerformanceIndicators() {
         const colors = colorMap[indicator.color as keyof typeof colorMap]
 
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<Card key={index} className="relative overflow-hidden border-0 shadow-lg">
+          <Card key={index} className="relative overflow-hidden border-0 shadow-lg">
             <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -61,8 +60,7 @@ export function PerformanceIndicators() {
             <CardContent>
               <div className="space-y-3">
                 {indicator.items.map((item, itemIndex) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<div key={itemIndex} className="flex items-center justify-between">
+                  <div key={itemIndex} className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{item.label}</span>
                     <span className={`font-semibold ${colors.text}`}>{item.value}</span>
                   </div>
