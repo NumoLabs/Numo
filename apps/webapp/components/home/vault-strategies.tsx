@@ -47,7 +47,7 @@ export function VaultStrategies() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Takes advantage of Ekubo's optimized AMM architecture
+                      Takes advantage of Ekubo&apos;s optimized AMM architecture
                     </span>
                   </div>
                   <div className="flex items-start gap-3">
