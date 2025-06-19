@@ -4,39 +4,56 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DashboardChart } from "@/components/dashboard/dashboard-chart"
-import { DashboardTransactions } from "@/components/dashboard/dashboard-transactions"
-import { PortfolioOverview } from "./portfolio-overview"
-import { StrategyDistribution } from "./strategy-distribution"
-import { RecentActivity } from "./recent-activity"
-import { AnalyticsMetrics } from "./analytics-metrics"
-import { RebalancingHistory } from "./rebalancing-history"
+import { DashboardChart } from "./dashboard-chart"
+import { DashboardTransactions } from "../transactions"
+import { PortfolioOverview } from "../overview"
+import { StrategyDistribution } from "../overview"
+import { RecentActivity } from "../overview"
+import { AnalyticsMetrics } from "../metrics"
+import { RebalancingHistory } from "../analytics"
 
 export function DashboardTabs() {
   return (
-    <Tabs defaultValue="overview" className="space-y-6">
+    <Tabs defaultValue="overview" className="space-y-6 mt-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <TabsList className="grid w-full md:w-auto grid-cols-3 h-12">
-          <TabsTrigger value="overview" className="gap-2">
+          <TabsTrigger
+            value="overview"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:via-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+          >
             <PieChart className="h-4 w-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="gap-2">
+          <TabsTrigger
+            value="analytics"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:via-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+          >
             <BarChart3 className="h-4 w-4" />
             Analytics
           </TabsTrigger>
-          <TabsTrigger value="transactions" className="gap-2">
+          <TabsTrigger
+            value="transactions"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:via-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+          >
             <Activity className="h-4 w-4" />
             Transactions
           </TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-md"
+          >
+            <RefreshCw className="h-4 w-4 transition-transform duration-300 hover:rotate-180" />
             Refresh
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Settings className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-md"
+          >
+            <Settings className="h-4 w-4 transition-transform duration-300 hover:rotate-90" />
             Configure
           </Button>
         </div>
@@ -138,7 +155,7 @@ export function DashboardTabs() {
                 </CardTitle>
                 <CardDescription>Complete history of deposits, withdrawals, and rebalancing</CardDescription>
               </div>
-              <Link href="/app/history">
+              <Link href="/history">
                 <Button className="gap-2">
                   <Eye className="h-4 w-4" />
                   View Full History

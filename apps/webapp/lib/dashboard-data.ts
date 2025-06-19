@@ -91,6 +91,7 @@ export interface AdvancedFeature {
   buttonText: string
   buttonHref: string
   buttonVariant: "default" | "outline"
+  buttonColor?: string
 }
 
 // Data functions
@@ -366,7 +367,7 @@ export function getAdvancedFeatures(): AdvancedFeature[] {
       title: "Custom Pools",
       description: "Create and manage your own vaults with custom distributions between different pools.",
       icon: "Target",
-      color: "indigo",
+      color: "indigo", // Puedes dejar el color de la card como quieras
       stats: [
         { label: "Active Vaults", value: "2 active" },
         { label: "Average Return", value: "5.4%" },
@@ -374,6 +375,7 @@ export function getAdvancedFeatures(): AdvancedFeature[] {
       buttonText: "Explore Pools",
       buttonHref: "/pools",
       buttonVariant: "default",
+      buttonColor: "black", // <--- Agrega esta línea para que el botón sea negro
     },
     {
       title: "Learn about DeFi",

@@ -19,8 +19,7 @@ export function StrategyDistribution() {
       <CardContent>
         <div className="space-y-6">
           {strategies.map((strategy, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<div key={index} className="space-y-3">
+            <div key={index} className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3">
                   <div className={`h-4 w-4 rounded-full bg-gradient-to-r ${strategy.color}`} />

@@ -46,7 +46,7 @@ export function RecentActivity() {
             </CardTitle>
             <CardDescription>Últimas transacciones y rebalanceos automáticos</CardDescription>
           </div>
-          <Link href="/app/history">
+          <Link href="/history">
             <Button variant="outline" size="sm" className="gap-2">
               <Eye className="h-4 w-4" />
               Ver Todo
@@ -62,7 +62,6 @@ export function RecentActivity() {
 
             return (
               <div
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                 key={index}
                 className={`flex items-center gap-4 p-4 rounded-lg ${colors.bg} border ${colors.border}`}
               >

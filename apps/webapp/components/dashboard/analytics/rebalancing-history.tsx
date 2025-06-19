@@ -50,7 +50,6 @@ export function RebalancingHistory() {
 
             return (
               <div
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                 key={index}
                 className={`flex items-center gap-4 p-4 rounded-lg ${colors.bg} border ${colors.border}`}
               >
@@ -67,8 +66,7 @@ export function RebalancingHistory() {
                     {event.tags.map((tag, tagIndex) => {
                       const TagIcon = iconMap[tag.icon as keyof typeof iconMap]
                       return (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-<div key={tagIndex} className="flex items-center gap-1">
+                        <div key={tagIndex} className="flex items-center gap-1">
                           <TagIcon className={`h-3 w-3 text-${tag.color}-500`} />
                           <span className={`text-xs text-${tag.color}-600`}>{tag.label}</span>
                         </div>

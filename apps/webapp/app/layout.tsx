@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PayStark - Starknet Payment Gateway',
-  description: 'Generate custom APIs and payment gateways for Starknet',
+  title: 'Numo - Modular BTC Finance on Starknet',
+  description: 'Grow your BTC safely, automatically, and transparently with auto-rebalancing vaults, fixed-term bonds, strategy sharing, and forecasting tools on Starknet.',
 }
 
 export default function RootLayout({
