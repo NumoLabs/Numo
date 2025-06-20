@@ -4,7 +4,6 @@ import { useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Header } from "@/components/ui/header"
 import { WalletBalanceCard } from "@/components/deposit/wallet-balance-card"
 import { VaultInfoCard } from "@/components/deposit/vault-info-card"
 import { DepositOptions } from "@/components/deposit/deposit-options"
@@ -63,37 +62,49 @@ export default function DepositPage() {
       toast({
         title: "Error",
         description: "There was a problem processing your deposit. Please try again.",
-        variant: "destructive",    
+        variant: "destructive",
       })
-      console.error(error);
+      console.error(error)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header variant="dashboard" />
-      <main className="flex-1 p-4 md:p-8 pt-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex items-center mb-6">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 dark:from-gray-950 dark:via-blue-950/30 dark:to-purple-950/20">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-700 text-white">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl"></div>
+        <div className="relative z-10 px-4 py-12 md:px-8">
+          <div className="mx-auto max-w-6xl">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-white hover:bg-white/20 mb-6 transition-all duration-300 hover:scale-105"
+              >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Button>
             </Link>
-            <div className="ml-4">
-              <h1 className="text-3xl font-bold">Deposit BTC</h1>
-              <p className="text-muted-foreground mt-1">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                Deposit BTC
+              </h1>
+              <p className="text-xl text-blue-100 max-w-2xl">
                 Deposit BTC or WBTC into the vault to start generating returns automatically
               </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
+      <main className="flex-1 p-4 md:p-8 pt-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-6 lg:grid-cols-3" style={{ animation: "fadeInUp 0.6s ease-out" }}>
             {/* Left Column - Main Form */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6" style={{ animation: "fadeInUp 0.6s ease-out 0.1s both" }}>
               <div className="grid gap-6 md:grid-cols-2">
                 <WalletBalanceCard balance={walletBalance} />
                 <VaultInfoCard vaultInfo={vaultInfo} />
@@ -115,7 +126,7 @@ export default function DepositPage() {
             </div>
 
             {/* Right Column - Summary and Actions */}
-            <div className="space-y-6">
+            <div className="space-y-6 sticky top-6" style={{ animation: "fadeInUp 0.6s ease-out 0.2s both" }}>
               {estimate && selectedDepositOption && (
                 <DepositSummary estimate={estimate} option={selectedDepositOption} selectedToken={selectedToken} />
               )}

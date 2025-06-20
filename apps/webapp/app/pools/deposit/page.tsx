@@ -5,16 +5,6 @@ import { Sidebar } from "@/components/dashboard/layout/sidebar"
 import { TopNavigation } from "@/components/dashboard/layout/top-navigation"
 import { Footer } from "@/components/ui/footer"
 import { PoolsContent } from "@/components/pools/pools-content"
-import Link from "next/link"
-import { Filter, Info, Plus, Search, ArrowLeft } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PoolCard } from "@/components/pools/pool-card"
-import { VaultCard } from "@/components/pools/vault-card"
-import { poolsData } from "@/lib/pools-data"
 
 export default function PoolsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)

@@ -20,7 +20,8 @@ export function PoolRisks({ pool }: PoolRisksProps) {
             <div>
               <p className="font-medium">Risk Level: {pool.risk}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                This pool has a {pool.risk.toLowerCase()} risk level. Make sure you understand the risks before investing.
+                This pool has a {pool.risk.toLowerCase()} risk level. Make sure you understand the risks before
+                investing.
               </p>
             </div>
           </div>
@@ -41,7 +42,8 @@ export function PoolRisks({ pool }: PoolRisksProps) {
         <div>
           <h4 className="font-medium mb-2">Risk Mitigation</h4>
           <p>
-            To mitigate these risks, consider diversifying your investments across different pools and protocols. The automatic vault can help you manage these risks by automatically rebalancing between different strategies.
+            To mitigate these risks, consider diversifying your investments across different pools and protocols. The
+            automatic vault can help you manage these risks by automatically rebalancing between different strategies.
           </p>
         </div>
       </CardContent>

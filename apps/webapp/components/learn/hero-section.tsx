@@ -1,5 +1,4 @@
-import Link from "next/link"
-import { ArrowLeft, BookOpen, Play, Clock, TrendingUp, Users, Lock, Zap } from "lucide-react"
+import { BookOpen, Play, Clock, TrendingUp, Users, Lock, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -8,14 +7,6 @@ export function HeroSection() {
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-8 md:p-12 mb-8 text-white">
       <div className="absolute inset-0 bg-black/20" />
       <div className="relative z-10">
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/pools">
-            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/20">
-              <ArrowLeft className="h-4 w-4" />
-              Volver a Pools
-            </Button>
-          </Link>
-        </div>
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -29,7 +20,8 @@ export function HeroSection() {
               </span>
             </h1>
             <p className="text-xl text-blue-100 mb-6">
-              Learn the fundamental concepts of DeFi, liquidity pools, and investment strategies in a simple and practical way.
+              Learn the fundamental concepts of DeFi, liquidity pools, and investment strategies in a simple and
+              practical way.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 gap-2">

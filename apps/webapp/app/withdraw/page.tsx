@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Header } from "@/components/ui/header"
 import { VaultBalanceCard } from "@/components/withdraw/vault-balance-card"
 import { WithdrawOptions } from "@/components/withdraw/withdraw-options"
 import { AmountInput } from "@/components/withdraw/amount-input"
@@ -51,9 +50,9 @@ export default function WithdrawPage() {
       })
 
       // Redirect to history
-      router.push('/history')
+      router.push("/history")
     } catch (error) {
-      console.error(error);
+      console.error(error)
       toast({
         title: "Error",
         description: "There was a problem processing your withdrawal. Please try again.",
@@ -65,49 +64,74 @@ export default function WithdrawPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header variant="dashboard" />
-      <main className="flex-1 p-4 md:p-8 pt-6">
-        <div className="mx-auto max-w-4xl">
-          <div className="flex items-center mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-700 text-white">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl"></div>
+        <div className="relative z-10 px-4 py-12 md:px-8">
+          <div className="mx-auto max-w-4xl">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm" className="gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-white hover:bg-white/20 hover:text-white mb-6 transition-all duration-300 hover:scale-105"
+              >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Button>
             </Link>
-            <div className="ml-4">
-              <h1 className="text-3xl font-bold">Withdraw BTC</h1>
-              <p className="text-muted-foreground mt-1">Withdraw your funds from the vault at any time</p>
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                Withdraw BTC
+              </h1>
+              <p className="text-xl text-blue-100 max-w-2xl">
+                Withdraw your funds from the vault at any time with flexible options and transparent fees
+              </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
+      {/* Main Content */}
+      <main className="relative -mt-8 px-4 md:px-8 pb-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-8 lg:grid-cols-3">
             {/* Left Column - Main Form */}
-            <div className="lg:col-span-2 space-y-6">
-              <VaultBalanceCard balance={vaultBalance} />
+            <div className="lg:col-span-2 space-y-8">
+              <div className="animate-slide-up-fade-in">
+                <VaultBalanceCard balance={vaultBalance} />
+              </div>
 
-              <WithdrawOptions
-                options={withdrawOptions}
-                selectedOption={selectedOption}
-                onSelectOption={setSelectedOption}
-              />
+              <div className="animate-slide-up-fade-in" style={{ animationDelay: "0.1s" }}>
+                <WithdrawOptions
+                  options={withdrawOptions}
+                  selectedOption={selectedOption}
+                  onSelectOption={setSelectedOption}
+                />
+              </div>
 
-              <AmountInput
-                amount={amount}
-                onAmountChange={setAmount}
-                maxAmount={vaultBalance.totalBalance}
-                onMaxClick={handleMaxClick}
-              />
+              <div className="animate-slide-up-fade-in" style={{ animationDelay: "0.2s" }}>
+                <AmountInput
+                  amount={amount}
+                  onAmountChange={setAmount}
+                  maxAmount={vaultBalance.totalBalance}
+                  onMaxClick={handleMaxClick}
+                />
+              </div>
             </div>
 
             {/* Right Column - Summary and Actions */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {estimate && selectedWithdrawOption && (
-                <WithdrawSummary estimate={estimate} option={selectedWithdrawOption} />
+                <div className="animate-slide-up-fade-in" style={{ animationDelay: "0.3s" }}>
+                  <WithdrawSummary estimate={estimate} option={selectedWithdrawOption} />
+                </div>
               )}
 
-              <WithdrawActions isValid={!!isValidAmount} isLoading={isLoading} onWithdraw={handleWithdraw} />
+              <div className="animate-slide-up-fade-in" style={{ animationDelay: "0.4s" }}>
+                <WithdrawActions isValid={!!isValidAmount} isLoading={isLoading} onWithdraw={handleWithdraw} />
+              </div>
             </div>
           </div>
         </div>

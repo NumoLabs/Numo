@@ -1,16 +1,41 @@
 "use client"
 
 import Link from "next/link"
-import { Upload, Download, Wallet, Activity, Bitcoin, TrendingUp, Star, Clock, CheckCircle2 } from "lucide-react"
+import {
+  Upload,
+  Download,
+  Wallet,
+  Activity,
+  Bitcoin,
+  TrendingUp,
+  Star,
+  Clock,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useState } from "react"
 
 export function DashboardHero() {
+  const [showBalance, setShowBalance] = useState(true)
+
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-700 p-8 md:p-12 text-white mb-8 shadow-2xl">
       <div className="absolute inset-0 bg-black/10"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl"></div>
       <div className="relative z-10">
+        {/* Balance Toggle Button - Top Right Corner */}
+        <div className="absolute -top-2 right-0 mb-4">
+          <button
+            onClick={() => setShowBalance(!showBalance)}
+            className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-105 border border-white/20"
+            title={showBalance ? "Hide balance" : "Show balance"}
+          >
+            {showBalance ? <Eye className="h-4 w-4 text-white" /> : <EyeOff className="h-4 w-4 text-white" />}
+          </button>
+        </div>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -61,12 +86,14 @@ export function DashboardHero() {
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-blue-100">Total Balance</p>
-              <div className="h-8 w-8 rounded-full bg-orange-300/30 flex items-center justify-center">
-                <Bitcoin className="h-5 w-5 text-orange-300" />
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-orange-300/30 flex items-center justify-center">
+                  <Bitcoin className="h-5 w-5 text-orange-300" />
+                </div>
               </div>
             </div>
-            <p className="text-2xl font-bold">1.245 BTC</p>
-            <p className="text-xs text-white">≈ $78,435.67 USD</p>
+            <p className="text-2xl font-bold">{showBalance ? "1.245 BTC" : "••••••••"}</p>
+            <p className="text-xs text-white">{showBalance ? "≈ $78,435.67 USD" : "≈ $••••••••"}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
             <div className="flex items-center justify-between mb-2">
