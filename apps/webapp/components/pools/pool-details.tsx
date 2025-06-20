@@ -8,7 +8,6 @@ interface PoolDetailsProps {
 }
 
 export function PoolDetails({ pool }: PoolDetailsProps) {
-
   return (
     <Card>
       <CardHeader>

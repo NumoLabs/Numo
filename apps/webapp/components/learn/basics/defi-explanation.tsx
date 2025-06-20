@@ -18,7 +18,8 @@ export function DefiExplanation() {
       <CardContent className="p-6">
         <div className="prose dark:prose-invert max-w-none">
           <p className="text-lg leading-relaxed mb-6">
-            DeFi (Decentralized Finance) represents a revolution in the traditional financial system. Imagine a world where you can lend, borrow, exchange, and invest without the need for banks or intermediaries.
+            DeFi (Decentralized Finance) represents a revolution in the traditional financial system. Imagine a world
+            where you can lend, borrow, exchange, and invest without the need for banks or intermediaries.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 my-8">
@@ -84,9 +85,7 @@ export function DefiExplanation() {
                 </h4>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <h5 className="font-medium text-purple-800 dark:text-purple-200 mb-2">
-                      🔓 Permissionless
-                    </h5>
+                    <h5 className="font-medium text-purple-800 dark:text-purple-200 mb-2">🔓 Permissionless</h5>
                     <p className="text-sm text-purple-700 dark:text-purple-300">
                       Anyone with a wallet can access DeFi services, without the need for approvals or verifications.
                     </p>
@@ -94,7 +93,8 @@ export function DefiExplanation() {
                   <div>
                     <h5 className="font-medium text-purple-800 dark:text-purple-200 mb-2">🔍 Transparent</h5>
                     <p className="text-sm text-purple-700 dark:text-purple-300">
-                      All transactions are public and verifiable on the blockchain, eliminating the opacity of the traditional system.
+                      All transactions are public and verifiable on the blockchain, eliminating the opacity of the
+                      traditional system.
                     </p>
                   </div>
                   <div>

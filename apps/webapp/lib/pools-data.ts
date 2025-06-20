@@ -109,14 +109,9 @@ export const poolsData: Pool[] = [
     risk: "Low",
     tokens: ["BTC"],
     url: "https://vesu.xyz",
-    details:
-      "Automated vault that optimizes BTC performance through different Vesu Finance strategies.",
+    details: "Automated vault that optimizes BTC performance through different Vesu Finance strategies.",
     risks: ["Smart contract risk", "Automated strategy risk", "Dependency on Vesu platform"],
-    benefits: [
-      "Automated strategy management",
-      "Continuous yield optimization",
-      "Lower risk than liquidity pools",
-    ],
+    benefits: ["Automated strategy management", "Continuous yield optimization", "Lower risk than liquidity pools"],
   },
   {
     id: "ekubo-btc-usdt",
@@ -147,11 +142,7 @@ export const poolsData: Pool[] = [
     tokens: ["BTC", "DAI"],
     url: "https://ekubo.org",
     details: "Liquidity pool combining BTC with DAI, a decentralized stablecoin from the MakerDAO ecosystem.",
-    risks: [
-      "Impermanent loss risk",
-      "Smart contract risk",
-      "Dependency on MakerDAO ecosystem for DAI",
-    ],
+    risks: ["Impermanent loss risk", "Smart contract risk", "Dependency on MakerDAO ecosystem for DAI"],
     benefits: ["BTC exposure with decentralized stablecoin", "Trading fees", "Diversification with DAI"],
   },
 ]
@@ -210,3 +201,6 @@ export const getPoolBySlug = (slug: string): Pool | undefined => {
 export const getVaultBySlug = (slug: string): Vault | undefined => {
   return vaultsData[slug]
 }
+
+// Alias para compatibilidad con imports antiguos
+export const pools = poolsData

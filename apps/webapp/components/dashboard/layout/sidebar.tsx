@@ -2,33 +2,36 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import {
-  LayoutDashboard,
-  Upload,
-  Download,
-  History,
-  Target,
-  Coins,
-  TrendingUp,
-  BookOpen,
-  Settings,
-  X,
-  BarChart3,
-} from "lucide-react"
+import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, current: true },
-  { name: "Deposit", href: "/deposit", icon: Upload, current: false },
-  { name: "Withdraw", href: "/withdraw", icon: Download, current: false },
-  { name: "History", href: "/history", icon: History, current: false },
-  { name: "Custom Pools", href: "/pools", icon: Target, current: false },
-  { name: "Bonds", href: "/bonds", icon: Coins, current: false },
-  { name: "Forecast", href: "/forecast", icon: TrendingUp, current: false },
-  { name: "Marketplace", href: "/marketplace", icon: BarChart3, current: false },
-  { name: "Learn DeFi", href: "/learn", icon: BookOpen, current: false },
-  { name: "Settings", href: "/settings", icon: Settings, current: false },
+  {
+    section: "Core",
+    items: [
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, current: true },
+      { name: "History", href: "/history", icon: History, current: false },
+    ],
+  },
+  {
+    section: "Trading",
+    items: [
+      { name: "Custom Pools", href: "/pools", icon: Target, current: false },
+      { name: "Bonds", href: "/bonds", icon: Coins, current: false },
+    ],
+  },
+  {
+    section: "Analytics",
+    items: [
+      { name: "Forecast", href: "/forecast", icon: TrendingUp, current: false },
+      { name: "Marketplace", href: "/marketplace", icon: BarChart3, current: false },
+    ],
+  },
+  {
+    section: "Resources",
+    items: [{ name: "Learn DeFi", href: "/learn", icon: BookOpen, current: false }],
+  },
 ]
 
 interface SidebarProps {
@@ -63,26 +66,37 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             </Button>
           </div>
           <nav className="mt-6 px-3">
-            <div className="space-y-1">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
-                    pathname === item.href
-                      ? "bg-gradient-to-r from-cyan-500/10 to-blue-500/10 text-cyan-700 dark:text-cyan-300 border-r-2 border-cyan-500"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      "mr-3 h-5 w-5 transition-colors",
-                      pathname === item.href ? "text-cyan-600" : "text-gray-400 group-hover:text-gray-600",
-                    )}
-                  />
-                  {item.name}
-                </Link>
+            <div className="space-y-6">
+              {navigation.map((section) => (
+                <div key={section.section}>
+                  <h3 className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                    {section.section}
+                  </h3>
+                  <div className="space-y-1">
+                    {section.items.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={cn(
+                          "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                          pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                            ? "bg-gradient-to-r from-cyan-500/10 to-blue-500/10 text-cyan-700 dark:text-cyan-300 border-r-2 border-cyan-500"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            "mr-3 h-5 w-5 transition-colors",
+                            pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                              ? "text-cyan-600"
+                              : "text-gray-400 group-hover:text-gray-600",
+                          )}
+                        />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </nav>
@@ -106,55 +120,41 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           </div>
           <nav className="flex flex-1 flex-col px-4">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
-              <li>
-                <ul role="list" className="-mx-2 space-y-2">
-                  {navigation.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "group relative flex gap-x-3 rounded-2xl px-4 py-4 text-sm font-semibold leading-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:-translate-y-0.5",
-                          pathname === item.href
-                            ? "bg-gradient-to-r from-cyan-500/15 via-blue-500/15 to-purple-500/15 text-cyan-700 dark:text-cyan-300 shadow-xl border border-cyan-200/50 dark:border-cyan-800/50 backdrop-blur-sm"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-50/80 hover:via-gray-100/60 hover:to-gray-50/80 dark:hover:from-gray-800/80 dark:hover:via-gray-700/60 dark:hover:to-gray-800/80 hover:text-gray-900 dark:hover:text-white hover:shadow-md",
-                        )}
-                      >
-                        {/* Background glow effect for active item */}
-                        {pathname === item.href && (
-                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 blur-sm" />
-                        )}
-
-                        {/* Icon container with background */}
-                        <div
+              {navigation.map((section) => (
+                <li key={section.section}>
+                  <div className="text-xs font-semibold leading-6 text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                    {section.section}
+                  </div>
+                  <ul role="list" className="-mx-2 space-y-1">
+                    {section.items.map((item) => (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
                           className={cn(
-                            "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all duration-300",
-                            pathname === item.href
-                              ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-110"
-                              : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:bg-gradient-to-br group-hover:from-cyan-400 group-hover:to-blue-500 group-hover:text-white group-hover:scale-105 group-hover:shadow-md",
+                            "group flex gap-x-3 rounded-xl px-3 py-3 text-sm font-semibold leading-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-md",
+                            pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                              ? "bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 text-cyan-700 dark:text-cyan-300 shadow-lg border border-cyan-200/50 dark:border-cyan-800/50"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-100/80 hover:to-gray-50/80 dark:hover:from-gray-800/80 dark:hover:to-gray-700/80 hover:text-gray-900 dark:hover:text-white",
                           )}
                         >
-                          <item.icon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
-                        </div>
-
-                        <span className="relative z-10 transition-all duration-300 group-hover:translate-x-1">
+                          <item.icon
+                            className={cn(
+                              "h-5 w-5 shrink-0 transition-all duration-200",
+                              pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                                ? "text-cyan-600 scale-110"
+                                : "text-gray-400 group-hover:text-gray-600 group-hover:scale-105",
+                            )}
+                          />
                           {item.name}
-                        </span>
-
-                        {/* Active indicator */}
-                        {pathname === item.href && (
-                          <>
-                            <div className="ml-auto h-2 w-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 animate-pulse shadow-sm" />
-                            <div className="absolute right-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-l-full bg-gradient-to-b from-cyan-500 to-blue-600 shadow-lg" />
-                          </>
-                        )}
-
-                        {/* Hover effect line */}
-                        <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
+                          {(pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))) && (
+                            <div className="ml-auto h-2 w-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 animate-pulse" />
+                          )}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>

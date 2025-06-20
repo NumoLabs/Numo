@@ -18,9 +18,9 @@ interface PoolCardProps {
 }
 
 export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, poolId }: PoolCardProps) {
-  // Function to determine risk badge color
-  const getRiskColor = (risk: string) => {
-    switch (risk.toLowerCase()) {
+  // Determinar color según riesgo
+  const getRiskColor = (level: string) => {
+    switch (level.toLowerCase()) {
       case "low":
         return "bg-green-100 text-green-800 hover:bg-green-100/80 dark:bg-green-800/30 dark:text-green-300"
       case "medium":
@@ -34,7 +34,7 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
     }
   }
 
-  const slug = poolId || name.toLowerCase().replace(/\//g, "-").replace(/\s+/g, "-")
+  const slug = poolId ?? name.toLowerCase().replace(/\//g, "-").replace(/\s+/g, "-")
 
   return (
     <Card>
@@ -51,8 +51,8 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">
-                  Click on &quot;View Details&quot; to get more information about this pool, including risks,
-                  strategies and historical performance.
+                  Click on &quot;View Details&quot; to get more information about this pool, including risks, strategies
+                  and historical performance.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -60,6 +60,7 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
         </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
+
       <CardContent>
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="space-y-1">
@@ -71,6 +72,7 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
             <p className="text-lg font-semibold">{tvl}</p>
           </div>
         </div>
+
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary">{protocol}</Badge>
           <Badge className={getRiskColor(risk)}>{risk}</Badge>
@@ -81,6 +83,7 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
           ))}
         </div>
       </CardContent>
+
       <CardFooter className="flex justify-between">
         <Link href={`/pools/${slug}`}>
           <Button variant="outline" size="sm">

@@ -27,14 +27,11 @@ interface VaultCardProps {
 }
 
 export function VaultCard({ name, description, apy, totalValue, pools, vaultId }: VaultCardProps) {
-  // Function to generate a color based on the pool name
+  // Color bar según el nombre del pool
   const getPoolColor = (poolName: string) => {
-    if (poolName.includes("Vesu")) {
-      return "bg-emerald-500"
-    }if (poolName.includes("Ekubo")) {
-      return "bg-amber-500"
-    }
-      return "bg-gray-500"
+    if (poolName.includes("Vesu")) return "bg-emerald-500"
+    if (poolName.includes("Ekubo")) return "bg-amber-500"
+    return "bg-gray-500"
   }
 
   const slug = vaultId || name.toLowerCase().replace(/\//g, "-").replace(/\s+/g, "-")
@@ -67,6 +64,7 @@ export function VaultCard({ name, description, apy, totalValue, pools, vaultId }
         </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
+
       <CardContent className="pb-2">
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="space-y-1">
@@ -78,6 +76,7 @@ export function VaultCard({ name, description, apy, totalValue, pools, vaultId }
             <p className="text-lg font-semibold">{totalValue}</p>
           </div>
         </div>
+
         <div className="space-y-3">
           {pools.map((pool) => (
             <div key={pool.name} className="space-y-1">
@@ -95,6 +94,7 @@ export function VaultCard({ name, description, apy, totalValue, pools, vaultId }
           ))}
         </div>
       </CardContent>
+
       <CardFooter className="flex justify-between pt-4">
         <Link href={`/pools/vault/${slug}`}>
           <Button variant="outline" size="sm">

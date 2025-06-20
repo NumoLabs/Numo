@@ -25,9 +25,7 @@ export function LearningPathCard({
 }: LearningPathCardProps) {
   return (
     <Card className={`relative overflow-hidden ${isActive ? "border-2 border-blue-200 dark:border-blue-800" : ""}`}>
-      {isActive && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500" />
-      )}
+      {isActive && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500" />}
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
           <div className={`h-12 w-12 rounded-full ${bgColor} flex items-center justify-center`}>
