@@ -12,19 +12,19 @@ import { PoolDetailChart } from "@/components/pools/pool-detail-chart"
 import { PoolDetails, PoolPerformance, PoolStatistics } from "@/components/pools/pool-details"
 import { PoolRisks } from "@/components/pools/pool-risks"
 import { AddToVaultActions } from "@/components/pools/vault-actions"
-import { getPoolBySlug } from "@/lib/pools-data"
+import { getPoolBySlug, type Pool } from "@/lib/pools-data"
 import { useEffect, useState } from "react"
 
 export function PoolDetailContent() {
   const params = useParams()
-  const [pool, setPool] = useState<any>(null)
+  const [pool, setPool] = useState<Pool | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadPool = async () => {
       if (params.pool) {
         const poolData = await getPoolBySlug(params.pool as string)
-        setPool(poolData)
+        setPool(poolData || null)
         setLoading(false)
       }
     }

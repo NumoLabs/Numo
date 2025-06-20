@@ -9,7 +9,7 @@ import { DashboardTabs } from "@/components/dashboard/charts/dashboard-tabs"
 import { historyStats } from "@/lib/history-data"
 
 export function HistoryContent() {
-  const [searchTerm, setSearchTerm] = useState("")
+  // const [searchTerm, setSearchTerm] = useState("")
   const [, setSelectedType] = useState("all")
   const [, setSelectedPeriod] = useState("all")
 
@@ -39,7 +39,7 @@ export function HistoryContent() {
       <StatsOverview stats={historyStats} />
 
       {/* Search and Filters */}
-      <SearchFilters onSearchChange={setSearchTerm} onTypeChange={setSelectedType} onPeriodChange={setSelectedPeriod} />
+      <SearchFilters onSearchChange={() => {}} onTypeChange={setSelectedType} onPeriodChange={setSelectedPeriod} />
 
       {/* Transaction Tabs */}
       <DashboardTabs />
