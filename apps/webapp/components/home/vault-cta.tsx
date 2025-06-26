@@ -2,12 +2,59 @@
 
 import { useState } from "react"
 import { Mail, User, CheckCircle2, Sparkles, ArrowRight, Star } from "lucide-react"
+import { supabase } from "../../lib/supabase"
 
 export function VaultCTA() {
   const [status, setStatus] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = e.currentTarget as HTMLFormElement
+    const email = (form.email as HTMLInputElement).value.trim()
+    const handle = (form.handle as HTMLInputElement).value.trim()
+    
+    // Validación
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      setStatus("Please enter a valid email.")
+      return
+    }
+
+    setIsLoading(true)
+    setStatus("Adding you to the waitlist...")
+
+    try {
+      const { error } = await supabase
+        .from('waitlist')
+        .insert([
+          { 
+            email: email.toLowerCase(),
+            social_handle: handle || null
+          }
+        ])
+
+      if (error) {
+        throw error
+      }
+
+      setStatus("You are on the waitlist! 🚀")
+      form.reset() // Limpiar formulario
+      
+    } catch (error: unknown) {
+      console.error('Error saving to waitlist:', error)
+      
+      if (error instanceof Error && 'code' in error && error.code === '23505') {
+        setStatus("You're already on our waitlist! 🎉")
+      } else {
+        setStatus("Something went wrong. Please try again.")
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <section className="w-full py-12 md:py-20 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
+    <section id="waitlist" className="w-full py-12 md:py-20 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
       {/* Background decorative elements */}
 
       <div className="container px-4 md:px-6 flex flex-col items-center relative z-10">
@@ -31,17 +78,7 @@ export function VaultCTA() {
 
             <form
               className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/50 p-4 md:p-6 flex flex-col gap-6"
-              onSubmit={async (e) => {
-                e.preventDefault()
-                const form = e.currentTarget
-                const email = form.email.value.trim()
-                if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-                  setStatus("Please enter a valid email.")
-                  return
-                }
-                setStatus("Submitting...")
-                setTimeout(() => setStatus("You are on the whitelist! 🚀"), 1200)
-              }}
+              onSubmit={handleSubmit}
             >
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="relative group">
@@ -53,8 +90,9 @@ export function VaultCTA() {
                       type="email"
                       name="email"
                       required
+                      disabled={isLoading}
                       placeholder="your@email.com"
-                      className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-blue-500"
+                      className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-700"
                     />
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 transition-transform group-focus-within:scale-110" />
                   </div>
@@ -67,8 +105,9 @@ export function VaultCTA() {
                     <input
                       type="text"
                       name="handle"
+                      disabled={isLoading}
                       placeholder="@username (optional)"
-                      className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-purple-500"
+                      className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-700"
                     />
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500 transition-transform group-focus-within:scale-110" />
                   </div>
@@ -78,13 +117,29 @@ export function VaultCTA() {
               <div className="flex flex-col sm:flex-row gap-4 items-center">
                 <button
                   type="submit"
-                  className="group relative w-full sm:flex-1 overflow-hidden bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white font-bold rounded-xl py-4 px-8 text-lg shadow-xl shadow-cyan-500/50 transition-all transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-400/60 focus:outline-none focus:ring-4 focus:ring-cyan-500/50"
+                  disabled={isLoading}
+                  className={`group relative w-full sm:flex-1 overflow-hidden font-bold rounded-xl py-4 px-8 text-lg shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-cyan-500/50 ${
+                    isLoading 
+                      ? 'bg-gray-400 cursor-not-allowed text-white'
+                      : 'bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white shadow-cyan-500/50 hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-400/60'
+                  }`}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
-                    Join Beta Waitlist
-                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        Adding to waitlist...
+                      </>
+                    ) : (
+                      <>
+                        Join Beta Waitlist
+                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                      </>
+                    )}
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {!isLoading && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  )}
                 </button>
 
                 <div className="text-center sm:text-left">
@@ -101,9 +156,17 @@ export function VaultCTA() {
               </div>
 
               {status && (
-                <div className="flex items-center justify-center gap-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 animate-fade-in">
-                  <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400 animate-bounce-in" />
-                  <span className="text-green-700 dark:text-green-300 font-medium text-lg">{status}</span>
+                <div className={`flex items-center justify-center gap-3 border rounded-xl p-4 animate-fade-in ${
+                  status.includes('Something went wrong') || status.includes('Please enter')
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+                    : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300'
+                }`}>
+                  <CheckCircle2 className={`w-6 h-6 animate-bounce-in ${
+                    status.includes('Something went wrong') || status.includes('Please enter')
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-green-600 dark:text-green-400'
+                  }`} />
+                  <span className="font-medium text-lg">{status}</span>
                 </div>
               )}
 

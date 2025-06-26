@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 import { StarknetkitConnector, useStarknetkitConnectModal } from 'starknetkit';
