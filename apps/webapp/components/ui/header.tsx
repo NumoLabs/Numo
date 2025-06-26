@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, LayoutDashboard } from "lucide-react"
+import { Menu } from "lucide-react"
 import { useAccount } from '@starknet-react/core'
 import Image from "next/image"
 
