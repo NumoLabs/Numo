@@ -1,17 +1,23 @@
 "use client";
 import React from "react";
 
-import { sepolia, mainnet } from "@starknet-react/chains";
+import { sepolia } from "@starknet-react/chains";
 import {
   StarknetConfig,
-  publicProvider,
+  jsonRpcProvider,
   voyager,
 } from "@starknet-react/core";
 import { InjectedConnector } from "starknetkit/injected";
 import { WebWalletConnector } from "starknetkit/webwallet";
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
-  // Define connectors using StarknetKit
+  function rpc() {
+    return {
+      nodeUrl: `https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/yI1L61QqzPDE0eXH4nVDl`
+    }
+  }
+  const provider = jsonRpcProvider({ rpc });
+
   const connectors = [
     new InjectedConnector({
       options: { id: "argentX", name: "Argent X" },
@@ -24,8 +30,8 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <StarknetConfig
-      chains={[mainnet, sepolia]}
-      provider={publicProvider()}
+      chains={[sepolia]}
+      provider={provider}
       connectors={connectors}
       explorer={voyager}
     >
