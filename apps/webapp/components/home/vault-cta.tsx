@@ -54,7 +54,7 @@ export function VaultCTA() {
   }
 
   return (
-    <section className="w-full py-12 md:py-20 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
+    <section id="waitlist" className="w-full py-12 md:py-20 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
       {/* Background decorative elements */}
 
       <div className="container px-4 md:px-6 flex flex-col items-center relative z-10">
