@@ -45,7 +45,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
               </span>
             </Link>
           </div>
-          <nav className="hidden md:flex gap-8 ml-12">
+          <nav className="hidden md:flex items-center gap-7 ml-12">
             <Link
               href="#stats"
               className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300"
@@ -67,7 +67,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
             <Button
               asChild
               variant="default"
-              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
+              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
             >
               <Link href="#waitlist">
                 Waitlist
@@ -216,7 +216,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
               umo
             </span>
           </Link>
-          <nav className="hidden md:flex gap-8 ml-10">
+          <nav className="hidden md:flex row-gap-4 ml-10">
             <Link
               href="/dashboard"
               className={cn(
