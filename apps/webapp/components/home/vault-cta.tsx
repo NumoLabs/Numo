@@ -24,7 +24,7 @@ export function VaultCTA() {
     setStatus("Adding you to the waitlist...")
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('waitlist')
         .insert([
           { 
@@ -40,10 +40,10 @@ export function VaultCTA() {
       setStatus("You are on the waitlist! 🚀")
       form.reset() // Limpiar formulario
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving to waitlist:', error)
       
-      if (error.code === '23505') {
+      if (error instanceof Error && 'code' in error && error.code === '23505') {
         setStatus("You're already on our waitlist! 🎉")
       } else {
         setStatus("Something went wrong. Please try again.")
