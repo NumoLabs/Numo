@@ -22,7 +22,7 @@ const initialPools = [
 
 const recommendedStrategies = [
   {
-    name: "Estrategia Conservadora",
+    name: "Conservative Strategy",
     description: "70% Vesu BTC Lending, 30% Vesu BTC Vault",
     pools: [
       { id: "1", name: "Vesu BTC Lending", allocation: 70, apy: 5.8 },
@@ -30,7 +30,7 @@ const recommendedStrategies = [
     ],
   },
   {
-    name: "Estrategia Balanceada",
+    name: "Balanced Strategy",
     description: "50% Vesu BTC Lending, 30% Ekubo BTC/USDC, 20% Ekubo BTC/ETH",
     pools: [
       { id: "1", name: "Vesu BTC Lending", allocation: 50, apy: 5.8 },
@@ -39,7 +39,7 @@ const recommendedStrategies = [
     ],
   },
   {
-    name: "Estrategia Agresiva",
+    name: "Aggressive Strategy",
     description: "30% Vesu BTC Lending, 40% Ekubo BTC/ETH, 30% Ekubo BTC/USDT",
     pools: [
       { id: "1", name: "Vesu BTC Lending", allocation: 30, apy: 5.8 },
@@ -201,7 +201,7 @@ export function CreateVaultContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Crear Vault Personalizada</h1>
+        <h1 className="text-3xl font-bold">Create Custom Vault</h1>
         <p className="text-muted-foreground mt-1">Create your own custom investment strategy</p>
       </div>
 
@@ -209,11 +209,10 @@ export function CreateVaultContent() {
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
           <div className="space-y-1">
-            <p className="font-medium">Crea tu propia estrategia</p>
+            <p className="font-medium">Create your own strategy</p>
             <p className="text-sm text-muted-foreground">
-              Las vaults personalizadas te permiten distribuir tus fondos entre diferentes pools según tus preferencias.
-              Puedes elegir pools con diferentes niveles de riesgo y rendimiento para crear una estrategia que se adapte
-              a tus objetivos.
+              Custom vaults allow you to distribute your funds between different pools according to your preferences.
+              You can choose pools with different risk and return levels to create a strategy that fits your goals.
             </p>
           </div>
         </div>
@@ -252,9 +251,9 @@ export function CreateVaultContent() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Selección de Pools</CardTitle>
+                <CardTitle>Pool Selection</CardTitle>
                 <CardDescription>
-                  Selecciona los pools que quieres incluir en tu vault y asigna porcentajes.
+                  Select the pools you want to include in your vault and assign percentages.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -270,12 +269,12 @@ export function CreateVaultContent() {
                           onClick={() => handleRemovePool(pool.id)}
                         >
                           <Trash className="h-4 w-4" />
-                          <span className="sr-only">Eliminar</span>
+                          <span className="sr-only">Remove</span>
                         </Button>
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span>Asignación: {pool.allocation.toFixed(0)}%</span>
+                          <span>Allocation: {pool.allocation.toFixed(0)}%</span>
                           <span>APY: {pool.apy}%</span>
                         </div>
                         <Slider
@@ -299,17 +298,17 @@ export function CreateVaultContent() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Resumen</CardTitle>
-                <CardDescription>Resumen de tu vault personalizada.</CardDescription>
+                <CardTitle>Summary</CardTitle>
+                <CardDescription>Summary of your custom vault.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">APY Estimado</div>
+                  <div className="text-sm text-muted-foreground">Estimated APY</div>
                   <div className="text-2xl font-bold">{estimatedAPY.toFixed(2)}%</div>
                 </div>
                 <Separator />
                 <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">Distribución</div>
+                  <div className="text-sm text-muted-foreground">Distribution</div>
                   <div className="space-y-2">
                     {pools.map((pool) => (
                       <div key={pool.id} className="space-y-2">
@@ -330,11 +329,11 @@ export function CreateVaultContent() {
               </CardContent>
               <CardFooter className="flex flex-col space-y-2">
                 <Button className="w-full" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Creando..." : "Crear Vault"}
+                  {isSubmitting ? "Creating..." : "Create Vault"}
                 </Button>
                 <Link href="/pools">
                   <Button variant="outline" className="w-full" type="button">
-                    Cancelar
+                    Cancel
                   </Button>
                 </Link>
                 {errors.allocation && <p className="text-sm text-red-500">{errors.allocation}</p>}
@@ -343,7 +342,7 @@ export function CreateVaultContent() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Recomendaciones</CardTitle>
+                <CardTitle>Recommendations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {recommendedStrategies.map((strategy) => (
@@ -356,7 +355,7 @@ export function CreateVaultContent() {
                       className="w-full"
                       onClick={() => applyRecommendedStrategy(strategy)}
                     >
-                      Aplicar
+                      Apply
                     </Button>
                     <Separator />
                   </div>

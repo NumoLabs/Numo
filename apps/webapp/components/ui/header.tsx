@@ -112,7 +112,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                     <Link
                       href="/dashboard"
                       className={cn(
-                        "hover:text-foreground",
+                        "hover:text-foreground transition-colors",
                         pathname === "/dashboard" ? "text-foreground" : "text-muted-foreground",
                       )}
                     >
@@ -121,7 +121,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                     <Link
                       href="/deposit"
                       className={cn(
-                        "hover:text-foreground",
+                        "hover:text-foreground transition-colors",
                         pathname === "/deposit" ? "text-foreground" : "text-muted-foreground",
                       )}
                     >
@@ -130,7 +130,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                     <Link
                       href="/withdraw"
                       className={cn(
-                        "hover:text-foreground",
+                        "hover:text-foreground transition-colors",
                         pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground",
                       )}
                     >
@@ -139,7 +139,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                     <Link
                       href="/history"
                       className={cn(
-                        "hover:text-foreground",
+                        "hover:text-foreground transition-colors",
                         pathname === "/history" ? "text-foreground" : "text-muted-foreground",
                       )}
                     >
@@ -148,7 +148,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                     <Link
                       href="/pools"
                       className={cn(
-                        "hover:text-foreground",
+                        "hover:text-foreground transition-colors",
                         pathname === "/pools" ? "text-foreground" : "text-muted-foreground",
                       )}
                     >

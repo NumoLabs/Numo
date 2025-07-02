@@ -8,9 +8,12 @@ import { BondSummary } from "@/components/bonds/bond-summary"
 import { BondActions } from "@/components/bonds/bond-actions"
 import { ActiveBonds } from "@/components/bonds/active-bonds"
 import { useToast } from "@/hooks/use-toast"
+import { useWalletAuth } from "@/hooks/use-wallet-auth"
 import { bondOptions, getBondOptionById, getActiveBonds, calculateBondEstimate } from "@/lib/bonds-data"
 
 export function BondsContent() {
+  // Use centralized wallet system to prevent extension activation
+  useWalletAuth()
   const [selectedOption, setSelectedOption] = useState("30-day")
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)

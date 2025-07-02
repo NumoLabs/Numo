@@ -1,7 +1,8 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useWalletStatus } from "@/hooks/use-wallet"
 import { Footer } from "@/components/ui/footer"
 import { Sidebar } from "./sidebar"
 import { TopNavigation } from "./top-navigation"
@@ -21,7 +22,30 @@ import { LearnContent } from "@/components/learn/learn-content"
 
 export function DashboardLayout() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { isConnected } = useWalletStatus()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Redirect to home page when wallet is disconnected
+  useEffect(() => {
+    // Only redirect if we're in a dashboard route and wallet is disconnected
+    const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
+    
+    if (isDashboardRoute && !isConnected) {
+      // Add a small delay to avoid immediate redirect on initial load
+      const timeoutId = setTimeout(() => {
+        router.push("/")
+      }, 100)
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [isConnected, pathname, router])
+
+  // Show nothing while redirecting to prevent flash of content
+  const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
+  if (isDashboardRoute && !isConnected) {
+    return null
+  }
 
   const renderContent = () => {
     if (pathname === "/") {

@@ -1,9 +1,11 @@
 "use client"
 
 import { Menu, Bell, Search, User, Settings } from "lucide-react"
+import { memo, useMemo } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +20,33 @@ interface TopNavigationProps {
   setSidebarOpen: (open: boolean) => void
 }
 
+// Memoized avatar component to prevent unnecessary re-renders
+const UserAvatar = memo(() => {
+  const avatarImage = useMemo(() => (
+    <Image
+      src="/user-avatar.jpg"
+      alt="User"
+      width={32}
+      height={32}
+      className="h-8 w-8 rounded-full object-cover"
+      priority
+      unoptimized={false}
+      // Prevent reloading on navigation
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+    />
+  ), [])
+
+  return (
+    <Avatar className="h-8 w-8">
+      {avatarImage}
+      <AvatarFallback>U</AvatarFallback>
+    </Avatar>
+  )
+})
+
+UserAvatar.displayName = 'UserAvatar'
+
 export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -31,7 +60,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
         <div className="relative flex flex-1 items-center">
           <div className="relative w-full max-w-lg">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
+              <Search className="h-4 w-4 text-black-400" />
             </div>
             <Input
               className="block w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm py-2.5 pl-10 pr-12 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg sm:text-sm"
@@ -60,10 +89,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/user-avatar.jpg" alt="User" />
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
+                <UserAvatar />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
