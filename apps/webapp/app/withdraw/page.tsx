@@ -11,14 +11,21 @@ import { AmountInput } from "@/components/withdraw/amount-input"
 import { WithdrawSummary } from "@/components/withdraw/withdraw-summary"
 import { WithdrawActions } from "@/components/withdraw/withdraw-actions"
 import { useToast } from "@/hooks/use-toast"
+import { useWalletAuth } from "@/hooks/use-wallet-auth"
 import { vaultBalance, withdrawOptions, calculateWithdrawEstimate, getWithdrawOptionById } from "@/lib/withdraw-data"
 
 export default function WithdrawPage() {
   const router = useRouter()
+  const { isAuthenticated, isProtectedRoute } = useWalletAuth()
   const [selectedOption, setSelectedOption] = useState("standard")
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+
+  // Show nothing while redirecting to prevent flash of content
+  if (isProtectedRoute && !isAuthenticated) {
+    return null
+  }
 
   const selectedWithdrawOption = getWithdrawOptionById(selectedOption)
   const maxAmount = vaultBalance.totalBalance.replace(" BTC", "")

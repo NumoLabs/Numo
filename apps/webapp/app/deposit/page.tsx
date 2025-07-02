@@ -11,6 +11,7 @@ import { AmountInput } from "@/components/deposit/amount-input"
 import { DepositSummary } from "@/components/deposit/deposit-summary"
 import { DepositActions } from "@/components/deposit/deposit-actions"
 import { useToast } from "@/hooks/use-toast"
+import { useWalletAuth } from "@/hooks/use-wallet-auth"
 import {
   walletBalance,
   vaultInfo,
@@ -20,11 +21,17 @@ import {
 } from "@/lib/deposit-data"
 
 export default function DepositPage() {
+  const { isAuthenticated, isProtectedRoute } = useWalletAuth()
   const [selectedOption, setSelectedOption] = useState("standard")
   const [amount, setAmount] = useState("")
   const [selectedToken, setSelectedToken] = useState<"btc" | "wbtc">("btc")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+
+  // Show nothing while redirecting to prevent flash of content
+  if (isProtectedRoute && !isAuthenticated) {
+    return null
+  }
 
   const selectedDepositOption = getDepositOptionById(selectedOption)
 
@@ -77,12 +84,12 @@ export default function DepositPage() {
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl"></div>
         <div className="relative z-10 px-4 py-12 md:px-8">
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-4xl">
             <Link href="/dashboard">
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-2 text-white hover:bg-white/20 mb-6 transition-all duration-300 hover:scale-105"
+                className="gap-2 text-white hover:bg-white/20 hover:text-white mb-6 transition-all duration-300 hover:scale-105"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
@@ -93,7 +100,7 @@ export default function DepositPage() {
                 Deposit BTC
               </h1>
               <p className="text-xl text-blue-100 max-w-2xl">
-                Deposit BTC or WBTC into the vault to start generating returns automatically
+                Start earning returns on your BTC by depositing into our automated vault strategy
               </p>
             </div>
           </div>

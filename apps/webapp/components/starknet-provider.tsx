@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 
 import { sepolia } from "@starknet-react/chains";
 import {
@@ -7,27 +7,25 @@ import {
   argent,
   braavos,
   jsonRpcProvider,
-  useInjectedConnectors,
   voyager,
 } from "@starknet-react/core";
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
-  function rpc() {
-    return {
-      nodeUrl: `https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/yI1L61QqzPDE0eXH4nVDl`
+  // Static RPC provider configuration
+  const provider = useMemo(() => {
+    function rpc() {
+      return {
+        nodeUrl: `https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/yI1L61QqzPDE0eXH4nVDl`
+      }
     }
-  }
-  const provider = jsonRpcProvider({ rpc });
+    return jsonRpcProvider({ rpc });
+  }, []);
 
-  const { connectors } = useInjectedConnectors({
-    recommended: [
-      braavos(),
-      argent(),
-    ],
-    
-    includeRecommended: "onlyIfNoConnectors",
-    order: "random"
-  });
+  // Static connectors configuration - no useInjectedConnectors to prevent wallet triggers
+  const connectors = useMemo(() => [
+    braavos(),
+    argent(),
+  ], []);
 
   return (
     <StarknetConfig
@@ -35,6 +33,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       provider={provider}
       connectors={connectors}
       explorer={voyager}
+      autoConnect={false}
     >
       {children}
     </StarknetConfig>
