@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { staggerContainer, staggerItem, fadeInUp, cardAdvanced } from "@/lib/animation-variants"
+import { staggerContainer, cardAdvanced } from "@/lib/animation-variants"
 
 export function VaultStrategies() {
   return (

@@ -4,7 +4,7 @@ import { ArrowUpDown, Bitcoin, Clock, TrendingUp, Target, BookOpen, Shield } fro
 import { motion } from "framer-motion"
 
 import { Card, CardDescription, CardTitle } from "@/components/ui/card"
-import { staggerContainer, staggerItem, fadeInUp, cardAdvanced, cardStaggerAdvanced, cardHover, iconFloat } from "@/lib/animation-variants"
+import { cardAdvanced, cardStaggerAdvanced } from "@/lib/animation-variants"
 
 export function VaultFeatures() {
   return (

@@ -10,7 +10,7 @@ interface WalletProviderProps {
 
 export function WalletProvider({ children }: WalletProviderProps) {
   // Centralized wallet hooks - only executed once here
-  const { address, status } = useAccount()
+  const { address } = useAccount()
   const { connect, connectors, status: connectStatus } = useConnect()
   const { disconnect, status: disconnectStatus } = useDisconnect()
 
