@@ -3,12 +3,12 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, Menu } from "lucide-react"
-import { useAccount } from '@starknet-react/core'
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import WalletConnector from "@/components/ui/connectWallet"
+import { useWalletStatus } from "@/hooks/use-wallet"
 import { cn } from "@/lib/utils"
 
 interface HeaderProps {
@@ -17,7 +17,7 @@ interface HeaderProps {
 
 export function Header({ variant = "auto" }: HeaderProps) {
   const pathname = usePathname()
-  const { address } = useAccount()
+  const { address } = useWalletStatus()
 
   // Auto-detect variant based on pathname
   const getVariant = () => {
