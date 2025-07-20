@@ -11,10 +11,10 @@ export function Footer() {
           <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
             Documentation
           </Link>
-          <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="https://github.com/NumoLabs" className="text-sm text-muted-foreground hover:text-foreground">
             GitHub
           </Link>
-          <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="https://x.com/NumoLabs" className="text-sm text-muted-foreground hover:text-foreground">
             Twitter
           </Link>
         </div>
