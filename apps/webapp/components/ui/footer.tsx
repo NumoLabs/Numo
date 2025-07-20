@@ -15,7 +15,7 @@ export function Footer() {
             GitHub
           </Link>
           <Link href="https://x.com/NumoLabs" className="text-sm text-muted-foreground hover:text-foreground">
-            Twitter
+            X
           </Link>
         </div>
       </div>
