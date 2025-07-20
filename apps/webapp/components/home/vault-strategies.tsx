@@ -1,25 +1,72 @@
+"use client"
+
 import Image from "next/image"
+import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { staggerContainer, staggerItem, fadeInUp, cardAdvanced } from "@/lib/animation-variants"
 
 export function VaultStrategies() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32" id="strategies">
       <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+        <motion.div 
+          className="flex flex-col items-center justify-center space-y-4 text-center"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
           <div className="space-y-2">
-            <div className="inline-block rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 px-3 py-1 text-sm text-white font-medium shadow-lg shadow-blue-500/50 animate-pulse">
+            <motion.div 
+              className="inline-block rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 px-3 py-1 text-sm text-white font-medium shadow-lg shadow-blue-500/50 animate-pulse"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
               Strategies
-            </div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Optimized Strategies</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            </motion.div>
+            <motion.h2 
+              className="text-3xl font-bold tracking-tighter sm:text-5xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              Optimized Strategies
+            </motion.h2>
+            <motion.p 
+              className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
               Our vault uses multiple strategies to maximize your BTC returns.
-            </p>
+            </motion.p>
           </div>
-        </div>
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-2">
-          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:-rotate-1 hover:border-purple-500 dark:hover:border-purple-400 hover:will-change-transform">
+        </motion.div>
+        <motion.div 
+          className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-2"
+          initial="hidden"
+          whileInView="visible"
+          variants={staggerContainer}
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <motion.div
+            variants={cardAdvanced}
+            whileHover={{ 
+              scale: 1.02,
+              rotateY: -3,
+              rotateX: 2,
+              z: 20,
+              transition: { duration: 0.3, ease: "easeOut" }
+            }}
+            className="transform-gpu preserve-3d"
+          >
+            <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:-rotate-1 hover:border-purple-500 dark:hover:border-purple-400 hover:will-change-transform">
             <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-purple-600/10"></div>
               <div className="relative w-4/5 max-w-[300px] py-6 transition-transform duration-250 ease-out group-hover:scale-105 group-hover:-rotate-1">
@@ -83,8 +130,20 @@ export function VaultStrategies() {
               </CardFooter>
             </div>
           </Card>
+        </motion.div>
 
-          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:rotate-1 hover:border-blue-500 dark:hover:border-blue-400 hover:will-change-transform">
+          <motion.div
+            variants={cardAdvanced}
+            whileHover={{ 
+              scale: 1.02,
+              rotateY: 3,
+              rotateX: -2,
+              z: 20,
+              transition: { duration: 0.3, ease: "easeOut" }
+            }}
+            className="transform-gpu preserve-3d"
+          >
+            <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:rotate-1 hover:border-blue-500 dark:hover:border-blue-400 hover:will-change-transform">
             <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-pink-600/10"></div>
               <div className="relative w-3/4 max-w-[250px] py-6 transition-transform duration-250 ease-out group-hover:scale-105 group-hover:rotate-1">
@@ -148,7 +207,8 @@ export function VaultStrategies() {
               </CardFooter>
             </div>
           </Card>
-        </div>
+        </motion.div>
+      </motion.div>
       </div>
     </section>
   )

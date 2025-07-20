@@ -3,12 +3,60 @@
 import Link from "next/link"
 import { ArrowRight, Settings, TrendingUp, Download, Plus, MoreVertical, Bitcoin } from "lucide-react"
 import Image from "next/image"
+import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 
 export function VaultHero() {
   return (
     <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
+      {/* Animated floating background elements */}
+      <motion.div 
+        className="absolute top-0 left-0 w-full h-full opacity-20"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.2 }}
+        transition={{ duration: 2 }}
+      >
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500/30 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -20, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ 
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute top-3/4 right-1/4 w-24 h-24 bg-purple-500/30 rounded-full blur-xl"
+          animate={{ 
+            y: [0, 15, 0],
+            scale: [1, 0.9, 1],
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-3/4 w-28 h-28 bg-cyan-500/30 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -10, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{ 
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+      </motion.div>
+      
       <div className="container px-4 md:px-6 relative z-10">
         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
           <div className="flex flex-col justify-center space-y-4 animate-fade-in">
@@ -75,9 +123,45 @@ export function VaultHero() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center relative">
+          <motion.div 
+            className="flex items-center justify-center relative"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.5, 
+              ease: "easeOut",
+              delay: 0.2 
+            }}
+          >
             {/* Phone frame */}
-            <div className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-8 border-black bg-black shadow-2xl transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-3xl group">
+            <motion.div 
+              className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-8 border-black bg-black shadow-2xl transform-gpu will-change-transform group"
+              initial={{ scale: 0.95, rotateY: 10 }}
+              animate={{ 
+                scale: 1, 
+                rotateY: 0,
+                rotate: 0,
+                y: 0,
+                transition: { 
+                  duration: 0.6,
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: 0.3
+                }
+              }}
+              whileHover={{ 
+                scale: 1.02,
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
+                transition: { 
+                  duration: 0.1, 
+                  ease: "easeOut"
+                }
+              }}
+              transition={{
+                duration: 0.1,
+                ease: "easeOut"
+              }}
+              whileTap={{ scale: 0.98 }}
+            >
               {/* Phone frame */}
               <div className="absolute top-0 left-0 right-0 h-6 bg-black z-10 flex justify-center">
                 <div className="w-32 h-5 bg-black rounded-b-xl"></div>
@@ -227,8 +311,8 @@ export function VaultHero() {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </section>
