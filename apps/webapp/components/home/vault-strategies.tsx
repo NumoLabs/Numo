@@ -19,19 +19,19 @@ export function VaultStrategies() {
           </div>
         </div>
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-2">
-          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-2 hover:rotate-1 hover:border-purple-500 dark:hover:border-purple-400 hover:scale-[1.02] animate-fade-in will-change-transform">
+          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:-rotate-1 hover:border-purple-500 dark:hover:border-purple-400 hover:will-change-transform">
             <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-purple-600/10"></div>
-              <div className="relative w-4/5 max-w-[300px] py-6 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-2 will-change-transform">
+              <div className="relative w-4/5 max-w-[300px] py-6 transition-transform duration-250 ease-out group-hover:scale-105 group-hover:-rotate-1">
                 <Image
                   src="/ekubo-logo.png"
                   alt="Ekubo Logo"
                   width={400}
                   height={150}
-                  className="object-contain w-full transition-all duration-300 ease-out group-hover:brightness-110 will-change-transform"
+                  className="object-contain w-full transition-all duration-250 ease-out group-hover:brightness-110"
                 />
               </div>
-              <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 ease-out group-hover:scale-110 group-hover:bg-purple-400 will-change-transform">
+              <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 ease-out group-hover:scale-105 group-hover:bg-purple-400">
                 Active
               </div>
             </div>
@@ -76,7 +76,7 @@ export function VaultStrategies() {
                     <span className="text-xs text-gray-500 dark:text-gray-400">Current APY</span>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">4.8%</div>
                   </div>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 focus:scale-105 focus:shadow-lg focus:-translate-y-1 transform">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200 hover:scale-105 hover:shadow-lg transform">
                     Learn More
                   </Button>
                 </div>
@@ -84,19 +84,19 @@ export function VaultStrategies() {
             </div>
           </Card>
 
-          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-2 hover:-rotate-1 hover:border-blue-500 dark:hover:border-blue-400 hover:scale-[1.02] animate-fade-in will-change-transform">
+          <Card className="group overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:rotate-1 hover:border-blue-500 dark:hover:border-blue-400 hover:will-change-transform">
             <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-pink-600/10"></div>
-              <div className="relative w-3/4 max-w-[250px] py-6 transition-all duration-300 ease-out group-hover:scale-110 group-hover:-rotate-2 will-change-transform">
+              <div className="relative w-3/4 max-w-[250px] py-6 transition-transform duration-250 ease-out group-hover:scale-105 group-hover:rotate-1">
                 <Image
                   src="/vesu-logo.png"
                   alt="Vesu Logo"
                   width={300}
                   height={120}
-                  className="object-contain w-full transition-all duration-300 ease-out group-hover:brightness-110 will-change-transform"
+                  className="object-contain w-full transition-all duration-250 ease-out group-hover:brightness-110"
                 />
               </div>
-              <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 ease-out group-hover:scale-110 group-hover:bg-blue-400 will-change-transform">
+              <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 ease-out group-hover:scale-105 group-hover:bg-blue-400">
                 Active
               </div>
             </div>
@@ -141,7 +141,7 @@ export function VaultStrategies() {
                     <span className="text-xs text-gray-500 dark:text-gray-400">Current APY</span>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">5.8%</div>
                   </div>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 focus:scale-105 focus:shadow-lg focus:-translate-y-1 transform">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:scale-105 hover:shadow-lg transform">
                     Learn More
                   </Button>
                 </div>
