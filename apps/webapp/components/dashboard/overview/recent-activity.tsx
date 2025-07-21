@@ -42,14 +42,14 @@ export function RecentActivity() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-green-500" />
-              Actividad Reciente
+              Recent Activity
             </CardTitle>
-            <CardDescription>Últimas transacciones y rebalanceos automáticos</CardDescription>
+            <CardDescription>Latest transactions and automatic rebalances</CardDescription>
           </div>
           <Link href="/history">
             <Button variant="outline" size="sm" className="gap-2">
               <Eye className="h-4 w-4" />
-              Ver Todo
+              View All
             </Button>
           </Link>
         </div>

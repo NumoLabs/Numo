@@ -39,9 +39,9 @@ export function RebalancingHistory() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <RefreshCw className="h-5 w-5 text-blue-500" />
-          Historial de Rebalanceos
+          Rebalancing History
         </CardTitle>
-        <CardDescription>Optimizaciones automáticas realizadas por la vault</CardDescription>
+        <CardDescription>Automatic optimizations performed by the vault</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
