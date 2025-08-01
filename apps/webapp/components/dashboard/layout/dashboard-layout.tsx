@@ -19,6 +19,8 @@ import { BondsContent } from "@/components/bonds/bonds-content"
 import { ForecastContent } from "@/components/forecast/forecast-content"
 import { MarketplaceContent } from "@/components/marketplace/marketplace-content"
 import { LearnContent } from "@/components/learn/learn-content"
+import { PoolsVaultContent } from "@/components/pools-vault/pools-vault-content"
+import { BitcoinBridgeContent } from "@/components/deposit-test/deposit-test-content"
 
 export function DashboardLayout() {
   const pathname = usePathname()
@@ -68,6 +70,12 @@ export function DashboardLayout() {
     }
     if (pathname === "/pools") {
       return <PoolsContent />
+    }
+    if (pathname === "/pools-vault") {
+      return <PoolsVaultContent />
+    }
+    if (pathname === "/deposit-test") {
+      return <BitcoinBridgeContent />
     }
     if (pathname === "/pools/create") {
       return <CreateVaultContent />

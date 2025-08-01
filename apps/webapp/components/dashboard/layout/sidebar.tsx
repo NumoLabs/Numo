@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3 } from "lucide-react"
+import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Wallet, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -19,6 +19,8 @@ const navigation = [
     items: [
       { name: "Custom Pools", href: "/pools", icon: Target, current: false },
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
+      { name: "Deposit Test", href: "/deposit-test", icon: Wallet, current: false },
+      { name: "Pools", href: "/pools-vault", icon: Users, current: false },
     ],
   },
   {
@@ -79,7 +81,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         href={item.href}
                         className={cn(
                           "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
-                          pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                          pathname === item.href || 
+                          (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                          (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                             ? "bg-gradient-to-r from-cyan-500/10 to-blue-500/10 text-cyan-700 dark:text-cyan-300 border-r-2 border-cyan-500"
                             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
                         )}
@@ -87,7 +91,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         <item.icon
                           className={cn(
                             "mr-3 h-5 w-5 transition-colors",
-                            pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                            pathname === item.href || 
+                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                               ? "text-cyan-600"
                               : "text-gray-400 group-hover:text-gray-600",
                           )}
