@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Users, TrendingUp, Shield, Zap, DollarSign, ChevronRight, Star, Lock, Plus, Search, Filter, Info } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TrendingUp, ArrowRight, Shield, Coins, Star, Target, Users } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 import { VesuPoolCard } from "@/components/pools-vault/vesu-pool-card"
 import { PoolStats } from "@/components/pools-vault/pool-stats"
 import { AddToPoolForm } from "@/components/pools-vault/add-to-pool-form"
@@ -164,10 +164,10 @@ export function PoolsVaultContent() {
         title: "Successfully Added to Pool",
         description: `${amount} WBTC has been added to the ${selectedPoolData?.name}`,
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
-        description: "Failed to add funds to pool. Please try again.",
+        description: "Failed to load pool data. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -213,14 +213,14 @@ export function PoolsVaultContent() {
           </div>
 
           {/* Info Banner */}
-          <div className="rounded-lg border p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                        <div className="rounded-lg border p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800">
+              <div className="flex items-start gap-3">
+                <Users className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
                 <p className="font-medium text-blue-900 dark:text-blue-100">New to Pool Vaults?</p>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   Explore different vault strategies and liquidity pools. Each vault has detailed information about 
-                  risks, strategies, and potential returns. Start with lower-risk vaults if you're new to DeFi.
+                  risks, strategies, and potential returns. Start with lower-risk vaults if you&apos;re new to DeFi.
                 </p>
               </div>
             </div>
@@ -237,7 +237,6 @@ export function PoolsVaultContent() {
               {/* Search and Filters */}
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 text-muted-foreground -translate-y-1/2" />
                   <Input 
                     type="search" 
                     placeholder="Search vaults by name, protocol, or tokens..." 
@@ -247,7 +246,7 @@ export function PoolsVaultContent() {
                   />
                 </div>
                 <Button variant="outline" className="gap-2 h-11">
-                  <Filter className="h-4 w-4" />
+                  <Target className="h-4 w-4" />
                   Filters
                 </Button>
               </div>
@@ -264,20 +263,20 @@ export function PoolsVaultContent() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-                            <Zap className="h-5 w-5 text-white" />
+                            <Coins className="h-5 w-5 text-white" />
                           </div>
                           <div>
                             <CardTitle className="flex items-center gap-2">
                               {pool.name}
                               {pool.featured && <Star className="h-4 w-4 text-yellow-500" />}
-                              {pool.status === "coming-soon" && <Lock className="h-4 w-4 text-blue-500" />}
+                              {pool.status === "coming-soon" && <Target className="h-4 w-4 text-blue-500" />}
                             </CardTitle>
                             <CardDescription className="mt-1">
                               {pool.description}
                             </CardDescription>
                           </div>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-cyan-500 transition-colors" />
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-cyan-500 transition-colors" />
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -341,7 +340,7 @@ export function PoolsVaultContent() {
                             </CardDescription>
                           </div>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-cyan-500 transition-colors" />
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-cyan-500 transition-colors" />
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -402,7 +401,7 @@ export function PoolsVaultContent() {
             {/* Left Column - Pool Information */}
             <div className="lg:col-span-2 space-y-6">
               <VesuPoolCard poolData={selectedPoolData!} />
-              <PoolStats poolData={selectedPoolData!} />
+              <PoolStats />
               <PoolBenefits />
             </div>
 
@@ -435,11 +434,11 @@ export function PoolsVaultContent() {
                     </div>
                     <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-blue-500" />
+                        <Coins className="h-4 w-4 text-blue-500" />
                         <span className="text-sm font-medium">Total Value</span>
                       </div>
                       <span className="font-bold text-blue-600 dark:text-blue-400">
-                        ${(selectedPoolData?.tvl! / 1000000).toFixed(1)}M
+                        ${selectedPoolData?.tvl ? (selectedPoolData.tvl / 1000000).toFixed(1) : '0.0'}M
                       </span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 rounded-lg border border-purple-200/50">
@@ -448,7 +447,7 @@ export function PoolsVaultContent() {
                         <span className="text-sm font-medium">Participants</span>
                       </div>
                       <span className="font-bold text-purple-600 dark:text-purple-400">
-                        {selectedPoolData?.participants.toLocaleString()}
+                        {selectedPoolData?.participants?.toLocaleString() || '0'}
                       </span>
                     </div>
                   </div>
@@ -467,13 +466,13 @@ export function PoolsVaultContent() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Risk Level</span>
-                      <Badge className={getRiskColor(selectedPoolData?.riskLevel!)}>
-                        {selectedPoolData?.riskLevel}
+                      <Badge className={getRiskColor(selectedPoolData?.riskLevel || 'medium')}>
+                        {selectedPoolData?.riskLevel || 'Medium'}
                       </Badge>
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                       <p>• Automated strategies may experience volatility</p>
-                      <p>• Past performance doesn't guarantee future returns</p>
+                      <p>• Past performance doesn&apos;t guarantee future returns</p>
                       <p>• Consider your risk tolerance before investing</p>
                     </div>
                   </div>

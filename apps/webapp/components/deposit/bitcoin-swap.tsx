@@ -16,18 +16,17 @@ interface BitcoinSwapProps {
   starknetWallet: string
 }
 
-export function BitcoinSwap({ onSwapSubmit, currentAmount, bitcoinWallet, starknetWallet }: BitcoinSwapProps) {
-  const [amount, setAmount] = useState(currentAmount)
+export function BitcoinSwap({ onSwapSubmit, bitcoinWallet, starknetWallet }: BitcoinSwapProps) {
+  const [amount, setAmount] = useState('')
+  const [exchangeRate, setExchangeRate] = useState(1.0)
   const [isLoading, setIsLoading] = useState(false)
-  const [swapRate, setSwapRate] = useState(1.0)
-  const [gasEstimate, setGasEstimate] = useState(0.005)
   const { toast } = useToast()
 
   const handleAmountChange = (value: string) => {
     setAmount(value)
     // Simulate rate calculation
     if (value && !isNaN(Number(value))) {
-      setSwapRate(1.0 + Math.random() * 0.02) // Small variation
+      setExchangeRate(1.0 + Math.random() * 0.02) // Small variation
     }
   }
 
@@ -36,15 +35,15 @@ export function BitcoinSwap({ onSwapSubmit, currentAmount, bitcoinWallet, starkn
     try {
       // Simulate API call to get fresh rate
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      setSwapRate(1.0 + Math.random() * 0.02)
+      setExchangeRate(1.0 + Math.random() * 0.02)
       toast({
         title: "Rate Updated",
         description: "Latest exchange rate has been fetched",
       })
-    } catch (error) {
+    } catch {
       toast({
-        title: "Rate Update Failed",
-        description: "Could not fetch latest rate",
+        title: "Error",
+        description: "Failed to refresh exchange rate. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -68,7 +67,7 @@ export function BitcoinSwap({ onSwapSubmit, currentAmount, bitcoinWallet, starkn
     }
   }
 
-  const estimatedWBTC = amount && !isNaN(Number(amount)) ? Number(amount) * swapRate : 0
+  const estimatedWBTC = amount && !isNaN(Number(amount)) ? Number(amount) * exchangeRate : 0
   const isValidAmount = amount && !isNaN(Number(amount)) && Number(amount) > 0
 
   return (
@@ -136,7 +135,7 @@ export function BitcoinSwap({ onSwapSubmit, currentAmount, bitcoinWallet, starkn
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Exchange Rate:</span>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                1 BTC = {swapRate.toFixed(4)} WBTC
+                1 BTC = {exchangeRate.toFixed(4)} WBTC
               </span>
             </div>
             <Button

@@ -2,37 +2,22 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { TrendingUp, DollarSign, Users, Clock, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { TrendingUp, DollarSign, Users, Clock, ArrowUpRight } from "lucide-react"
 
-interface PoolData {
-  name: string
-  description: string
-  apy: number
-  tvl: number
-  participants: number
-  riskLevel: string
-  minDeposit: number
-  maxDeposit: number
-  token: string
-  strategy: string
-  rewards: string[]
-}
-
-interface PoolStatsProps {
-  poolData: PoolData
-}
-
-export function PoolStats({ poolData }: PoolStatsProps) {
-  // Mock data for stats
+export function PoolStats() {
   const stats = {
+    tvl: 1250000,
+    apy: 18.5,
+    participants: 1250,
+    volume24h: 450000,
+    apyChange: 2.3,
+    tvlChange: 5.7,
     dailyVolume: 125000,
     weeklyVolume: 875000,
     monthlyVolume: 3500000,
     avgDeposit: 2000,
     totalRewards: 125000,
     activeStrategies: 3,
-    apyChange: 0.5,
-    tvlChange: 2.3,
     participantsChange: 15,
   }
 
@@ -55,9 +40,7 @@ export function PoolStats({ poolData }: PoolStatsProps) {
             <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Daily Volume</span>
-                <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900/20">
-                  +{stats.apyChange}%
-                </Badge>
+                <span className="text-sm font-medium">Daily Volume</span>
               </div>
               <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
                 ${(stats.dailyVolume / 1000).toFixed(0)}K

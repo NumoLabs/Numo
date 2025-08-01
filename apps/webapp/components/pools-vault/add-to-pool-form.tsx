@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, DollarSign, Shield, Zap, Loader2, ArrowRight } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { CheckCircle, TrendingUp, ArrowRight, Loader2, Shield } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 interface PoolData {
   name: string
@@ -30,8 +30,8 @@ interface AddToPoolFormProps {
 }
 
 export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFormProps) {
-  const [amount, setAmount] = useState("")
-  const [walletBalance, setWalletBalance] = useState(2.5) // Mock balance in WBTC
+  const [amount, setAmount] = useState('')
+  const [walletBalance] = useState(2.5) // Mock balance in WBTC
   const { toast } = useToast()
 
   const handleAmountChange = (value: string) => {
@@ -85,7 +85,7 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
     <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-cyan-200/50 dark:border-cyan-800/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-green-500" />
+          <CheckCircle className="h-5 w-5 text-green-500" />
           Add to Pool
         </CardTitle>
         <CardDescription>
@@ -180,7 +180,7 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
               <span className="text-sm">Audited smart contracts</span>
             </div>
             <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-200/50">
-              <Zap className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-green-500" />
               <span className="text-sm">Automated strategies</span>
             </div>
           </div>
@@ -239,7 +239,7 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
               </p>
               <p className="text-orange-700 dark:text-orange-300">
                 DeFi investments carry risks. Only invest what you can afford to lose. 
-                Past performance doesn't guarantee future returns.
+                Past performance doesn&apos;t guarantee future returns.
               </p>
             </div>
           </div>

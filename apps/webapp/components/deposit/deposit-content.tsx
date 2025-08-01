@@ -1,16 +1,15 @@
 "use client"
 
-import { useState } from "react"
-import { Bitcoin, Wallet, Settings, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { CheckCircle, Wallet } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { DepositTestFlow } from "@/components/deposit-test/deposit-test-flow"
-import { DepositSummary } from "@/components/deposit-test/deposit-summary"
-import { BitcoinWalletConnect } from "@/components/deposit-test/bitcoin-wallet-connect"
-import { StarknetWalletInput } from "@/components/deposit-test/starknet-wallet-input"
-import { BitcoinSwap } from "@/components/deposit-test/bitcoin-swap"
+import { BitcoinWalletConnect } from "./bitcoin-wallet-connect"
+import { BitcoinSwap } from "./bitcoin-swap"
+import { StarknetWalletInput } from "./starknet-wallet-input"
+import { DepositSummary } from "./deposit-summary"
 
 export function DepositTestContent() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -54,27 +53,6 @@ export function DepositTestContent() {
     handleNextStep()
   }
 
-  const handleBridgeComplete = async () => {
-    setIsLoading(true)
-    try {
-      // Simulate bridge process
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-      handleNextStep()
-      toast({
-        title: "Bridge Complete",
-        description: "Successfully bridged Bitcoin to WBTC",
-      })
-    } catch (error) {
-      toast({
-        title: "Bridge Error",
-        description: "Failed to bridge Bitcoin to WBTC",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleFinalDeposit = async () => {
     setIsLoading(true)
     try {
@@ -86,10 +64,10 @@ export function DepositTestContent() {
       })
       // Mark step as completed by incrementing currentStep
       setCurrentStep(currentStep + 1)
-    } catch (error) {
+    } catch {
       toast({
-        title: "Deposit Error",
-        description: "Failed to deposit WBTC",
+        title: "Error",
+        description: "Failed to complete deposit. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -114,8 +92,6 @@ export function DepositTestContent() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column - Flow Steps */}
         <div className="lg:col-span-2 space-y-6">
-          <DepositTestFlow steps={steps} currentStep={currentStep} />
-
           {/* Step Content */}
           <div className="space-y-6">
             {currentStep === 1 && (
@@ -246,7 +222,7 @@ export function DepositTestContent() {
           <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-orange-200/50 dark:border-orange-800/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Bitcoin className="h-5 w-5 text-orange-500" />
+                <Wallet className="h-5 w-5 text-orange-500" />
                 Deposit Progress
               </CardTitle>
               <CardDescription>
@@ -255,15 +231,13 @@ export function DepositTestContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                {steps.map((step, index) => (
+                {steps.map((step) => (
                   <div
                     key={step.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${
-                      currentStep === step.id
-                        ? "bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-200/50"
-                        : currentStep > step.id
-                        ? "bg-orange-50 dark:bg-orange-900/20 border border-orange-200/50"
-                        : "bg-gray-50 dark:bg-gray-800/50 border border-gray-200/50"
+                    className={`flex items-center gap-3 p-3 rounded-lg ${
+                      step.id <= currentStep
+                        ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                        : 'bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:border-gray-700'
                     }`}
                   >
                     <div

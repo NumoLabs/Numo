@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Circle, ArrowRight } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 
 interface Step {
   id: number
