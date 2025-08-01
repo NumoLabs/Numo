@@ -58,7 +58,7 @@ export function VaultStats() {
           variants={staggerContainer}
         >
           <motion.div 
-            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
+            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
             variants={staggerItem}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -81,7 +81,7 @@ export function VaultStats() {
             </Card>
           </motion.div>
           <motion.div 
-            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
+            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
             variants={staggerItem}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -104,7 +104,7 @@ export function VaultStats() {
             </Card>
           </motion.div>
           <motion.div 
-            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
+            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
             variants={staggerItem}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -123,7 +123,7 @@ export function VaultStats() {
             </Card>
           </motion.div>
           <motion.div 
-            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
+            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
             variants={staggerItem}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -140,7 +140,7 @@ export function VaultStats() {
             </Card>
           </motion.div>
           <motion.div 
-            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
+            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
             variants={staggerItem}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -157,7 +157,7 @@ export function VaultStats() {
             </Card>
           </motion.div>
           <motion.div 
-            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
+            className="group p-[3px] rounded-lg bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 animate-gradient-x hover:shadow-xl transition-all duration-300"
             variants={staggerItem}
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
