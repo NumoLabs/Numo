@@ -74,7 +74,7 @@ export function VaultFeatures() {
                 <div className="flex flex-col h-full">
                   <div className="mb-6">
                     <motion.div 
-                      className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                      className="w-16 h-16 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                       whileHover={{ 
                         scale: 1.2,
                         rotate: -15,
@@ -120,9 +120,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-blue-600/30">
+            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                 whileHover={{ 
                   scale: 1.2,
                   rotate: -15,
@@ -156,9 +156,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-green-600 dark:hover:border-green-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-green-600/30">
+            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-green-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                 whileHover={{ 
                   scale: 1.25,
                   rotate: 20,
@@ -193,9 +193,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-600 dark:hover:border-purple-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-purple-600/30">
+            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                 whileHover={{ 
                   scale: 1.15,
                   rotate: -10,
@@ -229,9 +229,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-600 dark:hover:border-gray-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-gray-600/30">
+            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-gray-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                 whileHover={{ 
                   scale: 1.3,
                   rotate: 25,
@@ -273,10 +273,10 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-blue-500/30">
+            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-500/30">
               <div className="flex flex-col items-start">
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30"
+                  className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                   whileHover={{ 
                     scale: 1.2,
                     rotate: -8,
@@ -298,8 +298,8 @@ export function VaultFeatures() {
               </CardDescription>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -310,8 +310,8 @@ export function VaultFeatures() {
                   <span className="text-sm text-gray-700 dark:text-gray-300">Interactive tutorials</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -337,10 +337,10 @@ export function VaultFeatures() {
           }}
           className="transform-gpu preserve-3d"
         >
-          <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-green-500 dark:hover:border-green-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-green-500/30">
+          <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-500/30">
             <div className="flex flex-col items-start">
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-green-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
                 whileHover={{ 
                   scale: 1.2,
                   rotate: 10,
@@ -362,8 +362,8 @@ export function VaultFeatures() {
               </CardDescription>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -374,8 +374,8 @@ export function VaultFeatures() {
                   <span className="text-sm text-gray-700 dark:text-gray-300">Multi-signature support</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

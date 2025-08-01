@@ -118,7 +118,7 @@ export function VaultCTA() {
                       placeholder="your@email.com"
                       className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-700"
                     />
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 transition-transform group-focus-within:scale-110" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-yellow-500 transition-transform group-focus-within:scale-110" />
                   </div>
                 </div>
                 <div className="relative group">
@@ -133,7 +133,7 @@ export function VaultCTA() {
                       placeholder="@username (optional)"
                       className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4 pl-12 text-base text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder:text-gray-400 group-focus-within:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-700"
                     />
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500 transition-transform group-focus-within:scale-110" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-yellow-500 transition-transform group-focus-within:scale-110" />
                   </div>
                 </div>
               </div>
@@ -148,10 +148,10 @@ export function VaultCTA() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`group relative w-full sm:flex-1 overflow-hidden font-bold rounded-xl py-4 px-8 text-lg shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-cyan-500/50 ${
+                  className={`group relative w-full sm:flex-1 overflow-hidden font-bold rounded-xl py-4 px-8 text-lg shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 ${
                     isLoading 
                       ? 'bg-gray-400 cursor-not-allowed text-white'
-                      : 'bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white shadow-cyan-500/50 hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan-400/60'
+                      : 'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white shadow-orange-500/50 hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-400/60'
                   }`}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
@@ -222,7 +222,7 @@ export function VaultCTA() {
             viewport={{ once: true, amount: 0.3 }}
           >
             <div className="text-center group">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">Early Access</h3>
@@ -231,7 +231,7 @@ export function VaultCTA() {
               </p>
             </div>
             <div className="text-center group">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3">
                 <Star className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">Exclusive Rewards</h3>
@@ -240,7 +240,7 @@ export function VaultCTA() {
               </p>
             </div>
             <div className="text-center group">
-              <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 group-hover:rotate-3">
                 <CheckCircle2 className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">Priority Support</h3>
