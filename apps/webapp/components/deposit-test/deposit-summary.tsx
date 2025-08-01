@@ -45,7 +45,7 @@ export function DepositSummary({
             <CheckCircle className="h-5 w-5 text-orange-500 mt-0.5" />
             <div className="text-sm">
               <p className="font-medium text-orange-800 dark:text-orange-200 mb-1">
-                Swap Completed Successfully!
+                Bridge Completed Successfully!
               </p>
               <p className="text-orange-700 dark:text-orange-300 text-xs">
                 Your Bitcoin has been successfully bridged to WBTC using LayerSwap and is ready for deposit to StarkNet.
