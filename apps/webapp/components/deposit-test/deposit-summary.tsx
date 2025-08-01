@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Wallet, TrendingUp, ArrowRight, Loader2, Shield } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 
 interface DepositSummaryProps {
   onDeposit: () => void
@@ -21,8 +20,6 @@ export function DepositSummary({
   starknetWallet, 
   swapAmount 
 }: DepositSummaryProps) {
-  const { toast } = useToast()
-
   const estimatedWBTC = Number(swapAmount) * 1.0 // Assuming 1:1 ratio for simplicity
   const depositFee = estimatedWBTC * 0.001 // 0.1% deposit fee
   const finalAmount = estimatedWBTC - depositFee
@@ -181,7 +178,7 @@ export function DepositSummary({
                   Ready to Deposit
                 </p>
                 <p className="text-orange-700 dark:text-orange-300 text-xs">
-                  Your WBTC is ready to be deposited to your dashboard. Click "Complete Deposit" to finish the process.
+                  Your WBTC is ready to be deposited to your dashboard. Click &quot;Complete Deposit&quot; to finish the process.
                 </p>
               </div>
             </div>

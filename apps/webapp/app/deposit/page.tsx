@@ -135,7 +135,13 @@ export default function DepositPage() {
             {/* Right Column - Summary and Actions */}
             <div className="space-y-6 sticky top-6" style={{ animation: "fadeInUp 0.6s ease-out 0.2s both" }}>
               {estimate && selectedDepositOption && (
-                <DepositSummary estimate={estimate} option={selectedDepositOption} selectedToken={selectedToken} />
+                <DepositSummary 
+                  onDeposit={handleDeposit}
+                  isLoading={isLoading}
+                  bitcoinWallet="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+                  starknetWallet="0x1234567890123456789012345678901234567890123456789012345678901234"
+                  swapAmount={amount}
+                />
               )}
 
               <DepositActions

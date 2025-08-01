@@ -1,8 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, Shield, Zap, Users, DollarSign, Target } from "lucide-react"
+import { TrendingUp, Shield, Zap, CheckCircle } from "lucide-react"
 
 export function PoolBenefits() {
   const benefits = [
@@ -25,19 +24,19 @@ export function PoolBenefits() {
       color: "yellow",
     },
     {
-      icon: Users,
+      icon: CheckCircle,
       title: "Community Driven",
       description: "Governance tokens and community voting rights",
       color: "purple",
     },
     {
-      icon: DollarSign,
+      icon: CheckCircle,
       title: "Multiple Rewards",
       description: "Earn trading fees, liquidity incentives, and VESU tokens",
       color: "orange",
     },
     {
-      icon: Target,
+      icon: CheckCircle,
       title: "Risk Management",
       description: "Advanced risk controls and portfolio diversification",
       color: "cyan",
@@ -57,7 +56,7 @@ export function PoolBenefits() {
     <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-cyan-200/50 dark:border-cyan-800/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-purple-500" />
+          <CheckCircle className="h-5 w-5 text-purple-500" />
           Pool Benefits & Features
         </CardTitle>
         <CardDescription>
@@ -177,7 +176,7 @@ export function PoolBenefits() {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
-              <Target className="h-5 w-5 text-blue-500" />
+              <CheckCircle className="h-5 w-5 text-blue-500" />
               <div>
                 <div className="font-medium text-sm">Audited Smart Contracts</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -195,7 +194,7 @@ export function PoolBenefits() {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/50 dark:to-red-950/50 rounded-lg border border-orange-200/50">
-              <Users className="h-5 w-5 text-orange-500" />
+              <CheckCircle className="h-5 w-5 text-orange-500" />
               <div>
                 <div className="font-medium text-sm">Community Governance</div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">

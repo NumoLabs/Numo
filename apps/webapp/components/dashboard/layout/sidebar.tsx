@@ -19,7 +19,7 @@ const navigation = [
     items: [
       { name: "Custom Pools", href: "/pools", icon: Target, current: false },
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
-      { name: "Deposit Test", href: "/deposit-test", icon: Wallet, current: false },
+      { name: "Deposit", href: "/deposit-test", icon: Wallet, current: false },
       { name: "Pools", href: "/pools-vault", icon: Users, current: false },
     ],
   },
@@ -138,7 +138,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           href={item.href}
                           className={cn(
                             "group flex gap-x-3 rounded-xl px-3 py-3 text-sm font-semibold leading-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-md",
-                            pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
+                            pathname === item.href || 
+                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                               ? "bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 text-cyan-700 dark:text-cyan-300 shadow-lg border border-cyan-200/50 dark:border-cyan-800/50"
                               : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-100/80 hover:to-gray-50/80 dark:hover:from-gray-800/80 dark:hover:to-gray-700/80 hover:text-gray-900 dark:hover:text-white",
                           )}
@@ -146,13 +148,17 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           <item.icon
                             className={cn(
                               "h-5 w-5 shrink-0 transition-all duration-200",
-                              pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))
-                                ? "text-cyan-600 scale-110"
-                                : "text-gray-400 group-hover:text-gray-600 group-hover:scale-105",
+                                                          pathname === item.href || 
+                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                              ? "text-cyan-600 scale-110"
+                              : "text-gray-400 group-hover:text-gray-600 group-hover:scale-105",
                             )}
                           />
                           {item.name}
-                          {(pathname === item.href || (item.href === "/pools" && pathname.startsWith("/pools"))) && (
+                          {(pathname === item.href || 
+                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))) && (
                             <div className="ml-auto h-2 w-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 animate-pulse" />
                           )}
                         </Link>

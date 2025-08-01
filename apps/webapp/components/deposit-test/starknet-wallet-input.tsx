@@ -5,8 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Wallet, Copy, CheckCircle, AlertCircle, Zap } from "lucide-react"
+import { Wallet, Copy, CheckCircle, Zap } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface StarknetWalletInputProps {
@@ -55,7 +54,7 @@ export function StarknetWalletInput({ onWalletSubmit, currentWallet }: StarknetW
         title: "Address Pasted",
         description: "StarkNet address has been pasted from clipboard",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Paste Failed",
         description: "Could not paste from clipboard",
@@ -73,7 +72,7 @@ export function StarknetWalletInput({ onWalletSubmit, currentWallet }: StarknetW
         description: "StarkNet address has been copied to clipboard",
       })
       setTimeout(() => setIsCopied(false), 2000)
-    } catch (error) {
+    } catch {
       toast({
         title: "Copy Failed",
         description: "Could not copy address to clipboard",

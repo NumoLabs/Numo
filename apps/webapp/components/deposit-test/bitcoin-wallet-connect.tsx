@@ -3,8 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Bitcoin, Wallet, CheckCircle, AlertCircle, ExternalLink, Shield } from "lucide-react"
+import { CheckCircle, Wallet, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface BitcoinWalletConnectProps {
@@ -33,10 +32,10 @@ export function BitcoinWalletConnect({ onWalletConnect, currentWallet }: Bitcoin
         title: "Wallet Connected",
         description: "Bitcoin wallet connected successfully",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Connection Failed",
-        description: "Failed to connect Bitcoin wallet",
+        description: "Could not connect to Bitcoin wallet. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -57,7 +56,7 @@ export function BitcoinWalletConnect({ onWalletConnect, currentWallet }: Bitcoin
     <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-orange-200/50 dark:border-orange-800/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Bitcoin className="h-5 w-5 text-yellow-500" />
+          <Wallet className="h-5 w-5 text-yellow-500" />
           Connect Bitcoin Wallet
         </CardTitle>
         <CardDescription>
@@ -111,7 +110,7 @@ export function BitcoinWalletConnect({ onWalletConnect, currentWallet }: Bitcoin
               </>
             ) : (
               <>
-                <Bitcoin className="h-4 w-4 mr-2" />
+                <Wallet className="h-4 w-4 mr-2" />
                 Connect Bitcoin Wallet
               </>
             )}
