@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 
 export function VaultHero() {
   return (
-    <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-gray-100 dark:bg-gray-900/20 relative overflow-hidden">
+    <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-black relative overflow-hidden">
       {/* Animated floating background elements */}
       <motion.div 
         className="absolute top-0 left-0 w-full h-full opacity-20"
@@ -18,7 +18,7 @@ export function VaultHero() {
         transition={{ duration: 2 }}
       >
         <motion.div 
-          className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500/30 rounded-full blur-xl"
+          className="absolute top-1/4 left-1/4 w-32 h-32 bg-orange-500/20 rounded-full blur-xl"
           animate={{ 
             y: [0, -20, 0],
             scale: [1, 1.1, 1],
@@ -30,7 +30,7 @@ export function VaultHero() {
           }}
         />
         <motion.div 
-          className="absolute top-3/4 right-1/4 w-24 h-24 bg-purple-500/30 rounded-full blur-xl"
+          className="absolute top-3/4 right-1/4 w-24 h-24 bg-yellow-500/20 rounded-full blur-xl"
           animate={{ 
             y: [0, 15, 0],
             scale: [1, 0.9, 1],
@@ -43,7 +43,7 @@ export function VaultHero() {
           }}
         />
         <motion.div 
-          className="absolute top-1/2 left-3/4 w-28 h-28 bg-cyan-500/30 rounded-full blur-xl"
+          className="absolute top-1/2 left-3/4 w-28 h-28 bg-orange-400/20 rounded-full blur-xl"
           animate={{ 
             y: [0, -10, 0],
             scale: [1, 1.2, 1],
@@ -62,17 +62,17 @@ export function VaultHero() {
           <div className="flex flex-col justify-center space-y-4 animate-fade-in">
             <div className="space-y-2">
               {/* Badge with enhanced styling */}
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-800 via-gray-900 to-black hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg shadow-gray-800/40 animate-bounce-in mb-4 transition-all duration-200 border border-gray-600/30">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-full text-sm font-medium shadow-lg shadow-bitcoin animate-bounce-in mb-4 transition-all duration-200 border border-orange-400/50">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
                 Live Beta on Starknet
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
               </div>
 
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-slide-up-fade-in bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-slide-up-fade-in bg-gradient-to-r from-white via-orange-300 to-yellow-400 bg-clip-text text-transparent">
                 Modular BTC Finance on Starknet
               </h1>
               <p
-                className="max-w-[600px] text-muted-foreground md:text-xl animate-slide-up-fade-in"
+                className="max-w-[600px] text-gray-300 md:text-xl animate-slide-up-fade-in"
                 style={{ animationDelay: "0.2s" }}
               >
                 Grow your BTC with automated vaults, fixed-term bonds, strategy marketplace, forecasting tools, and DeFi
@@ -83,18 +83,18 @@ export function VaultHero() {
             {/* Stats preview */}
             <div className="flex items-center gap-6 py-4 animate-slide-up-fade-in" style={{ animationDelay: "0.3s" }}>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">127.45</div>
-                <div className="text-xs text-muted-foreground">BTC Locked</div>
+                <div className="text-2xl font-bold text-bitcoin-gold">127.45</div>
+                <div className="text-xs text-gray-400">BTC Locked</div>
               </div>
-              <div className="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+              <div className="w-px h-8 bg-gray-600"></div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">5.8%</div>
-                <div className="text-xs text-muted-foreground">Current APY</div>
+                <div className="text-2xl font-bold text-bitcoin-gold">5.8%</div>
+                <div className="text-xs text-gray-400">Current APY</div>
               </div>
-              <div className="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+              <div className="w-px h-8 bg-gray-600"></div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">4,400+</div>
-                <div className="text-xs text-muted-foreground">Active Users</div>
+                <div className="text-2xl font-bold text-bitcoin-gold">4,400+</div>
+                <div className="text-xs text-gray-400">Active Users</div>
               </div>
             </div>
 
@@ -105,7 +105,8 @@ export function VaultHero() {
               <Link href="/app">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"                  >
+                  className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
+                >
                   Start Earning BTC
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Button>
@@ -114,7 +115,7 @@ export function VaultHero() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-gray-800 focus:scale-105 focus:shadow-lg focus:-translate-y-1 border-2"
+                  className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 border-2 border-orange-500 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300 focus:scale-105 focus:shadow-lg focus:-translate-y-1"
                 >
                   Explore Features
                 </Button>
@@ -167,7 +168,7 @@ export function VaultHero() {
               </div>
 
               {/* App content */}
-              <div className="relative h-full bg-gray-900 text-white overflow-hidden pt-6">
+              <div className="relative h-full bg-black text-white overflow-hidden pt-6">
                 {/* Status bar */}
                 <div className="flex justify-between items-center px-5 py-2">
                   <div className="text-sm font-medium">9:41</div>
@@ -203,14 +204,14 @@ export function VaultHero() {
                     </div>
                     <span className="font-medium">@numo_user</span>
                   </div>
-                  <Settings className="w-6 h-6 text-gray-400" />
+                  <Settings className="w-6 h-6 text-gray-300" />
                 </div>
 
                 {/* Vault value */}
                 <div className="px-5 pt-4">
-                  <div className="text-gray-400 text-sm flex items-center">
+                  <div className="text-gray-300 text-sm flex items-center">
                     Total Vault Value
-                    <div className="w-4 h-4 ml-1 rounded-full border border-gray-400 flex items-center justify-center">
+                    <div className="w-4 h-4 ml-1 rounded-full border border-gray-300 flex items-center justify-center">
                       <span className="text-xs">i</span>
                     </div>
                   </div>
@@ -241,8 +242,8 @@ export function VaultHero() {
 
                 {/* Tabs */}
                 <div className="flex border-b border-gray-800 mt-6">
-                  <button className="flex-1 text-center py-3 border-b-2 border-white font-medium">Strategies</button>
-                  <button className="flex-1 text-center py-3 text-gray-500">History</button>
+                  <button className="flex-1 text-center py-3 border-b-2 border-orange-500 font-medium text-white">Strategies</button>
+                  <button className="flex-1 text-center py-3 text-gray-400">History</button>
                 </div>
 
                 {/* Strategies list */}
