@@ -11,7 +11,7 @@ export function VaultStats() {
   const { ref: statsRef, controls: statsControls } = useScrollAnimation(0.2)
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-black" id="stats">
+    <section className="w-full py-12 md:py-24 lg:py-32" id="stats" style={{ backgroundColor: '#000000' }}>
       <div className="container px-4 md:px-6">
         <motion.div 
           className="flex flex-col items-center justify-center space-y-4 text-center"
@@ -63,7 +63,7 @@ export function VaultStats() {
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Card className="h-full bg-black border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin">
+            <Card className="h-full border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin" style={{ backgroundColor: '#0f1114' }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium text-white">Vault APY</CardTitle>
                 <TrendingUp className="w-4 h-4 text-bitcoin transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
@@ -86,7 +86,7 @@ export function VaultStats() {
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Card className="h-full bg-black border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin">
+            <Card className="h-full border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin" style={{ backgroundColor: '#0f1114' }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium text-white">BTC Locked</CardTitle>
                 <Bitcoin className="w-4 h-4 text-bitcoin transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" />
@@ -109,7 +109,7 @@ export function VaultStats() {
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Card className="h-full bg-black border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin">
+            <Card className="h-full border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin" style={{ backgroundColor: '#0f1114' }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium text-white">Active Strategies</CardTitle>
                 <Percent className="w-4 h-4 text-bitcoin transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" />
@@ -128,7 +128,7 @@ export function VaultStats() {
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Card className="h-full bg-black border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin">
+            <Card className="h-full border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin" style={{ backgroundColor: '#0f1114' }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium text-white">Users</CardTitle>
                 <Bitcoin className="w-4 h-4 text-bitcoin transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" />
@@ -145,7 +145,7 @@ export function VaultStats() {
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Card className="h-full bg-black border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin">
+            <Card className="h-full border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin" style={{ backgroundColor: '#0f1114' }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium text-white">Bond Yields</CardTitle>
                 <Percent className="w-4 h-4 text-bitcoin transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" />
@@ -162,7 +162,7 @@ export function VaultStats() {
             whileHover={{ scale: 1.05, rotateY: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <Card className="h-full bg-black border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin">
+              <Card className="h-full border-orange-500/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-bitcoin" style={{ backgroundColor: '#0f1114' }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium text-white">Forecasts Simulated</CardTitle>
                 <Percent className="w-4 h-4 text-bitcoin transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" />

@@ -31,7 +31,8 @@ export function Header({ variant = "auto" }: HeaderProps) {
   if (currentVariant === "landing") {
     return (
       <motion.header 
-        className="sticky top-0 z-50 mx-auto mt-6 max-w-4xl rounded-2xl bg-black/95 backdrop-blur-xl border border-orange-500/30 shadow-bitcoin transition-all animate-float"
+        className="sticky top-0 z-50 mx-auto mt-6 max-w-4xl rounded-2xl backdrop-blur-xl border border-orange-600/50 shadow-bitcoin transition-all animate-float"
+        style={{ backgroundColor: '#000000' }}
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ 
@@ -118,7 +119,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 mx-auto max-w-3xl rounded-2xl bg-black/95 backdrop-blur-xl border border-orange-500/30 shadow-bitcoin transition-all animate-float">
+    <header className="sticky top-0 z-50 mx-auto max-w-3xl rounded-2xl backdrop-blur-xl border border-orange-500/50 shadow-bitcoin transition-all animate-float" style={{ backgroundColor: '#000000' }}>
       <div className="container flex h-16 items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Sheet>

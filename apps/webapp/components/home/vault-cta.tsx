@@ -55,8 +55,8 @@ export function VaultCTA() {
   }
 
   return (
-    <section id="waitlist" className="w-full py-12 md:py-20 bg-black relative overflow-hidden">
-      {/* Background decorative elements - OPTIMIZADO */}
+    <section id="waitlist" className="w-full py-12 md:py-20 relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
+      {/* Background decorative elements */}
       <motion.div 
         className="absolute top-0 left-0 w-full h-full"
         initial={{ opacity: 0 }}
@@ -97,7 +97,7 @@ export function VaultCTA() {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
             viewport={{ once: true, amount: 0.2 }}
           >
-            {/* Animated border optimizado */}
+            {/* Animated border */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 rounded-3xl blur-sm opacity-60"></div>
 
             <form
@@ -213,7 +213,7 @@ export function VaultCTA() {
             </form>
           </motion.div>
 
-          {/* Benefits section - DISEÑO ORIGINAL RESTAURADO */}
+          {/* Benefits section */}
           <motion.div 
             className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8"
             initial={{ opacity: 0, y: 40 }}

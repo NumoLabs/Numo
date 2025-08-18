@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-black text-white`}>
+      <body className={`${inter.className} text-white`} style={{ backgroundColor: '#000000' }}>
         <StarknetProvider>
           <WalletProvider>
             {children}

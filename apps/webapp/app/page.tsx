@@ -8,7 +8,7 @@ import { SectionDivider } from "@/components/ui/section-divider"
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen flex-col bg-black">
+    <div className="relative flex min-h-screen flex-col" style={{ backgroundColor: '#000000' }}>
       <div className="absolute top-0 left-0 w-full h-[600px] bg-bitcoin-gradient -z-10" />
       <Header />
       <VaultHero />

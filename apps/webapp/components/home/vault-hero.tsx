@@ -9,16 +9,17 @@ import { Button } from "@/components/ui/button"
 
 export function VaultHero() {
   return (
-    <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 bg-black relative overflow-hidden">
+    <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
       {/* Animated floating background elements */}
       <motion.div 
-        className="absolute top-0 left-0 w-full h-full opacity-20"
+        className="absolute top-0 left-0 w-full h-full"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.2 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 2 }}
       >
+        {/* Shapes principals more subtle */}
         <motion.div 
-          className="absolute top-1/4 left-1/4 w-32 h-32 bg-orange-500/20 rounded-full blur-xl"
+          className="absolute top-1/4 left-1/4 w-40 h-40 bg-orange-500/8 rounded-full blur-xl"
           animate={{ 
             y: [0, -20, 0],
             scale: [1, 1.1, 1],
@@ -30,7 +31,7 @@ export function VaultHero() {
           }}
         />
         <motion.div 
-          className="absolute top-3/4 right-1/4 w-24 h-24 bg-yellow-500/20 rounded-full blur-xl"
+          className="absolute top-3/4 right-1/4 w-32 h-32 bg-yellow-500/8 rounded-full blur-xl"
           animate={{ 
             y: [0, 15, 0],
             scale: [1, 0.9, 1],
@@ -43,7 +44,7 @@ export function VaultHero() {
           }}
         />
         <motion.div 
-          className="absolute top-1/2 left-3/4 w-28 h-28 bg-orange-400/20 rounded-full blur-xl"
+          className="absolute top-1/2 left-3/4 w-36 h-36 bg-orange-400/8 rounded-full blur-xl"
           animate={{ 
             y: [0, -10, 0],
             scale: [1, 1.2, 1],
@@ -53,6 +54,138 @@ export function VaultHero() {
             repeat: Infinity,
             ease: "easeInOut",
             delay: 2
+          }}
+        />
+        
+        {/* Many additional shapes distributed */}
+        <motion.div 
+          className="absolute top-1/6 right-1/3 w-24 h-24 bg-orange-600/6 rounded-full blur-xl"
+          animate={{ 
+            y: [0, 8, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{ 
+            duration: 9,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 3
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/6 left-1/6 w-28 h-28 bg-yellow-400/6 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -12, 0],
+            scale: [1, 1.05, 1],
+          }}
+          transition={{ 
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 4
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/8 left-1/2 w-20 h-20 bg-orange-300/5 rounded-full blur-xl"
+          animate={{ 
+            y: [0, 5, 0],
+            scale: [1, 1.08, 1],
+          }}
+          transition={{ 
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 5
+          }}
+        />
+        <motion.div 
+          className="absolute top-2/3 left-1/8 w-22 h-22 bg-yellow-600/5 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -8, 0],
+            scale: [1, 1.12, 1],
+          }}
+          transition={{ 
+            duration: 11,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 6
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/3 right-1/8 w-26 h-26 bg-orange-400/6 rounded-full blur-xl"
+          animate={{ 
+            y: [0, 10, 0],
+            scale: [1, 1.06, 1],
+          }}
+          transition={{ 
+            duration: 13,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 7
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/3 right-2/3 w-18 h-18 bg-yellow-300/5 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -6, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ 
+            duration: 14,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 8
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/12 left-3/4 w-16 h-16 bg-orange-500/4 rounded-full blur-xl"
+          animate={{ 
+            y: [0, 4, 0],
+            scale: [1, 1.14, 1],
+          }}
+          transition={{ 
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 9
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/12 left-2/3 w-14 h-14 bg-yellow-500/4 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -3, 0],
+            scale: [1, 1.07, 1],
+          }}
+          transition={{ 
+            duration: 16,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 10
+          }}
+        />
+        <motion.div 
+          className="absolute top-5/6 left-1/3 w-30 h-30 bg-orange-600/5 rounded-full blur-xl"
+          animate={{ 
+            y: [0, 7, 0],
+            scale: [1, 1.09, 1],
+          }}
+          transition={{ 
+            duration: 17,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 11
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/5 right-1/6 w-12 h-12 bg-yellow-400/4 rounded-full blur-xl"
+          animate={{ 
+            y: [0, -4, 0],
+            scale: [1, 1.11, 1],
+          }}
+          transition={{ 
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 12
           }}
         />
       </motion.div>
@@ -135,7 +268,7 @@ export function VaultHero() {
           >
             {/* Phone frame */}
             <motion.div 
-              className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-8 border-black bg-black shadow-2xl transform-gpu will-change-transform group"
+              className="relative w-full max-w-[320px] h-[600px] rounded-[40px] overflow-hidden border-2 border-white bg-black shadow-2xl transform-gpu will-change-transform group"
               initial={{ scale: 0.95, rotateY: 10 }}
               animate={{ 
                 scale: 1, 
@@ -164,7 +297,7 @@ export function VaultHero() {
             >
               {/* Phone frame */}
               <div className="absolute top-0 left-0 right-0 h-6 bg-black z-10 flex justify-center">
-                <div className="w-32 h-5 bg-black rounded-b-xl"></div>
+                <div className="w-32 h-5 bg-white rounded-b-xl"></div>
               </div>
 
               {/* App content */}

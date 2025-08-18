@@ -8,7 +8,7 @@ import { cardAdvanced, cardStaggerAdvanced } from "@/lib/animation-variants"
 
 export function VaultFeatures() {
   return (
-    <section className="w-full py-16 md:py-24 lg:py-32 bg-black" id="features">
+    <section className="w-full py-16 md:py-24 lg:py-32" id="features" style={{ backgroundColor: '#000000' }}>
       <div className="container px-4 md:px-6">
         <motion.div 
           className="flex flex-col items-center justify-center space-y-6 text-center mb-16"
@@ -70,7 +70,7 @@ export function VaultFeatures() {
               }}
               className="h-full transform-gpu preserve-3d"
             >
-              <Card className="group h-full bg-black border-2 border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-8">
+              <Card className="group h-full border-2 border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-8" style={{ backgroundColor: '#0f1114' }}>
                 <div className="flex flex-col h-full">
                   <div className="mb-6">
                     <motion.div 
@@ -120,7 +120,7 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-black border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
                 className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
@@ -156,7 +156,7 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-black border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
                 className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
@@ -193,7 +193,7 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-black border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
                 className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
@@ -229,7 +229,7 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-black border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
                 className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
@@ -273,7 +273,7 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-black border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <div className="flex flex-col items-start">
                 <motion.div 
                   className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-bitcoin"
@@ -337,7 +337,7 @@ export function VaultFeatures() {
           }}
           className="transform-gpu preserve-3d"
         >
-          <Card className="group bg-black border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6">
+          <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
             <div className="flex flex-col items-start">
               <motion.div 
                 className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-bitcoin"
