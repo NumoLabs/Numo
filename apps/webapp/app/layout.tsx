@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { StarknetProvider } from '@/components/starknet-provider'
 import { WalletProvider } from '@/components/wallet-provider'
+import { CavosAuthProvider } from '@/components/cavos-auth-provider'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,10 +22,13 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} text-white`} style={{ backgroundColor: '#000000' }}>
         <StarknetProvider>
-          <WalletProvider>
-            {children}
-          </WalletProvider>
+          <CavosAuthProvider>
+            <WalletProvider>
+              {children}
+            </WalletProvider>
+          </CavosAuthProvider>
         </StarknetProvider>
+        <Toaster />
       </body>
     </html>
   )
