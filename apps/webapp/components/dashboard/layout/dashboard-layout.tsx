@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useWalletStatus } from "@/hooks/use-wallet"
+import { useCavosAuth } from "@/hooks/use-cavos-auth"
 import { Footer } from "@/components/ui/footer"
 import { Sidebar } from "./sidebar"
 import { TopNavigation } from "./top-navigation"
@@ -26,14 +27,18 @@ export function DashboardLayout() {
   const pathname = usePathname()
   const router = useRouter()
   const { isConnected } = useWalletStatus()
+  const { isAuthenticated: isCavosAuthenticated } = useCavosAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Redirect to home page when wallet is disconnected
+  // Check if user is authenticated (either wallet or Cavos)
+  const isAuthenticated = isConnected || isCavosAuthenticated
+
+  // Redirect to home page when user is not authenticated
   useEffect(() => {
-    // Only redirect if we're in a dashboard route and wallet is disconnected
+    // Only redirect if we're in a dashboard route and user is not authenticated
     const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
     
-    if (isDashboardRoute && !isConnected) {
+    if (isDashboardRoute && !isAuthenticated) {
       // Add a small delay to avoid immediate redirect on initial load
       const timeoutId = setTimeout(() => {
         router.push("/")
@@ -41,11 +46,11 @@ export function DashboardLayout() {
       
       return () => clearTimeout(timeoutId)
     }
-  }, [isConnected, pathname, router])
+  }, [isAuthenticated, pathname, router])
 
   // Show nothing while redirecting to prevent flash of content
   const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
-  if (isDashboardRoute && !isConnected) {
+  if (isDashboardRoute && !isAuthenticated) {
     return null
   }
 

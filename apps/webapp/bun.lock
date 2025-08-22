@@ -25,6 +25,7 @@
         "@starknet-react/core": "^3.7.4",
         "@supabase/supabase-js": "^2.50.2",
         "axios": "^1.9.0",
+        "cavos-service-sdk": "^1.2.34",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "framer-motion": "^12.9.2",
@@ -908,6 +909,8 @@
     "caniuse-lite": ["caniuse-lite@1.0.30001726", "", {}, "sha512-VQAUIUzBiZ/UnlM28fSp2CRF3ivUn1BWEvxMcVTNwpw91Py1pGbPIyIKtd+tzct9C3ouceCVdGAXxZOpZAsgdw=="],
 
     "cardinal": ["cardinal@2.1.1", "", { "dependencies": { "ansicolors": "~0.3.2", "redeyed": "~2.1.0" }, "bin": { "cdl": "./bin/cdl.js" } }, "sha512-JSr5eOgoEymtYHBjNWyjrMqet9Am2miJhlfKNdqLp6zoeAh0KN5dRAcxlecj5mAJrmQomgiOBj35xHLrFjqBpw=="],
+
+    "cavos-service-sdk": ["cavos-service-sdk@1.2.34", "", { "dependencies": { "react": "^19.1.0" } }, "sha512-hWLUxFDEGkBcwfaxjPXkKOa+aaSuHgVYy0TauVTjLgEhIYrRLwwDQVvL8gNY3rXe9GQH15Z9AJ/Ox2y77VB+AQ=="],
 
     "chalk": ["chalk@4.1.2", "", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }, "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="],
 
