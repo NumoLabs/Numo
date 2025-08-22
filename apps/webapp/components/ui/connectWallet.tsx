@@ -16,7 +16,7 @@ export default function WalletConnector() {
   } = useCavosAuthContext()
   const pathname = usePathname()
 
-  const handleCavosSuccess = useCallback((user: unknown) => {
+  const handleCavosSuccess = useCallback(() => {
     // Authentication successful callback
   }, [])
 
