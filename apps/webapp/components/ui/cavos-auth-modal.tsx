@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from './alert'
 import { Eye, EyeOff, Mail, Lock, Loader2, Check, X } from 'lucide-react'
 
 interface CavosAuthModalProps {
-  onSuccess?: (user: any) => void
+  onSuccess?: (user: unknown) => void
   trigger?: React.ReactNode
 }
 
@@ -84,7 +84,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
     }
 
     try {
-      const result = await signIn(formData.email, formData.password)
+      await signIn(formData.email, formData.password)
       
       // Show verification email notification for new registrations
       if (isSignUp) {
@@ -110,7 +110,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       }
       
       // The modal will close automatically via the useEffect above
-    } catch (error) {
+    } catch {
       // Don't close modal on error - let user try again
     }
   }

@@ -9,7 +9,6 @@ import { usePathname } from 'next/navigation'
 
 export default function WalletConnector() {
   const { 
-    user: cavosUser, 
     isAuthenticated: isCavosAuthenticated, 
     signOut: cavosSignOut,
     isInitialized,
@@ -17,7 +16,7 @@ export default function WalletConnector() {
   } = useCavosAuthContext()
   const pathname = usePathname()
 
-  const handleCavosSuccess = useCallback((user: any) => {
+  const handleCavosSuccess = useCallback((user: unknown) => {
     // Authentication successful callback
   }, [])
 

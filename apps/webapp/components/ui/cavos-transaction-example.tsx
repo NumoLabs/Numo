@@ -51,10 +51,10 @@ export function CavosTransactionExample() {
         success: true,
         hash: result.txHash
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       setTransactionResult({
         success: false,
-        error: error.message || 'Transaction failed'
+        error: error instanceof Error ? error.message : 'Transaction failed'
       })
     } finally {
       setIsExecuting(false)

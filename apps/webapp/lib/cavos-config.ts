@@ -1,4 +1,4 @@
-import { CavosAuth, formatAmount, getBalanceOf, executeCalls, deployWallet } from 'cavos-service-sdk'
+import { CavosAuth, getBalanceOf } from 'cavos-service-sdk'
 
 // Environment variables setup
 const config = {
@@ -91,7 +91,7 @@ export const authenticateUser = async (email: string, password: string) => {
         throw new Error(errorData.error || 'Registration failed')
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Authentication error:', error)
     throw error
   }
@@ -108,11 +108,11 @@ export const authenticateUserDirect = async (email: string, password: string) =>
     )
     
     return signUpResult
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If user already exists, try to sign in
-    if (error.message?.includes('already exists') || 
+    if (error instanceof Error && (error.message?.includes('already exists') || 
         error.message?.includes('already registered') ||
-        error.message?.includes('already has an account')) {
+        error.message?.includes('already has an account'))) {
       
       try {
         const signInResult = await cavosAuth.signIn(
@@ -122,7 +122,7 @@ export const authenticateUserDirect = async (email: string, password: string) =>
         )
         
         return signInResult
-      } catch (signInError: any) {
+      } catch (signInError: unknown) {
         console.error('Sign in also failed:', signInError)
         throw signInError
       }
@@ -137,7 +137,7 @@ export const authenticateUserDirect = async (email: string, password: string) =>
 export const executeTransaction = async (
   accessToken: string,
   walletAddress: string,
-  calls: any[]
+  calls: unknown[]
 ) => {
   try {
     const result = await cavosAuth.executeCalls(
@@ -196,7 +196,7 @@ export const refreshUserToken = async (refreshToken: string) => {
 // Transaction execution helper (legacy name for backward compatibility)
 export const executeUserTransaction = async (
   walletAddress: string,
-  calls: any[],
+  calls: unknown[],
   accessToken: string
 ) => {
   try {

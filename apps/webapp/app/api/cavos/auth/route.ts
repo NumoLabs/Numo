@@ -40,19 +40,21 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json(userData)
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Determine appropriate status code based on error type
       let statusCode = 400
-      let errorMessage = error.message || `${action} failed`
+      const errorMessage = error instanceof Error ? error.message : `${action} failed`
       
-      if (error.message?.includes('Invalid credentials') || 
-          error.message?.includes('wrong password') ||
-          error.message?.includes('authentication failed')) {
-        statusCode = 401
-      } else if (error.message?.includes('network') || 
-                 error.message?.includes('fetch') ||
-                 error.message?.includes('timeout')) {
-        statusCode = 503
+      if (error instanceof Error) {
+        if (error.message?.includes('Invalid credentials') || 
+            error.message?.includes('wrong password') ||
+            error.message?.includes('authentication failed')) {
+          statusCode = 401
+        } else if (error.message?.includes('network') || 
+                   error.message?.includes('fetch') ||
+                   error.message?.includes('timeout')) {
+          statusCode = 503
+        }
       }
       
       return NextResponse.json(
