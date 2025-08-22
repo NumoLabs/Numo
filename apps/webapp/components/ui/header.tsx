@@ -31,7 +31,8 @@ export function Header({ variant = "auto" }: HeaderProps) {
   if (currentVariant === "landing") {
     return (
       <motion.header 
-        className="sticky top-0 z-50 mx-auto mt-6 max-w-4xl rounded-2xl bg-background/80 border shadow-xl transition-all animate-float"
+        className="sticky top-0 z-50 mx-auto mt-6 max-w-4xl rounded-2xl backdrop-blur-xl border border-orange-600/50 shadow-bitcoin transition-all animate-float"
+        style={{ backgroundColor: '#000000' }}
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ 
@@ -55,7 +56,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                 whileHover={{ scale: 1.1, rotate: 5, transition: { duration: 0.2 } }}
               >
                 <Image
-                  src="/numo-logo.png"
+                  src="/numo-logo-blanco.png"
                   alt="Numo Logo"
                   width={40}
                   height={40}
@@ -63,7 +64,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                 />
               </motion.div>
               <motion.span 
-                className="text-lg font-bold -ml-1 transition-transform duration-300 group-hover:scale-110"
+                className="text-lg font-bold -ml-1 transition-transform duration-300 group-hover:scale-110 text-white"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.5 }}
@@ -75,21 +76,21 @@ export function Header({ variant = "auto" }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-7 ml-12">
             <Link
               href="#stats"
-              className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300"
+              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
             >
               Statistics
             </Link>
             <Link
               href="#features"
-              className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300"
+              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
             >
               Features
             </Link>
             <Link
-              href="#strategies"
-              className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-black after:transition-all after:duration-300"
+              href="#waitlist"
+              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
             >
-              Strategies
+              Waitlist
             </Link>
             <Button
               asChild
@@ -104,7 +105,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
           <div className="flex items-center gap-6 ml-auto pl-12">
             {address && (
               <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 hover:from-black hover:via-gray-800 hover:to-black text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2 border border-gray-600 hover:border-gray-500">
+                <Button className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2">
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Button>
@@ -118,7 +119,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 mx-auto max-w-3xl rounded-2xl bg-background/80 border shadow-xl transition-all animate-float">
+    <header className="sticky top-0 z-50 mx-auto max-w-3xl rounded-2xl backdrop-blur-xl border border-orange-500/50 shadow-bitcoin transition-all animate-float" style={{ backgroundColor: '#000000' }}>
       <div className="container flex h-16 items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Sheet>
@@ -239,7 +240,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
               height={40}
               className="h-14 w-14 transition-transform duration-300 group-hover:scale-110"
             />
-            <span className="text-lg font-bold -ml-1 transition-transform duration-300 group-hover:scale-110">
+            <span className="text-lg font-bold -ml-1 transition-transform duration-300 group-hover:scale-110 text-white">
               umo
             </span>
           </Link>

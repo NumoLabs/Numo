@@ -8,7 +8,7 @@ import { cardAdvanced, cardStaggerAdvanced } from "@/lib/animation-variants"
 
 export function VaultFeatures() {
   return (
-    <section className="w-full py-16 md:py-24 lg:py-32 bg-gray-50 dark:bg-gray-900" id="features">
+    <section className="w-full py-16 md:py-24 lg:py-32" id="features" style={{ backgroundColor: '#000000' }}>
       <div className="container px-4 md:px-6">
         <motion.div 
           className="flex flex-col items-center justify-center space-y-6 text-center mb-16"
@@ -19,7 +19,7 @@ export function VaultFeatures() {
         >
           <div className="space-y-4">
             <motion.div 
-              className="inline-block rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 px-3 py-1 text-sm text-white font-medium shadow-lg shadow-blue-500/50 animate-pulse"
+              className="inline-block rounded-lg bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 px-3 py-1 text-sm text-black font-bold shadow-bitcoin animate-pulse"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -28,16 +28,16 @@ export function VaultFeatures() {
               Platform Features
             </motion.div>
             <motion.h2 
-              className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-gray-900 dark:text-white"
+              className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl bg-gradient-to-r from-white via-orange-300 to-yellow-400 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              Why Choose Numo?
+              Why Choose Bitcoin DeFi?
             </motion.h2>
             <motion.p 
-              className="max-w-3xl text-lg text-gray-600 dark:text-gray-300 leading-relaxed"
+              className="max-w-3xl text-lg text-gray-300 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -70,11 +70,11 @@ export function VaultFeatures() {
               }}
               className="h-full transform-gpu preserve-3d"
             >
-              <Card className="group h-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-8 hover:shadow-orange-600/30">
+              <Card className="group h-full border-2 border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-8" style={{ backgroundColor: '#0f1114' }}>
                 <div className="flex flex-col h-full">
                   <div className="mb-6">
                     <motion.div 
-                      className="w-16 h-16 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                      className="w-16 h-16 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-bitcoin animate-bitcoin-pulse"
                       whileHover={{ 
                         scale: 1.2,
                         rotate: -15,
@@ -86,21 +86,21 @@ export function VaultFeatures() {
                         transition: { duration: 6, repeat: Infinity, ease: "easeInOut" }
                       }}
                     >
-                      <Bitcoin className="w-8 h-8 text-white" />
+                      <Bitcoin className="w-8 h-8 text-black" />
                     </motion.div>
-                  <CardTitle className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+                  <CardTitle className="text-2xl font-bold mb-3 text-white">
                     BTC Savings+ Vault
                   </CardTitle>
-                  <CardDescription className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <CardDescription className="text-base text-gray-300 leading-relaxed">
                     Auto-rebalancing vault designed for WBTC with{" "}
-                    <span className="font-semibold text-gray-900 dark:text-white">100% BTC exposure</span>. Enjoy
+                    <span className="font-semibold text-bitcoin-gold">100% BTC exposure</span>. Enjoy
                     flexible deposits and withdrawals while earning yield that&apos;s always paid in WBTC.
                   </CardDescription>
                 </div>
-                <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-auto pt-6 border-t border-gray-600">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Current APY</span>
-                    <span className="font-semibold text-gray-900 dark:text-white">5.8%</span>
+                    <span className="text-gray-400">Current APY</span>
+                    <span className="font-semibold text-bitcoin-gold">5.8%</span>
                   </div>
                 </div>
               </div>
@@ -120,9 +120,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
                   scale: 1.2,
                   rotate: -15,
@@ -134,11 +134,11 @@ export function VaultFeatures() {
                   transition: { duration: 6, repeat: Infinity, ease: "easeInOut" }
                 }}
               >
-                <ArrowUpDown className="w-6 h-6 text-white" />
+                <ArrowUpDown className="w-6 h-6 text-black" />
               </motion.div>
-              <CardTitle className="text-xl font-bold mb-2 text-gray-900 dark:text-white">BTC Bonds</CardTitle>
-              <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
-                Lock BTC for <span className="font-semibold text-gray-900 dark:text-white">7, 30, or 90 days</span> and
+              <CardTitle className="text-xl font-bold mb-2 text-white">BTC Bonds</CardTitle>
+              <CardDescription className="text-sm text-gray-300">
+                Lock BTC for <span className="font-semibold text-bitcoin-gold">7, 30, or 90 days</span> and
                 earn enhanced yields. Perfect for long-term holders.
               </CardDescription>
             </Card>
@@ -156,9 +156,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
                   scale: 1.25,
                   rotate: 20,
@@ -171,12 +171,12 @@ export function VaultFeatures() {
                   transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                 }}
               >
-                <TrendingUp className="w-6 h-6 text-white" />
+                <TrendingUp className="w-6 h-6 text-black" />
               </motion.div>
-              <CardTitle className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Strategy Marketplace</CardTitle>
-              <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+              <CardTitle className="text-xl font-bold mb-2 text-white">Strategy Marketplace</CardTitle>
+              <CardDescription className="text-sm text-gray-300">
                 Discover and publish community strategies. View detailed{" "}
-                <span className="font-semibold text-gray-900 dark:text-white">risk metrics and APY data</span>.
+                <span className="font-semibold text-bitcoin-gold">risk metrics and APY data</span>.
               </CardDescription>
             </Card>
           </motion.div>
@@ -193,9 +193,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
                   scale: 1.15,
                   rotate: -10,
@@ -207,12 +207,12 @@ export function VaultFeatures() {
                   transition: { duration: 8, repeat: Infinity, ease: "easeInOut" }
                 }}
               >
-                <Clock className="w-6 h-6 text-white" />
+                <Clock className="w-6 h-6 text-black" />
               </motion.div>
-              <CardTitle className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Forecasting Tools</CardTitle>
-              <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+              <CardTitle className="text-xl font-bold mb-2 text-white">Forecasting Tools</CardTitle>
+              <CardDescription className="text-sm text-gray-300">
                 Simulate performance and visualize potential returns with{" "}
-                <span className="font-semibold text-gray-900 dark:text-white">advanced analytics</span>.
+                <span className="font-semibold text-bitcoin-gold">advanced analytics</span>.
               </CardDescription>
             </Card>
           </motion.div>
@@ -229,9 +229,9 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-600 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-600/30">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
                   scale: 1.3,
                   rotate: 25,
@@ -243,11 +243,11 @@ export function VaultFeatures() {
                   transition: { duration: 5, repeat: Infinity, ease: "easeInOut" }
                 }}
               >
-                <Target className="w-6 h-6 text-white" />
+                <Target className="w-6 h-6 text-black" />
               </motion.div>
-              <CardTitle className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Strategy Modes</CardTitle>
-              <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
-                Choose from <span className="font-semibold text-gray-900 dark:text-white">Auto, Manual, or Hybrid</span>{" "}
+              <CardTitle className="text-xl font-bold mb-2 text-white">Strategy Modes</CardTitle>
+              <CardDescription className="text-sm text-gray-300">
+                Choose from <span className="font-semibold text-bitcoin-gold">Auto, Manual, or Hybrid</span>{" "}
                 modes to match your investment style.
               </CardDescription>
             </Card>
@@ -273,10 +273,10 @@ export function VaultFeatures() {
             }}
             className="transform-gpu preserve-3d"
           >
-            <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-500/30">
+            <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
               <div className="flex flex-col items-start">
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                  className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-bitcoin"
                   whileHover={{ 
                     scale: 1.2,
                     rotate: -8,
@@ -289,17 +289,17 @@ export function VaultFeatures() {
                     transition: { duration: 6, repeat: Infinity, ease: "easeInOut" }
                   }}
                 >
-                  <BookOpen className="w-6 h-6 text-white" />
+                  <BookOpen className="w-6 h-6 text-black" />
                 </motion.div>
-              <CardTitle className="text-xl font-bold mb-3 text-gray-900 dark:text-white">DeFi Learning Hub</CardTitle>
-              <CardDescription className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+              <CardTitle className="text-xl font-bold mb-3 text-white">DeFi Learning Hub</CardTitle>
+              <CardDescription className="text-sm text-gray-300 leading-relaxed mb-4">
                 Master DeFi concepts with our comprehensive educational resources covering vaults, liquidity management,
                 risk assessment, and advanced strategies.
               </CardDescription>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-900/50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -307,11 +307,11 @@ export function VaultFeatures() {
                       />
                     </svg>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Interactive tutorials</span>
+                  <span className="text-sm text-gray-300">Interactive tutorials</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-900/50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -319,7 +319,7 @@ export function VaultFeatures() {
                       />
                     </svg>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Risk assessment guides</span>
+                  <span className="text-sm text-gray-300">Risk assessment guides</span>
                 </div>
               </div>
             </div>
@@ -337,10 +337,10 @@ export function VaultFeatures() {
           }}
           className="transform-gpu preserve-3d"
         >
-          <Card className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-400 transition-all duration-500 hover:shadow-xl rounded-2xl p-6 hover:shadow-orange-500/30">
+          <Card className="group border border-orange-500/30 hover:border-orange-400 transition-all duration-500 hover:shadow-bitcoin rounded-2xl p-6" style={{ backgroundColor: '#0f1114' }}>
             <div className="flex flex-col items-start">
               <motion.div 
-                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-bitcoin"
                 whileHover={{ 
                   scale: 1.2,
                   rotate: 10,
@@ -353,17 +353,17 @@ export function VaultFeatures() {
                   transition: { duration: 7, repeat: Infinity, ease: "easeInOut" }
                 }}
               >
-                <Shield className="w-6 h-6 text-white" />
+                <Shield className="w-6 h-6 text-black" />
               </motion.div>
-              <CardTitle className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Security First</CardTitle>
-              <CardDescription className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+              <CardTitle className="text-xl font-bold mb-3 text-white">Security First</CardTitle>
+              <CardDescription className="text-sm text-gray-300 leading-relaxed mb-4">
                 Built on Starknet with bank-grade security protocols, multi-signature support, and comprehensive audit
                 coverage for maximum protection.
               </CardDescription>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-900/50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -371,11 +371,11 @@ export function VaultFeatures() {
                       />
                     </svg>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Multi-signature support</span>
+                  <span className="text-sm text-gray-300">Multi-signature support</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <svg className="w-3 h-3 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 rounded-full bg-orange-900/50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+                    <svg className="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -383,7 +383,7 @@ export function VaultFeatures() {
                       />
                     </svg>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Comprehensive audits</span>
+                  <span className="text-sm text-gray-300">Comprehensive audits</span>
                 </div>
               </div>
             </div>
