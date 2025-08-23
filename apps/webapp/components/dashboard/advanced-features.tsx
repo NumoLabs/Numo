@@ -38,33 +38,33 @@ export function AdvancedFeatures() {
           // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
           <Card key={index} className="border-0 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${getFeatureBgColor(feature.color)}`}>
+              <CardTitle className="flex items-center gap-3 text-white">
+                <div className="h-10 w-10 rounded-full flex items-center justify-center bg-yellow-500">
                   <IconComponent className="h-5 w-5 text-white" />
                 </div>
                 {feature.title}
               </CardTitle>
-              <CardDescription>{feature.description}</CardDescription>
+              <CardDescription className="text-white">{feature.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {feature.stats.map((stat, statIndex) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                   <div key={statIndex} className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{stat.label}</span>
-                    <Badge variant="secondary">{stat.value}</Badge>
+                    <span className="text-sm text-white">{stat.label}</span>
+                    <Badge variant="secondary" className="text-yellow-500">{stat.value}</Badge>
                   </div>
                 ))}
                 {feature.title === "Learn about DeFi" && (
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Basic Concepts</span>
-                      <span>0/3 completed</span>
+                    <div className="flex justify-between text-sm text-white">
+                      <span className="text-yellow-500">Basic Concepts</span>
+                      <span className="text-yellow-500">0/3 completed</span>
                     </div>
                     <Progress value={0} className="h-2" />
                   </div>
                 )}
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-white">
                   {feature.title === "Custom Pools"
                     ? "Manually select liquidity pools and assign specific percentages according to your investment strategy."
                     : "Step-by-step guides, concept explanations, and strategies to maximize your returns while minimizing risks."}

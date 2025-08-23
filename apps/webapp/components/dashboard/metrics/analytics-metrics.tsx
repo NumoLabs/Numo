@@ -11,19 +11,19 @@ const iconMap = {
 
 const colorMap = {
   green: {
-    bg: "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20",
-    icon: "bg-green-500",
-    text: "text-green-600",
+    bg: "bg-gradient-to-br from-orange-500/10 to-yellow-500/10",
+    icon: "bg-gradient-to-r from-orange-500 to-yellow-500",
+    text: "text-orange-400",
   },
   blue: {
-    bg: "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20",
-    icon: "bg-blue-500",
-    text: "text-blue-600",
+    bg: "bg-gradient-to-br from-yellow-500/10 to-orange-500/10",
+    icon: "bg-gradient-to-r from-yellow-500 to-orange-500",
+    text: "text-yellow-400",
   },
   purple: {
-    bg: "bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20",
-    icon: "bg-purple-500",
-    text: "text-purple-600",
+    bg: "bg-gradient-to-br from-orange-500/15 to-yellow-500/15",
+    icon: "bg-gradient-to-r from-orange-500 to-yellow-500",
+    text: "text-orange-400",
   },
 }
 
@@ -37,9 +37,9 @@ export function AnalyticsMetrics() {
         const colors = colorMap[metric.color as keyof typeof colorMap]
 
         return (
-          <Card key={index} className={`border-0 shadow-lg ${colors.bg}`}>
+          <Card key={index} className={`border-0 shadow-lg ${colors.bg} bg-black/30`}>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-white">
                 <div className={`h-8 w-8 rounded-full ${colors.icon} flex items-center justify-center`}>
                   <IconComponent className="h-4 w-4 text-white" />
                 </div>
@@ -49,7 +49,7 @@ export function AnalyticsMetrics() {
             <CardContent className="space-y-4">
               {metric.items.map((item, itemIndex) => (
                 <div key={itemIndex} className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">{item.label}</span>
+                  <span className="text-sm text-gray-300">{item.label}</span>
                   <span className={`font-semibold ${colors.text}`}>{item.value}</span>
                 </div>
               ))}
@@ -57,7 +57,7 @@ export function AnalyticsMetrics() {
                 <div className="space-y-2">
                   {metric.items.map((item, itemIndex) => (
                     <div key={itemIndex}>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-sm mb-1 text-white">
                         <span>{item.label}</span>
                         <span className="font-medium">{item.value}</span>
                       </div>
@@ -67,9 +67,9 @@ export function AnalyticsMetrics() {
                 </div>
               )}
               {metric.title === "APY Comparison" && (
-                <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>+38%</strong> better than DeFi average
+                <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 rounded-lg p-3 border border-orange-500/30">
+                  <p className="text-sm text-white">
+                    <strong className="text-yellow-400">+38%</strong> better than DeFi average
                   </p>
                 </div>
               )}

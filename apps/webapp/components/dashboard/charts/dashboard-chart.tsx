@@ -3,6 +3,19 @@
 import { useEffect, useState } from "react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
+// Custom Tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-orange-500 border-0 rounded-lg shadow-lg p-3">
+        <p className="text-black font-semibold mb-1">{label}</p>
+        <p className="text-white font-bold">{`APY: ${payload[0].value}%`}</p>
+      </div>
+    )
+  }
+  return null
+}
+
 export function DashboardChart() {
   const [isMounted, setIsMounted] = useState(false)
 
@@ -31,7 +44,7 @@ export function DashboardChart() {
         <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" />
         <XAxis dataKey="name" />
         <YAxis domain={[4, 6]} tickFormatter={(value) => `${value}%`} />
-        <Tooltip formatter={(value) => [`${value}%`, "APY"]} />
+        <Tooltip content={<CustomTooltip />} />
         <Line type="monotone" dataKey="apy" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
       </LineChart>
     </ResponsiveContainer>

@@ -157,14 +157,14 @@ export function getPerformanceIndicators(): PerformanceIndicator[] {
     {
       title: "Risk Level",
       badge: "Low",
-      badgeColor: "orange",
+      badgeColor: "red",
       items: [
         { label: "Diversification", value: "Excellent" },
         { label: "Volatility", value: "Low" },
       ],
       progress: 25,
       description: "Controlled and managed risk",
-      color: "orange",
+      color: "red",
     },
   ]
 }
@@ -177,10 +177,10 @@ export function getPortfolioCards(): PortfolioCard[] {
       subValue: "≈ $78,435.67 USD",
       icon: "Bitcoin",
       colors: {
-        bg: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20",
-        border: "border-amber-200 dark:border-amber-800",
-        text: "text-amber-800 dark:text-amber-200",
-        subText: "text-amber-700 dark:text-amber-300",
+        bg: "",
+        border: "border-yellow-500",
+        text: "text-orange-500",
+        subText: "text-yellow-500",
       },
     },
     {
@@ -189,10 +189,10 @@ export function getPortfolioCards(): PortfolioCard[] {
       subValue: "+6.3% since initial deposit",
       icon: "TrendingUp",
       colors: {
-        bg: "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20",
-        border: "border-green-200 dark:border-green-800",
-        text: "text-green-800 dark:text-green-200",
-        subText: "text-green-700 dark:text-green-300",
+        bg: "",
+        border: "border-yellow-500",
+        text: "text-orange-500",
+        subText: "text-yellow-500",
       },
     },
     {
@@ -201,10 +201,10 @@ export function getPortfolioCards(): PortfolioCard[] {
       subValue: "+0.3% since last rebalance",
       icon: "Star",
       colors: {
-        bg: "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20",
-        border: "border-blue-200 dark:border-blue-800",
-        text: "text-blue-800 dark:text-blue-200",
-        subText: "text-blue-700 dark:text-blue-300",
+        bg: "",
+        border: "border-yellow-500",
+        text: "text-orange-500",
+        subText: "text-yellow-500",
       },
     },
     {
@@ -213,10 +213,10 @@ export function getPortfolioCards(): PortfolioCard[] {
       subValue: "Or when APY changes +/-1%",
       icon: "Clock",
       colors: {
-        bg: "bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20",
-        border: "border-purple-200 dark:border-purple-800",
-        text: "text-purple-800 dark:text-purple-200",
-        subText: "text-purple-700 dark:text-purple-300",
+        bg: "",
+        border: "border-yellow-500",
+        text: "text-orange-500",
+        subText: "text-yellow-500",
       },
     },
   ]
@@ -250,33 +250,33 @@ export function getRecentActivity(): RecentActivity[] {
       title: "Successful Deposit",
       description: "2 days ago • Tx: 0x1a2b...3c4d",
       badge: "Completed",
-      badgeColor: "green",
+      badgeColor: "yellow",
       value: "+0.5 BTC",
       subValue: "≈ $31,250",
       icon: "Upload",
-      color: "green",
+      color: "yellow",
     },
     {
       type: "rebalance",
       title: "Automatic Rebalance",
       description: "2 days ago • Tx: 0x1a2b...3c4d",
       badge: "Executed",
-      badgeColor: "blue",
+      badgeColor: "yellow",
       value: "+0.3% APY",
       subValue: "Optimization",
       icon: "RefreshCw",
-      color: "blue",
+      color: "yellow",
     },
     {
       type: "milestone",
       title: "Milestone Reached",
       description: "3 days ago • First 0.05 BTC gain",
       badge: "Achievement",
-      badgeColor: "purple",
-      value: "🎉 +5% ROI",
+      badgeColor: "yellow",
+      value: "+5% ROI",
       subValue: "Congratulations!",
       icon: "Award",
-      color: "purple",
+      color: "yellow",
     },
   ]
 }
@@ -374,8 +374,7 @@ export function getAdvancedFeatures(): AdvancedFeature[] {
       ],
       buttonText: "Explore Pools",
       buttonHref: "/pools",
-      buttonVariant: "default",
-      buttonColor: "black", // <--- Agrega esta línea para que el botón sea negro
+      buttonVariant: "outline",
     },
     {
       title: "Learn about DeFi",

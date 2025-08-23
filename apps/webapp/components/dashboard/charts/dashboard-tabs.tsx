@@ -19,21 +19,21 @@ export function DashboardTabs() {
         <TabsList className="grid w-full md:w-auto grid-cols-3 h-12">
           <TabsTrigger
             value="overview"
-            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:via-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
             <PieChart className="h-4 w-4" />
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="analytics"
-            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:via-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
             <BarChart3 className="h-4 w-4" />
             Analytics
           </TabsTrigger>
           <TabsTrigger
             value="transactions"
-            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:via-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
             <Activity className="h-4 w-4" />
             Transactions
@@ -70,7 +70,7 @@ export function DashboardTabs() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <LineChart className="h-5 w-5 text-blue-500" />
+                    <LineChart className="h-5 w-5 text-orange-500" />
                     Historical Performance
                   </CardTitle>
                   <CardDescription>Evolution of your investment over the last months</CardDescription>
@@ -123,15 +123,15 @@ export function DashboardTabs() {
           <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-500" />
+                <TrendingUp className="h-5 w-5 text-yellow-500" />
                 APY History
               </CardTitle>
               <CardDescription>APY evolution over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="h-[300px] flex items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
                 <div className="text-center">
-                  <LineChart className="h-12 w-12 text-green-500 mx-auto mb-2" />
+                  <LineChart className="h-12 w-12 text-yellow-500 mx-auto mb-2" />
                   <p className="text-muted-foreground">Historical APY chart</p>
                   <p className="text-sm text-muted-foreground">(Last 6 months)</p>
                 </div>
@@ -150,13 +150,13 @@ export function DashboardTabs() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-blue-500" />
+                  <Activity className="h-5 w-5 text-orange-500" />
                   Transaction History
                 </CardTitle>
                 <CardDescription>Complete history of deposits, withdrawals, and rebalancing</CardDescription>
               </div>
               <Link href="/history">
-                <Button className="gap-2">
+                <Button className="gap-2 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black border-0">
                   <Eye className="h-4 w-4" />
                   View Full History
                 </Button>

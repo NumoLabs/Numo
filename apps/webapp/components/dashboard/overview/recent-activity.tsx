@@ -30,6 +30,12 @@ const colorMap = {
     badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
     text: "text-purple-600",
   },
+  yellow: {
+    bg: "bg-yellow-50 dark:bg-yellow-950/20",
+    border: "border-yellow-200 dark:border-yellow-800",
+    badge: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+    text: "text-yellow-600",
+  },
 }
 
 export function RecentActivity() {
