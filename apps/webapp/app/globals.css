@@ -395,7 +395,7 @@ html {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   padding: 2px;
   background: linear-gradient(45deg, #F7931A, #FFD700, #F7931A);
   background-size: 200% 200%;
