@@ -12,7 +12,7 @@ export function ForecastContent() {
         {/* Yield Simulator */}
         <section>
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Yield Simulator</h2>
+            <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Yield Simulator</h2>
             <p className="text-lg text-gray-600">
               Calculate and compare potential returns across different BTC strategies
             </p>
@@ -23,7 +23,7 @@ export function ForecastContent() {
         {/* Performance Chart */}
         <section>
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Historical Performance</h2>
+            <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Historical Performance</h2>
             <p className="text-lg text-gray-600">Compare how different strategies have performed over time</p>
           </div>
           <PerformanceChart />
@@ -32,7 +32,7 @@ export function ForecastContent() {
         {/* Insights Dashboard */}
         <section>
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Analytics & Insights</h2>
+            <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Analytics & Insights</h2>
             <p className="text-lg text-gray-600">Deep dive into performance metrics and optimization recommendations</p>
           </div>
           <InsightsDashboard />

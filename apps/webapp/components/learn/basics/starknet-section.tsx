@@ -8,25 +8,25 @@ export function StarknetSection() {
       title: "Fast Transactions",
       description: "Processing thousands of transactions per second with near-instant confirmations.",
       icon: Zap,
-      bgColor: "bg-indigo-500",
-      textColor: "text-indigo-900 dark:text-indigo-100",
-      descColor: "text-indigo-700 dark:text-indigo-300",
+      bgColor: "bg-yellow-500",
+      textColor: "text-yellow-900 dark:text-yellow-100",
+      descColor: "text-yellow-700 dark:text-yellow-300",
     },
     {
       title: "Low Fees",
       description: "Minimal transaction costs that make trading and farming viable even with small amounts.",
       icon: Coins,
-      bgColor: "bg-green-500",
-      textColor: "text-green-900 dark:text-green-100",
-      descColor: "text-green-700 dark:text-green-300",
+      bgColor: "bg-orange-500",
+      textColor: "text-orange-900 dark:text-orange-100",
+      descColor: "text-orange-700 dark:text-orange-300",
     },
     {
       title: "Ethereum Security",
       description: "Inherits Ethereum's security while offering improved scalability and efficiency.",
       icon: Shield,
-      bgColor: "bg-purple-500",
-      textColor: "text-purple-900 dark:text-purple-100",
-      descColor: "text-purple-700 dark:text-purple-300",
+      bgColor: "bg-yellow-600",
+      textColor: "text-yellow-900 dark:text-yellow-100",
+      descColor: "text-yellow-700 dark:text-yellow-300",
     },
   ]
 
@@ -35,23 +35,23 @@ export function StarknetSection() {
       name: "Ekubo",
       description: "DEX with AMM architecture optimized for efficient trading and liquidity provision.",
       icon: BarChart3,
-      bgColor: "bg-orange-100 dark:bg-orange-900/30",
-      iconColor: "text-orange-600",
+      bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+      iconColor: "text-yellow-600",
     },
     {
       name: "Vesu",
       description: "Decentralized lending and vault platform with automated strategies.",
       icon: Lock,
-      bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-      iconColor: "text-emerald-600",
+      bgColor: "bg-orange-100 dark:bg-orange-900/30",
+      iconColor: "text-orange-600",
     },
   ]
 
   return (
-    <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20 border-indigo-200 dark:border-indigo-800">
+    <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-200 dark:border-yellow-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
-          <Award className="h-6 w-6 text-indigo-600" />
+          <Award className="h-6 w-6 text-yellow-600" />
           DeFi on Starknet: The Competitive Advantage
         </CardTitle>
         <CardDescription>Why Starknet is ideal for DeFi applications</CardDescription>
@@ -74,7 +74,7 @@ export function StarknetSection() {
         <Separator className="my-6" />
 
         <div className="bg-white/50 dark:bg-gray-900/50 rounded-lg p-6">
-          <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-4">
+          <h4 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-4">
             Featured DeFi Protocols on Starknet
           </h4>
           <div className="grid md:grid-cols-2 gap-4">

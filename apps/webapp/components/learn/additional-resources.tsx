@@ -9,8 +9,8 @@ export function AdditionalResources() {
       description: "Complete guide to the Starknet ecosystem",
       href: "https://docs.starknet.io/documentation/",
       icon: ExternalLink,
-      bgColor: "bg-blue-100 dark:bg-blue-900/30",
-      iconColor: "text-blue-600",
+      bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+      iconColor: "text-bitcoin-orange",
       external: true,
     },
     {
@@ -18,8 +18,8 @@ export function AdditionalResources() {
       description: "Advanced DeFi strategies and techniques",
       href: "/learn/advanced",
       icon: BookOpen,
-      bgColor: "bg-purple-100 dark:bg-purple-900/30",
-      iconColor: "text-purple-600",
+      bgColor: "bg-orange-100 dark:bg-orange-900/30",
+      iconColor: "text-bitcoin-gold",
       external: false,
     },
   ]
@@ -29,15 +29,15 @@ export function AdditionalResources() {
       title: "Impermanent Loss Calculator",
       description: "Estimate potential losses in AMM pools",
       icon: BarChart3,
-      bgColor: "bg-green-100 dark:bg-green-900/30",
-      iconColor: "text-green-600",
+      bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+      iconColor: "text-bitcoin-orange",
     },
     {
       title: "APY Monitor",
       description: "Track returns in real-time",
       icon: TrendingUp,
       bgColor: "bg-orange-100 dark:bg-orange-900/30",
-      iconColor: "text-orange-600",
+      iconColor: "text-bitcoin-gold",
     },
   ]
 
@@ -45,7 +45,7 @@ export function AdditionalResources() {
     <Card className="mt-8">
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
-          <BookOpen className="h-6 w-6 text-indigo-500" />
+          <BookOpen className="h-6 w-6 text-bitcoin-orange" />
           Additional Resources
         </CardTitle>
         <CardDescription>Continue your DeFi education</CardDescription>
