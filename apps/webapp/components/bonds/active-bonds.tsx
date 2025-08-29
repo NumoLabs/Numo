@@ -15,7 +15,7 @@ export function ActiveBonds({ bonds }: ActiveBondsProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-blue-500" />
+            <Lock className="h-5 w-5 text-bitcoin-orange" />
             Active Bonds
           </CardTitle>
         </CardHeader>
@@ -34,7 +34,7 @@ export function ActiveBonds({ bonds }: ActiveBondsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Lock className="h-5 w-5 text-blue-500" />
+          <Lock className="h-5 w-5 text-bitcoin-orange" />
           Active Bonds
         </CardTitle>
       </CardHeader>
@@ -44,67 +44,78 @@ export function ActiveBonds({ bonds }: ActiveBondsProps) {
             const totalDays = bond.bondType === "7 Days" ? 7 : bond.bondType === "30 Days" ? 30 : 90
             const remainingDays = bond.timeRemaining.days
             const progress = ((totalDays - remainingDays) / totalDays) * 100
+            const is30DayBond = bond.bondType === "30 Days"
 
             return (
               <div
                 key={bond.id}
-                className="p-4 rounded-lg border bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20"
+                className={`p-4 rounded-lg border ${
+                  is30DayBond 
+                    ? "bg-black border-yellow-400/30" 
+                    : "bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20"
+                }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{bond.bondType} Bond</h3>
-                      <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      <h3 className={`font-semibold ${is30DayBond ? 'text-white' : ''}`}>{bond.bondType} Bond</h3>
+                      <Badge className={
+                        is30DayBond 
+                          ? "bg-yellow-400/20 text-white border-yellow-400/30"
+                          : "bg-bitcoin-orange/20 text-bitcoin-orange border-bitcoin-orange/30"
+                      }>
                         {bond.status === "active" ? "Active" : "Matured"}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">Locked on {bond.lockedAt}</p>
+                    <p className={`text-sm ${is30DayBond ? 'text-gray-300' : 'text-muted-foreground'}`}>Locked on {bond.lockedAt}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold">{bond.amount}</p>
-                    <p className="text-sm text-muted-foreground">{bond.amountUSD}</p>
+                    <p className={`text-lg font-bold ${is30DayBond ? 'text-white' : ''}`}>{bond.amount}</p>
+                    <p className={`text-sm ${is30DayBond ? 'text-gray-300' : 'text-muted-foreground'}`}>{bond.amountUSD}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  <div className="text-center p-3 bg-white/50 dark:bg-gray-900/50 rounded-lg">
-                    <Clock className="h-4 w-4 text-blue-500 mx-auto mb-1" />
-                    <p className="text-xs text-muted-foreground">Time Left</p>
-                    <p className="font-semibold">
+                  <div className={`text-center p-3 ${is30DayBond ? 'bg-yellow-400/10' : 'bg-white/50 dark:bg-gray-900/50'} rounded-lg`}>
+                    <Clock className={`h-4 w-4 mx-auto mb-1 ${is30DayBond ? 'text-yellow-400' : 'text-bitcoin-orange'}`} />
+                    <p className={`text-xs ${is30DayBond ? 'text-gray-300' : 'text-muted-foreground'}`}>Time Left</p>
+                    <p className={`font-semibold ${is30DayBond ? 'text-white' : ''}`}>
                       {bond.timeRemaining.days}d {bond.timeRemaining.hours}h
                     </p>
                   </div>
 
-                  <div className="text-center p-3 bg-white/50 dark:bg-gray-900/50 rounded-lg">
-                    <TrendingUp className="h-4 w-4 text-green-500 mx-auto mb-1" />
-                    <p className="text-xs text-muted-foreground">APY</p>
-                    <p className="font-semibold text-green-600">{bond.currentAPY}</p>
+                  <div className={`text-center p-3 ${is30DayBond ? 'bg-yellow-400/10' : 'bg-white/50 dark:bg-gray-900/50'} rounded-lg`}>
+                    <TrendingUp className={`h-4 w-4 mx-auto mb-1 ${is30DayBond ? 'text-yellow-400' : 'text-bitcoin-gold'}`} />
+                    <p className={`text-xs ${is30DayBond ? 'text-gray-300' : 'text-muted-foreground'}`}>APY</p>
+                    <p className={`font-semibold ${is30DayBond ? 'text-yellow-400' : 'text-bitcoin-gold'}`}>{bond.currentAPY}</p>
                   </div>
 
-                  <div className="text-center p-3 bg-white/50 dark:bg-gray-900/50 rounded-lg">
-                    <TrendingUp className="h-4 w-4 text-purple-500 mx-auto mb-1" />
-                    <p className="text-xs text-muted-foreground">Est. Yield</p>
-                    <p className="font-semibold">{bond.estimatedYield}</p>
+                  <div className={`text-center p-3 ${is30DayBond ? 'bg-yellow-400/10' : 'bg-white/50 dark:bg-gray-900/50'} rounded-lg`}>
+                    <TrendingUp className={`h-4 w-4 mx-auto mb-1 ${is30DayBond ? 'text-yellow-400' : 'text-orange-500'}`} />
+                    <p className={`text-xs ${is30DayBond ? 'text-gray-300' : 'text-muted-foreground'}`}>Est. Yield</p>
+                    <p className={`font-semibold ${is30DayBond ? 'text-white' : ''}`}>{bond.estimatedYield}</p>
                   </div>
 
-                  <div className="text-center p-3 bg-white/50 dark:bg-gray-900/50 rounded-lg">
-                    <Calendar className="h-4 w-4 text-orange-500 mx-auto mb-1" />
-                    <p className="text-xs text-muted-foreground">Unlock Date</p>
-                    <p className="font-semibold">{bond.unlockDate}</p>
+                  <div className={`text-center p-3 ${is30DayBond ? 'bg-yellow-400/10' : 'bg-white/50 dark:bg-gray-900/50'} rounded-lg`}>
+                    <Calendar className={`h-4 w-4 mx-auto mb-1 ${is30DayBond ? 'text-yellow-400' : 'text-bitcoin-orange'}`} />
+                    <p className={`text-xs ${is30DayBond ? 'text-gray-300' : 'text-muted-foreground'}`}>Unlock Date</p>
+                    <p className={`font-semibold ${is30DayBond ? 'text-white' : ''}`}>{bond.unlockDate}</p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Lock Progress</span>
-                    <span>{progress.toFixed(1)}% complete</span>
+                    <span className={is30DayBond ? 'text-gray-300' : ''}>Lock Progress</span>
+                    <span className={is30DayBond ? 'text-gray-300' : ''}>{progress.toFixed(1)}% complete</span>
                   </div>
                   <Progress value={progress} className="h-2" />
                 </div>
 
                 {bond.status === "matured" && (
                   <div className="mt-4">
-                    <Button className="w-full">Claim Rewards</Button>
+                    <Button className={`w-full ${is30DayBond ? 'bg-yellow-400 hover:bg-yellow-500 text-black' : 'bg-bitcoin-orange hover:bg-orange-600'}`}>
+                      Claim Rewards
+                    </Button>
                   </div>
                 )}
               </div>

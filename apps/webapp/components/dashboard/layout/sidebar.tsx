@@ -71,7 +71,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             <div className="space-y-6">
               {navigation.map((section) => (
                 <div key={section.section}>
-                  <h3 className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                  <h3 className="px-3 text-xs font-semibold text-bitcoin-gold uppercase tracking-wider mb-2">
                     {section.section}
                   </h3>
                   <div className="space-y-1">
@@ -84,7 +84,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           pathname === item.href || 
                           (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                           (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                            ? "bg-gradient-to-r from-orange-500/10 to-yellow-500/10 text-orange-300 border-r-2 border-orange-500"
+                            ? "bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange border-r-2 border-bitcoin-orange"
                             : "text-gray-300 hover:bg-gray-800 hover:text-white",
                         )}
                       >
@@ -94,7 +94,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                             pathname === item.href || 
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-orange-500"
+                              ? "text-bitcoin-orange"
                               : "text-gray-400 group-hover:text-gray-300",
                           )}
                         />
@@ -128,7 +128,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               {navigation.map((section) => (
                 <li key={section.section}>
-                  <div className="text-xs font-semibold leading-6 text-gray-400 uppercase tracking-wider mb-2">
+                  <div className="text-xs font-semibold leading-6 text-bitcoin-gold uppercase tracking-wider mb-2">
                     {section.section}
                   </div>
                   <ul role="list" className="-mx-2 space-y-1">
@@ -141,7 +141,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                             pathname === item.href || 
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "bg-gradient-to-r from-orange-500/10 via-orange-500/10 to-yellow-500/10 text-orange-300 shadow-lg border border-orange-500/50"
+                              ? "bg-gradient-to-r from-bitcoin-orange/10 via-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange shadow-lg border border-bitcoin-orange/50"
                               : "text-gray-300 hover:bg-gradient-to-r hover:from-gray-800/80 hover:to-gray-700/80 hover:text-white",
                           )}
                         >
@@ -151,7 +151,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                                                           pathname === item.href || 
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-orange-500 scale-110"
+                              ? "text-bitcoin-orange scale-110"
                               : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
                             )}
                           />

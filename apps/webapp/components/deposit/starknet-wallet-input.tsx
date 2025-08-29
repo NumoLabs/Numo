@@ -85,7 +85,7 @@ export function StarknetWalletInput({ onWalletSubmit, currentWallet }: StarknetW
     <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-orange-200/50 dark:border-orange-800/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-purple-500" />
+          <Wallet className="h-5 w-5 text-yellow-500" />
           StarkNet Wallet Address
         </CardTitle>
         <CardDescription>
@@ -116,7 +116,7 @@ export function StarknetWalletInput({ onWalletSubmit, currentWallet }: StarknetW
               onChange={(e) => handleWalletChange(e.target.value)}
               className={`flex-1 ${
                 walletAddress && isValid
-                  ? "border-green-500 focus:border-green-500"
+                  ? "border-yellow-500 focus:border-yellow-500"
                   : walletAddress && !isValid
                   ? "border-red-500 focus:border-red-500"
                   : ""
@@ -135,8 +135,8 @@ export function StarknetWalletInput({ onWalletSubmit, currentWallet }: StarknetW
             <div className="flex items-center gap-2 text-sm">
               {isValid ? (
                 <>
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-green-600 dark:text-green-400">
+                  <CheckCircle className="h-4 w-4 text-yellow-500" />
+                  <span className="text-yellow-600 dark:text-yellow-400">
                     Valid StarkNet address
                   </span>
                 </>

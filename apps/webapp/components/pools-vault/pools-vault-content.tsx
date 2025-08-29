@@ -177,21 +177,21 @@ export function PoolsVaultContent() {
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
-      case "low": return "bg-green-100 text-green-800 hover:bg-green-100/80 dark:bg-green-800/30 dark:text-green-300"
-      case "medium": return "bg-amber-100 text-amber-800 hover:bg-amber-100/80 dark:bg-amber-800/30 dark:text-amber-300"
-      case "medium-high": return "bg-orange-100 text-orange-800 hover:bg-orange-100/80 dark:bg-orange-800/30 dark:text-orange-300"
-      case "high": return "bg-red-100 text-red-800 hover:bg-red-100/80 dark:bg-red-800/30 dark:text-red-300"
-      case "very high": return "bg-purple-100 text-purple-800 hover:bg-purple-100/80 dark:bg-purple-800/30 dark:text-purple-300"
-      default: return "bg-gray-100 text-gray-800 hover:bg-gray-100/80 dark:bg-gray-800/30 dark:text-gray-300"
+      case "low": return "bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30 hover:bg-bitcoin-gold/30"
+      case "medium": return "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200/80 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800"
+      case "medium-high": return "bg-bitcoin-orange/20 text-bitcoin-orange border-bitcoin-orange/30 hover:bg-bitcoin-orange/30"
+      case "high": return "bg-red-100 text-red-800 border-red-200 hover:bg-red-200/80 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800"
+      case "very high": return "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100/80 dark:bg-purple-800/30 dark:text-purple-300 dark:border-purple-800"
+      default: return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200/80 dark:bg-gray-800/30 dark:text-gray-300 dark:border-gray-700"
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active": return "bg-green-100 text-green-800 hover:bg-green-100/80 dark:bg-green-800/30 dark:text-green-300"
-      case "coming-soon": return "bg-blue-100 text-blue-800 hover:bg-blue-100/80 dark:bg-blue-800/30 dark:text-blue-300"
-      case "closed": return "bg-gray-100 text-gray-800 hover:bg-gray-100/80 dark:bg-gray-800/30 dark:text-gray-300"
-      default: return "bg-gray-100 text-gray-800 hover:bg-gray-100/80 dark:bg-gray-800/30 dark:text-gray-300"
+      case "active": return "bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30 hover:bg-bitcoin-gold/30"
+      case "coming-soon": return "bg-bitcoin-orange/20 text-bitcoin-orange border-bitcoin-orange/30 hover:bg-bitcoin-orange/30"
+      case "closed": return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200/80 dark:bg-gray-800/30 dark:text-gray-300 dark:border-gray-700"
+      default: return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200/80 dark:bg-gray-800/30 dark:text-gray-300 dark:border-gray-700"
     }
   }
 
@@ -203,7 +203,7 @@ export function PoolsVaultContent() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-bitcoin-orange to-bitcoin-gold bg-clip-text text-transparent">
                 Pool Vaults
               </h1>
               <p className="text-muted-foreground mt-2">
@@ -213,12 +213,12 @@ export function PoolsVaultContent() {
           </div>
 
           {/* Info Banner */}
-                        <div className="rounded-lg border p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800">
-              <div className="flex items-start gap-3">
-                <Users className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+          <div className="rounded-lg border p-4 bg-gradient-to-r from-bitcoin-gold/10 to-bitcoin-orange/10 dark:from-bitcoin-gold/5 dark:to-bitcoin-orange/5 border-bitcoin-gold/30 dark:border-bitcoin-gold/20">
+            <div className="flex items-start gap-3">
+              <Users className="h-5 w-5 text-bitcoin-gold mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
-                <p className="font-medium text-blue-900 dark:text-blue-100">New to Pool Vaults?</p>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
+                <p className="font-medium text-bitcoin-gold dark:text-bitcoin-gold">New to Pool Vaults?</p>
+                <p className="text-sm text-foreground">
                   Explore different vault strategies and liquidity pools. Each vault has detailed information about 
                   risks, strategies, and potential returns. Start with lower-risk vaults if you&apos;re new to DeFi.
                 </p>
@@ -229,8 +229,18 @@ export function PoolsVaultContent() {
           {/* Tabs */}
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-              <TabsTrigger value="explore">Explore Vaults</TabsTrigger>
-              <TabsTrigger value="featured">Featured</TabsTrigger>
+              <TabsTrigger 
+                value="explore"
+                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+              >
+                Explore Vaults
+              </TabsTrigger>
+              <TabsTrigger 
+                value="featured"
+                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+              >
+                Featured
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="explore" className="space-y-6">
@@ -256,46 +266,46 @@ export function PoolsVaultContent() {
                 {filteredPools.map((pool) => (
                   <Card 
                     key={pool.id}
-                    className="hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                    className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-bitcoin-orange/20 hover:border-bitcoin-orange/40"
                     onClick={() => setSelectedPool(pool.id)}
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-bitcoin-gold to-bitcoin-orange rounded-lg flex items-center justify-center">
                             <Coins className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <CardTitle className="flex items-center gap-2">
+                            <CardTitle className="flex items-center gap-2 text-bitcoin-orange">
                               {pool.name}
-                              {pool.featured && <Star className="h-4 w-4 text-yellow-500" />}
-                              {pool.status === "coming-soon" && <Target className="h-4 w-4 text-blue-500" />}
+                              {pool.featured && <Star className="h-4 w-4 text-bitcoin-gold" />}
+                              {pool.status === "coming-soon" && <Target className="h-4 w-4 text-bitcoin-orange" />}
                             </CardTitle>
-                            <CardDescription className="mt-1">
+                            <CardDescription className="mt-1 text-muted-foreground">
                               {pool.description}
                             </CardDescription>
                           </div>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-cyan-500 transition-colors" />
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-bitcoin-orange transition-colors" />
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                          <p className="text-2xl font-bold text-bitcoin-gold">
                             {pool.apy}%
                           </p>
                           <p className="text-xs text-gray-600 dark:text-gray-400">APY</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          <p className="text-lg font-bold text-bitcoin-orange">
                             ${(pool.tvl / 1000000).toFixed(1)}M
                           </p>
                           <p className="text-xs text-gray-600 dark:text-gray-400">TVL</p>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">{pool.protocol}</Badge>
+                        <Badge variant="secondary" className="bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30">{pool.protocol}</Badge>
                         <Badge className={getRiskColor(pool.riskLevel)}>
                           {pool.riskLevel}
                         </Badge>
@@ -305,7 +315,7 @@ export function PoolsVaultContent() {
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {pool.tokens.map((token) => (
-                          <Badge key={token} variant="outline" className="text-xs">
+                          <Badge key={token} variant="outline" className="text-xs border-bitcoin-orange/30 text-bitcoin-orange hover:bg-bitcoin-orange/10">
                             {token}
                           </Badge>
                         ))}
@@ -321,55 +331,55 @@ export function PoolsVaultContent() {
                 {availablePools.filter(pool => pool.featured).map((pool) => (
                   <Card 
                     key={pool.id}
-                    className="hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                    className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-bitcoin-orange/20 hover:border-bitcoin-orange/40"
                     onClick={() => setSelectedPool(pool.id)}
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-bitcoin-gold to-bitcoin-orange rounded-lg flex items-center justify-center">
                             <Star className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <CardTitle className="flex items-center gap-2">
+                            <CardTitle className="flex items-center gap-2 text-bitcoin-orange">
                               {pool.name}
-                              <Star className="h-4 w-4 text-yellow-500" />
+                              <Star className="h-4 w-4 text-bitcoin-gold" />
                             </CardTitle>
-                            <CardDescription className="mt-1">
+                            <CardDescription className="mt-1 text-muted-foreground">
                               {pool.description}
                             </CardDescription>
                           </div>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-cyan-500 transition-colors" />
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-bitcoin-orange transition-colors" />
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center">
-                          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                          <p className="text-2xl font-bold text-bitcoin-gold">
                             {pool.apy}%
                           </p>
                           <p className="text-xs text-gray-600 dark:text-gray-400">APY</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          <p className="text-lg font-bold text-bitcoin-orange">
                             ${(pool.tvl / 1000000).toFixed(1)}M
                           </p>
                           <p className="text-xs text-gray-600 dark:text-gray-400">TVL</p>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary">{pool.protocol}</Badge>
+                        <Badge variant="secondary" className="bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30">{pool.protocol}</Badge>
                         <Badge className={getRiskColor(pool.riskLevel)}>
                           {pool.riskLevel}
                         </Badge>
-                        <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80 dark:bg-yellow-800/30 dark:text-yellow-300">
+                        <Badge className="bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30 hover:bg-bitcoin-gold/30">
                           Featured
                         </Badge>
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {pool.tokens.map((token) => (
-                          <Badge key={token} variant="outline" className="text-xs">
+                          <Badge key={token} variant="outline" className="text-xs border-bitcoin-orange/30 text-bitcoin-orange hover:bg-bitcoin-orange/10">
                             {token}
                           </Badge>
                         ))}
@@ -417,27 +427,27 @@ export function PoolsVaultContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-500" />
+                    <TrendingUp className="h-5 w-5 text-bitcoin-gold" />
                     Quick Stats
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-3">
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-200/50">
+                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-bitcoin-gold/10 to-bitcoin-gold/5 dark:from-bitcoin-gold/5 dark:to-bitcoin-gold/2 rounded-lg border border-bitcoin-gold/30">
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <TrendingUp className="h-4 w-4 text-bitcoin-gold" />
                         <span className="text-sm font-medium">Current APY</span>
                       </div>
-                      <span className="font-bold text-green-600 dark:text-green-400">
+                      <span className="font-bold text-bitcoin-gold">
                         {selectedPoolData?.apy}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
+                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-orange/5 dark:from-bitcoin-orange/5 dark:to-bitcoin-orange/2 rounded-lg border border-bitcoin-orange/30">
                       <div className="flex items-center gap-2">
-                        <Coins className="h-4 w-4 text-blue-500" />
+                        <Coins className="h-4 w-4 text-bitcoin-orange" />
                         <span className="text-sm font-medium">Total Value</span>
                       </div>
-                      <span className="font-bold text-blue-600 dark:text-blue-400">
+                      <span className="font-bold text-bitcoin-orange">
                         ${selectedPoolData?.tvl ? (selectedPoolData.tvl / 1000000).toFixed(1) : '0.0'}M
                       </span>
                     </div>
@@ -458,7 +468,7 @@ export function PoolsVaultContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-orange-500" />
+                    <Shield className="h-5 w-5 text-bitcoin-orange" />
                     Risk Level
                   </CardTitle>
                 </CardHeader>

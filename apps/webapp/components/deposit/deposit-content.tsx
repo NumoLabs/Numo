@@ -236,7 +236,7 @@ export function DepositTestContent() {
                     key={step.id}
                     className={`flex items-center gap-3 p-3 rounded-lg ${
                       step.id <= currentStep
-                        ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                        ? 'bg-yellow-400/10 border border-yellow-400/30 dark:bg-yellow-400/5 dark:border-yellow-400/20'
                         : 'bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:border-gray-700'
                     }`}
                   >

@@ -48,7 +48,7 @@ export function BondAmountInput({ amount, onAmountChange, maxAmount, onMaxClick 
               className="pr-20"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <Coins className="h-4 w-4 text-blue-500" />
+              <Coins className="h-4 w-4 text-bitcoin-orange" />
               <span className="ml-1 text-sm font-medium">WBTC</span>
             </div>
           </div>
@@ -77,8 +77,8 @@ export function BondAmountInput({ amount, onAmountChange, maxAmount, onMaxClick 
           </div>
         </div>
 
-        <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <p className="text-xs text-blue-700 dark:text-blue-300">
+        <div className="p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+          <p className="text-xs text-orange-700 dark:text-orange-300">
             💡 <strong>Note:</strong> Once locked, your WBTC cannot be withdrawn until the lock period expires. Choose
             your lock duration carefully.
           </p>

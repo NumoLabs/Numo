@@ -12,12 +12,12 @@ interface BondSummaryProps {
 export function BondSummary({ estimate, option }: BondSummaryProps) {
   const getOptionBadge = () => {
     const colorMap = {
-      blue: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-      green: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-      purple: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      bitcoin: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+      gold: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      orange: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
     }
 
-    return <Badge className={colorMap[option.color as keyof typeof colorMap]}>{option.duration} Lock</Badge>
+    return <Badge className={colorMap[option.color as keyof typeof colorMap] || colorMap.bitcoin}>{option.duration} Lock</Badge>
   }
 
   return (
@@ -51,14 +51,14 @@ export function BondSummary({ estimate, option }: BondSummaryProps) {
 
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">Boost</span>
-            <span className="font-medium text-green-600">{estimate.boost}</span>
+            <span className="font-medium text-bitcoin-gold">{estimate.boost}</span>
           </div>
 
           <Separator />
 
           <div className="flex justify-between">
             <span className="font-medium">Boosted APY</span>
-            <span className="text-lg font-bold text-green-600">{estimate.boostedAPY}</span>
+            <span className="text-lg font-bold text-bitcoin-gold">{estimate.boostedAPY}</span>
           </div>
         </div>
 
@@ -67,14 +67,14 @@ export function BondSummary({ estimate, option }: BondSummaryProps) {
         {/* Yield Projection */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-green-500" />
+            <TrendingUp className="h-4 w-4 text-bitcoin-gold" />
             <span className="font-medium">Projected Returns</span>
           </div>
 
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">Estimated yield</span>
             <div className="text-right">
-              <span className="font-medium text-green-600">{estimate.estimatedYield}</span>
+              <span className="font-medium text-bitcoin-gold">{estimate.estimatedYield}</span>
               <p className="text-xs text-muted-foreground">{estimate.estimatedYieldUSD}</p>
             </div>
           </div>
@@ -94,19 +94,19 @@ export function BondSummary({ estimate, option }: BondSummaryProps) {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-blue-500" />
+              <Calendar className="h-4 w-4 text-bitcoin-orange" />
               <span className="text-sm text-muted-foreground">Unlock date</span>
             </div>
             <span className="font-medium">{estimate.unlockDate}</span>
           </div>
         </div>
 
-        <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div className="p-3 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
           <div className="flex items-start gap-2">
-            <Lock className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <Lock className="h-4 w-4 text-bitcoin-orange mt-0.5 flex-shrink-0" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Lock Terms</p>
-              <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+              <p className="text-sm font-medium text-orange-900 dark:text-orange-100">Lock Terms</p>
+              <ul className="text-xs text-orange-800 dark:text-orange-200 space-y-1">
                 <li>• Funds are locked for the entire duration</li>
                 <li>• No early withdrawal available</li>
                 <li>• Rewards are automatically compounded</li>

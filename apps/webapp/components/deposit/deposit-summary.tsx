@@ -104,9 +104,9 @@ export function DepositSummary({
             </div>
             <Badge variant="secondary" className="mt-2">Bitcoin</Badge>
           </div>
-                      <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 rounded-lg border border-purple-200/50">
+                      <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/50 dark:to-orange-950/50 rounded-lg border border-yellow-200/50">
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-4 w-4 text-purple-500" />
+                <Shield className="h-4 w-4 text-yellow-500" />
                 <span className="font-medium text-sm">StarkNet Address</span>
               </div>
               <div className="max-w-full overflow-hidden">
@@ -114,7 +114,10 @@ export function DepositSummary({
                   {starknetWallet}
                 </p>
               </div>
-              <Badge variant="outline" className="mt-2 bg-purple-100 dark:bg-purple-900/20">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                Your WBTC will be sent to this StarkNet wallet address
+              </p>
+              <Badge variant="secondary" className="mt-2">
                 StarkNet
               </Badge>
             </div>
@@ -124,9 +127,9 @@ export function DepositSummary({
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Deposit Benefits</h4>
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
+            <div className="p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-200/50">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-blue-500" />
+                <TrendingUp className="h-4 w-4 text-green-500" />
                 <span className="font-medium text-sm">Earn Returns</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">

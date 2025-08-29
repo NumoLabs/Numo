@@ -82,13 +82,13 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
     : 0
 
   return (
-    <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-cyan-200/50 dark:border-cyan-800/50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-green-500" />
+    <Card className="bg-gradient-to-br from-white/90 via-yellow-50/30 to-orange-50/30 dark:from-gray-900/90 dark:via-yellow-950/20 dark:to-orange-950/20 backdrop-blur-xl border-2 border-gradient-to-r from-bitcoin-gold/40 via-bitcoin-orange/40 to-yellow-400/40 shadow-lg hover:shadow-xl transition-all duration-300">
+      <CardHeader className="bg-gradient-to-r from-bitcoin-gold/5 to-bitcoin-orange/5 rounded-t-lg">
+        <CardTitle className="flex items-center gap-2 text-bitcoin-orange">
+          <CheckCircle className="h-5 w-5 text-bitcoin-gold" />
           Add to Pool
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-muted-foreground">
           Deposit funds to start earning {poolData.apy}% APY
         </CardDescription>
       </CardHeader>
@@ -125,15 +125,15 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
 
         {/* Estimated Rewards */}
         {isValidAmount && (
-          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-200/50">
+          <div className="p-4 bg-gradient-to-br from-yellow-100/50 via-bitcoin-gold/30 to-yellow-200/50 dark:from-yellow-900/30 dark:via-bitcoin-gold/20 dark:to-yellow-800/20 rounded-lg border-2 border-gradient-to-r from-yellow-300/40 to-bitcoin-gold/40 shadow-md hover:shadow-lg transition-all duration-200">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="font-medium text-sm mb-1">Estimated Annual Rewards</h4>
-                <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
                   {estimatedRewards.toFixed(2)} {poolData.token}
                 </p>
               </div>
-              <Badge variant="outline" className="bg-green-100 dark:bg-green-900/20">
+              <Badge variant="outline" className="bg-gradient-to-r from-yellow-400/20 to-bitcoin-gold/20 text-yellow-700 dark:text-yellow-300 border-2 border-gradient-to-r from-yellow-400/40 to-bitcoin-gold/40">
                 {poolData.apy}% APY
               </Badge>
             </div>
@@ -142,7 +142,7 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
 
         {/* Pool Summary */}
         <div className="space-y-3">
-          <h4 className="font-medium text-sm">Pool Summary</h4>
+          <h4 className="font-medium text-sm text-bitcoin-orange">Pool Summary</h4>
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-gray-600 dark:text-gray-400">Pool Name</span>
@@ -150,13 +150,13 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600 dark:text-gray-400">Current APY</span>
-              <span className="font-medium text-green-600 dark:text-green-400">
+              <span className="font-medium text-yellow-600 dark:text-yellow-400">
                 {poolData.apy}%
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600 dark:text-gray-400">Risk Level</span>
-              <Badge variant="outline" className="bg-orange-100 dark:bg-orange-900/20">
+              <Badge variant="outline" className="bg-gradient-to-r from-orange-400/20 to-bitcoin-orange/20 text-orange-700 dark:text-orange-300 border-2 border-gradient-to-r from-orange-400/40 to-bitcoin-orange/40">
                 {poolData.riskLevel}
               </Badge>
             </div>
@@ -169,18 +169,18 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
 
         {/* Benefits */}
         <div className="space-y-3">
-          <h4 className="font-medium text-sm">Benefits</h4>
+          <h4 className="font-medium text-sm text-bitcoin-orange">Benefits</h4>
           <div className="grid gap-2">
-            <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/50 dark:to-orange-950/50 rounded-lg border border-yellow-200/50">
-              <TrendingUp className="h-4 w-4 text-yellow-500" />
+            <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-yellow-100/30 via-bitcoin-gold/20 to-orange-100/30 dark:from-yellow-900/20 dark:via-bitcoin-gold/10 dark:to-orange-800/10 rounded-lg border-2 border-gradient-to-r from-yellow-200/40 via-bitcoin-gold/40 to-orange-200/40 shadow-md hover:shadow-lg transition-all duration-200">
+              <TrendingUp className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
               <span className="text-sm">High yield returns</span>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
-              <Shield className="h-4 w-4 text-blue-500" />
+            <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-orange-100/30 via-bitcoin-orange/20 to-red-100/30 dark:from-orange-900/20 dark:via-bitcoin-orange/10 dark:to-red-800/10 rounded-lg border-2 border-gradient-to-r from-orange-200/40 via-bitcoin-orange/40 to-red-200/40 shadow-md hover:shadow-lg transition-all duration-200">
+              <Shield className="h-4 w-4 text-orange-600 dark:text-orange-400" />
               <span className="text-sm">Audited smart contracts</span>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-200/50">
-              <CheckCircle className="h-4 w-4 text-green-500" />
+            <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-yellow-100/30 via-bitcoin-gold/20 to-yellow-200/30 dark:from-yellow-900/20 dark:via-bitcoin-gold/10 dark:to-yellow-800/10 rounded-lg border-2 border-gradient-to-r from-yellow-200/40 to-bitcoin-gold/40 shadow-md hover:shadow-lg transition-all duration-200">
+              <CheckCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
               <span className="text-sm">Automated strategies</span>
             </div>
           </div>
@@ -188,7 +188,7 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
 
         {/* Fees */}
         <div className="space-y-3">
-          <h4 className="font-medium text-sm">Fees & Terms</h4>
+          <h4 className="font-medium text-sm text-bitcoin-orange">Fees & Terms</h4>
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-gray-600 dark:text-gray-400">Deposit Fee</span>
@@ -213,7 +213,7 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
         <Button
           onClick={handleAddToPool}
           disabled={!isValidAmount || isLoading}
-          className="w-full"
+          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
           size="lg"
         >
           {isLoading ? (
@@ -230,11 +230,11 @@ export function AddToPoolForm({ poolData, onAddToPool, isLoading }: AddToPoolFor
         </Button>
 
         {/* Warning */}
-        <div className="p-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/50 dark:to-red-950/50 rounded-lg border border-orange-200/50">
+        <div className="p-3 bg-gradient-to-br from-yellow-100/30 via-bitcoin-gold/20 to-orange-100/30 dark:from-yellow-900/20 dark:via-bitcoin-gold/10 dark:to-orange-800/10 rounded-lg border-2 border-gradient-to-r from-yellow-200/40 via-bitcoin-gold/40 to-orange-200/40 shadow-md">
           <div className="flex items-start gap-2">
-            <Shield className="h-4 w-4 text-orange-500 mt-0.5" />
+            <Shield className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
             <div className="text-xs">
-              <p className="font-medium text-orange-800 dark:text-orange-200 mb-1">
+              <p className="font-medium text-yellow-700 dark:text-yellow-300 mb-1">
                 Important Notice
               </p>
               <p className="text-orange-700 dark:text-orange-300">
