@@ -374,6 +374,36 @@ html {
   animation: bitcoin-pulse 3s ease-in-out infinite;
 }
 
+/* Dashboard hero border animation */
+@keyframes border-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-border-gradient {
+  position: relative;
+}
+
+.animate-border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  padding: 2px;
+  background: linear-gradient(45deg, #F7931A, #FFD700, #F7931A);
+  background-size: 200% 200%;
+  animation: border-gradient 3s ease-in-out infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
 /* Disable heavy animations on low-end devices */
 @media (prefers-reduced-motion: reduce) {
   .animate-gradient-x {

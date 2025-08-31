@@ -18,12 +18,12 @@ interface CardColors {
 
 // Helper function to get solid background color for icons based on card colors
 function getIconBackgroundColor(cardColors: CardColors): string {
-  if (cardColors.bg.includes('amber')) return 'bg-amber-500'
-  if (cardColors.bg.includes('green')) return 'bg-green-500'
-  if (cardColors.bg.includes('blue')) return 'bg-blue-500'
-  if (cardColors.bg.includes('purple')) return 'bg-purple-500'
-  if (cardColors.bg.includes('orange')) return 'bg-orange-500'
-  return 'bg-gray-500' // fallback
+  if (cardColors.bg.includes('amber')) return 'bg-yellow-500'
+  if (cardColors.bg.includes('green')) return 'bg-yellow-500'
+  if (cardColors.bg.includes('blue')) return 'bg-yellow-500'
+  if (cardColors.bg.includes('purple')) return 'bg-yellow-500'
+  if (cardColors.bg.includes('orange')) return 'bg-yellow-500'
+  return 'bg-yellow-500' // default to yellow
 }
 
 export function PortfolioOverview() {

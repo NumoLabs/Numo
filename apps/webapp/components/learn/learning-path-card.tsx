@@ -24,8 +24,8 @@ export function LearningPathCard({
   isDisabled = false,
 }: LearningPathCardProps) {
   return (
-    <Card className={`relative overflow-hidden ${isActive ? "border-2 border-blue-200 dark:border-blue-800" : ""}`}>
-      {isActive && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500" />}
+    <Card className={`relative overflow-hidden ${isActive ? "border-2 border-bitcoin-gold dark:border-bitcoin-gold" : ""}`}>
+      {isActive && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-bitcoin-orange to-bitcoin-gold" />}
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
           <div className={`h-12 w-12 rounded-full ${bgColor} flex items-center justify-center`}>
@@ -41,7 +41,7 @@ export function LearningPathCard({
         <ul className="space-y-2 text-sm">
           {items.map((item, index) => (
             <li key={item} className="flex items-center gap-2">
-              <div className={`h-2 w-2 rounded-full ${index === 0 && isActive ? "bg-blue-500" : "bg-gray-300"}`} />
+              <div className={`h-2 w-2 rounded-full ${index === 0 && isActive ? "bg-bitcoin-orange" : "bg-gray-300"}`} />
               {item}
             </li>
           ))}

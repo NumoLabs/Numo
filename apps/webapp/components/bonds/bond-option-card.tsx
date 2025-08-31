@@ -18,32 +18,32 @@ const iconMap = {
 }
 
 const colorMap = {
-  blue: {
-    bg: "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20",
-    border: "border-blue-200 dark:border-blue-800",
-    icon: "bg-blue-500",
-    text: "text-blue-600",
-    badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  bitcoin: {
+    bg: "bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20",
+    border: "border-orange-200 dark:border-orange-800",
+    icon: "bg-bitcoin-orange",
+    text: "text-bitcoin-orange",
+    badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
   },
-  green: {
-    bg: "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20",
-    border: "border-green-200 dark:border-green-800",
-    icon: "bg-green-500",
-    text: "text-green-600",
-    badge: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  gold: {
+    bg: "bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20",
+    border: "border-yellow-200 dark:border-yellow-800",
+    icon: "bg-bitcoin-gold",
+    text: "text-bitcoin-gold",
+    badge: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
   },
-  purple: {
-    bg: "bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20",
-    border: "border-purple-200 dark:border-purple-800",
-    icon: "bg-purple-500",
-    text: "text-purple-600",
-    badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  orange: {
+    bg: "bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20",
+    border: "border-orange-200 dark:border-orange-800",
+    icon: "bg-orange-500",
+    text: "text-orange-600",
+    badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
   },
 }
 
 export function BondOptionCard({ option, selectedOption, onSelectOption }: BondOptionCardProps) {
   const IconComponent = iconMap[option.icon as keyof typeof iconMap]
-  const colors = colorMap[option.color as keyof typeof colorMap]
+  const colors = colorMap[option.color as keyof typeof colorMap] || colorMap.bitcoin
   const isSelected = selectedOption === option.id
 
   const getCardStyle = () => {
@@ -68,12 +68,12 @@ export function BondOptionCard({ option, selectedOption, onSelectOption }: BondO
           </div>
           <div className="flex items-center gap-2">
             {option.popular && (
-              <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 gap-1">
+              <Badge className="bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30 gap-1">
                 <Star className="h-3 w-3" />
                 Popular
               </Badge>
             )}
-            {isSelected && <CheckCircle className="h-5 w-5 text-green-500" />}
+            {isSelected && <CheckCircle className="h-5 w-5 text-bitcoin-orange" />}
           </div>
         </div>
       </CardHeader>

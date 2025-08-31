@@ -55,8 +55,8 @@ export function StrategyCard({ strategy, onFollow, isFollowing = false }: Strate
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <CardTitle className="text-lg group-hover:text-purple-600 transition-colors">{strategy.name}</CardTitle>
-              {strategy.verified && <Verified className="h-4 w-4 text-blue-500" />}
+              <CardTitle className="text-lg group-hover:text-bitcoin-orange transition-colors">{strategy.name}</CardTitle>
+              {strategy.verified && <Verified className="h-4 w-4 text-bitcoin-gold" />}
               {strategy.featured && <Star className="h-4 w-4 text-yellow-500 fill-current" />}
             </div>
             <p className="text-sm text-muted-foreground line-clamp-2">{strategy.description}</p>
@@ -71,8 +71,8 @@ export function StrategyCard({ strategy, onFollow, isFollowing = false }: Strate
       <CardContent className="space-y-4">
         {/* APY and Performance */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">{strategy.apy}</div>
+          <div className="text-center p-3 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-lg">
+            <div className="text-2xl font-bold text-bitcoin-orange">{strategy.apy}</div>
             <div className="text-xs text-muted-foreground">Current APY</div>
           </div>
           <div className="space-y-1">
@@ -117,14 +117,14 @@ export function StrategyCard({ strategy, onFollow, isFollowing = false }: Strate
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 pt-2 border-t">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-bitcoin-orange" />
             <div>
               <div className="text-sm font-medium">{strategy.tvl}</div>
               <div className="text-xs text-muted-foreground">TVL</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-bitcoin-gold" />
             <div>
               <div className="text-sm font-medium">{formatNumber(strategy.followers)}</div>
               <div className="text-xs text-muted-foreground">Followers</div>

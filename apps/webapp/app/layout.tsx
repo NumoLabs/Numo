@@ -9,8 +9,11 @@ import { Toaster } from '@/components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Numo - Modular BTC Finance on Starknet',
+  title: 'Numo',
   description: 'Grow your BTC safely, automatically, and transparently with auto-rebalancing vaults, fixed-term bonds, strategy sharing, and forecasting tools on Starknet.',
+  icons: {
+    icon: '/numo-logo.png',
+  },
 }
 
 export default function RootLayout({

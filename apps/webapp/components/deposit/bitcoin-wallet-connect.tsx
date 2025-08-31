@@ -130,9 +130,9 @@ export function BitcoinWalletConnect({ onWalletConnect, currentWallet }: Bitcoin
                 Ledger, Trezor, Coldcard
               </p>
             </div>
-            <div className="p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-lg border border-blue-200/50">
+            <div className="p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/50 dark:to-orange-950/50 rounded-lg border border-yellow-200/50">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <div className="w-2 h-2 bg-yellow-500 rounded-full" />
                 <span className="font-medium text-sm">Software Wallets</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -147,7 +147,7 @@ export function BitcoinWalletConnect({ onWalletConnect, currentWallet }: Bitcoin
           <h4 className="font-medium text-sm">Security Information</h4>
           <div className="space-y-2 text-sm">
             <div className="flex items-start gap-2">
-              <Shield className="h-4 w-4 text-green-500 mt-0.5" />
+              <Shield className="h-4 w-4 text-yellow-500 mt-0.5" />
               <div>
                 <p className="font-medium">Secure Connection</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -156,7 +156,7 @@ export function BitcoinWalletConnect({ onWalletConnect, currentWallet }: Bitcoin
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle className="h-4 w-4 text-blue-500 mt-0.5" />
+              <CheckCircle className="h-4 w-4 text-yellow-500 mt-0.5" />
               <div>
                 <p className="font-medium">Read-Only Access</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">

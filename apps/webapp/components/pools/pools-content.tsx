@@ -23,7 +23,7 @@ export function PoolsContent() {
           </p>
         </div>
         <Link href="/pools/create">
-          <Button className="gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+          <Button className="gap-2 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105">
             <Plus className="h-4 w-4" />
             New Custom Vault
           </Button>
@@ -31,12 +31,12 @@ export function PoolsContent() {
       </div>
 
       {/* Info Banner */}
-      <div className="rounded-lg border p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-blue-200 dark:border-blue-800">
+      <div className="rounded-lg border p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-200 dark:border-yellow-800">
         <div className="flex items-start gap-3">
-          <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+          <Info className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
           <div className="space-y-1">
-            <p className="font-medium text-blue-900 dark:text-blue-100">New to DeFi?</p>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+            <p className="font-medium text-yellow-900 dark:text-yellow-100">New to DeFi?</p>
+            <p className="text-sm text-white">
               Here you can explore different liquidity pools and create your own custom vaults. Each pool has detailed
               information about how it works, risks, and potential returns. The automatic vault remains the safest
               option for beginners.
@@ -44,7 +44,7 @@ export function PoolsContent() {
             <Link href="/learn">
               <Button
                 variant="link"
-                className="h-auto p-0 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                className="h-auto p-0 text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-200"
               >
                 Learn more about DeFi and liquidity pools →
               </Button>
@@ -56,8 +56,18 @@ export function PoolsContent() {
       {/* Tabs */}
       <Tabs defaultValue="explore" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-          <TabsTrigger value="explore">Explore Pools</TabsTrigger>
-          <TabsTrigger value="custom">My Custom Vaults</TabsTrigger>
+          <TabsTrigger 
+            value="explore"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+          >
+            Explore Pools
+          </TabsTrigger>
+          <TabsTrigger 
+            value="custom"
+            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+          >
+            My Custom Vaults
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="explore" className="space-y-6">
@@ -120,15 +130,15 @@ export function PoolsContent() {
 
             {/* Create New Vault Card */}
             <Link href="/pools/create">
-              <Card className="flex flex-col items-center justify-center p-8 h-full border-2 border-dashed border-gray-300 dark:border-gray-700 cursor-pointer hover:border-cyan-400 dark:hover:border-cyan-600 hover:bg-gradient-to-br hover:from-cyan-50/50 hover:to-blue-50/50 dark:hover:from-cyan-950/20 dark:hover:to-blue-950/20 transition-all duration-200 group">
-                <div className="rounded-full bg-gradient-to-r from-cyan-100 to-blue-100 dark:from-cyan-900/50 dark:to-blue-900/50 p-4 mb-4 group-hover:scale-110 transition-transform duration-200">
-                  <Plus className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
+              <Card className="flex flex-col items-center justify-center p-8 h-full border-2 border-dashed border-yellow-300 dark:border-yellow-700 cursor-pointer hover:border-yellow-400 dark:hover:border-yellow-600 hover:bg-gradient-to-br hover:from-yellow-50/50 hover:to-orange-50/50 dark:hover:from-yellow-950/20 dark:hover:to-orange-950/20 transition-all duration-200 group">
+                <div className="rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/50 dark:to-orange-900/50 p-4 mb-4 group-hover:scale-110 transition-transform duration-200">
+                  <Plus className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Create New Vault</p>
-                <p className="text-sm text-muted-foreground text-center mb-4">
+                <p className="text-lg font-medium text-yellow-900 dark:text-yellow-100 mb-2">Create New Vault</p>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 text-center mb-4">
                   Build a custom vault with your preferred pool allocation
                 </p>
-                <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+                <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black">
                   Get Started
                 </Button>
               </Card>
