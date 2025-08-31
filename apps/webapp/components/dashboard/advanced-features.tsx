@@ -11,12 +11,6 @@ const iconMap = {
   BookOpen,
 }
 
-function getFeatureBgColor(color: string) {
-  if (color === "black") return "bg-black"
-  if (color === "zinc") return "bg-zinc-900"
-  return `bg-${color}-500`
-}
-
 function getButtonBgColor(color?: string) {
   if (!color) return ''
   if (color === "black") return "bg-black hover:bg-zinc-900 text-white"

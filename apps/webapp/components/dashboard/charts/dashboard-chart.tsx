@@ -3,8 +3,17 @@
 import { useEffect, useState } from "react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
+interface CustomTooltipProps {
+  active?: boolean
+  payload?: Array<{
+    value: number
+    dataKey: string
+  }>
+  label?: string
+}
+
 // Custom Tooltip component
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-orange-500 border-0 rounded-lg shadow-lg p-3">
