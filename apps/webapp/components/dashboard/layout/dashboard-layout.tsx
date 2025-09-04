@@ -27,7 +27,11 @@ export function DashboardLayout() {
   const pathname = usePathname()
   const router = useRouter()
   const { isConnected } = useWalletStatus()
-  const { isAuthenticated: isCavosAuthenticated } = useCavosAuth()
+  
+  // Get Cavos auth state
+  const cavosAuth = useCavosAuth()
+  const isCavosAuthenticated = cavosAuth?.isAuthenticated || false
+  
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Check if user is authenticated (either wallet or Cavos)
@@ -35,10 +39,16 @@ export function DashboardLayout() {
 
   // Redirect to home page when user is not authenticated
   useEffect(() => {
-    // Only redirect if we're in a dashboard route and user is not authenticated
-    const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
+    // Define public routes that don't require authentication
+    const publicRoutes = ["/learn", "/marketplace"]
+    const isPublicRoute = publicRoutes.some(route => 
+      pathname === route || pathname.startsWith(`${route}/`)
+    )
     
-    if (isDashboardRoute && !isAuthenticated) {
+    // Only redirect if we're in a protected route and user is not authenticated
+    const isProtectedRoute = pathname !== "/" && !pathname.startsWith("/#") && !isPublicRoute
+    
+    if (isProtectedRoute && !isAuthenticated) {
       // Add a small delay to avoid immediate redirect on initial load
       const timeoutId = setTimeout(() => {
         router.push("/")
@@ -49,8 +59,14 @@ export function DashboardLayout() {
   }, [isAuthenticated, pathname, router])
 
   // Show nothing while redirecting to prevent flash of content
+  const publicRoutes = ["/learn", "/marketplace"]
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith(`${route}/`)
+  )
   const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
-  if (isDashboardRoute && !isAuthenticated) {
+  const isProtectedRoute = isDashboardRoute && !isPublicRoute
+  
+  if (isProtectedRoute && !isAuthenticated) {
     return null
   }
 
