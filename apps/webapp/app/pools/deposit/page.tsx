@@ -5,12 +5,14 @@ import { Sidebar } from "@/components/dashboard/layout/sidebar"
 import { TopNavigation } from "@/components/dashboard/layout/top-navigation"
 import { Footer } from "@/components/ui/footer"
 import { PoolsContent } from "@/components/pools/pools-content"
+import { CavosAuthGuard } from "@/components/auth"
 
 export default function PoolsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <CavosAuthGuard>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Main content */}
@@ -26,6 +28,7 @@ export default function PoolsPage() {
 
         <Footer />
       </div>
-    </div>
+      </div>
+    </CavosAuthGuard>
   )
 }

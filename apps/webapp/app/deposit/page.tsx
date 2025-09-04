@@ -11,7 +11,7 @@ import { AmountInput } from "@/components/deposit/amount-input"
 import { DepositSummary } from "@/components/deposit/deposit-summary"
 import { DepositActions } from "@/components/deposit/deposit-actions"
 import { useToast } from "@/hooks/use-toast"
-import { useWalletAuth } from "@/hooks/use-wallet-auth"
+import { CavosAuthGuard } from "@/components/auth"
 import {
   walletBalance,
   vaultInfo,
@@ -21,17 +21,11 @@ import {
 } from "@/lib/deposit-data"
 
 export default function DepositPage() {
-  const { isAuthenticated, isProtectedRoute } = useWalletAuth()
   const [selectedOption, setSelectedOption] = useState("standard")
   const [amount, setAmount] = useState("")
   const [selectedToken, setSelectedToken] = useState<"btc" | "wbtc">("btc")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
-
-  // Show nothing while redirecting to prevent flash of content
-  if (isProtectedRoute && !isAuthenticated) {
-    return null
-  }
 
   const selectedDepositOption = getDepositOptionById(selectedOption)
 
@@ -78,7 +72,8 @@ export default function DepositPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 dark:from-gray-950 dark:via-blue-950/30 dark:to-purple-950/20">
+    <CavosAuthGuard>
+      <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 dark:from-gray-950 dark:via-blue-950/30 dark:to-purple-950/20">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-700 text-white">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -154,6 +149,7 @@ export default function DepositPage() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </CavosAuthGuard>
   )
 }

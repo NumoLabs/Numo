@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout"
+import { CavosAuthGuard } from "@/components/auth"
 
 // type Props = {
 //   params: Promise<{ vault: string }>
@@ -28,5 +29,9 @@ export default async function VaultDetailPage(
   //   ],
   // }
 
-  return <DashboardLayout>{/* rest of code here */}</DashboardLayout>
+  return (
+    <CavosAuthGuard>
+      <DashboardLayout>{/* rest of code here */}</DashboardLayout>
+    </CavosAuthGuard>
+  )
 }

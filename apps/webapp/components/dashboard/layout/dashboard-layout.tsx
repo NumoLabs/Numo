@@ -1,9 +1,7 @@
 "use client"
 
-import { usePathname, useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-import { useWalletStatus } from "@/hooks/use-wallet"
-import { useCavosAuth } from "@/hooks/use-cavos-auth"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 import { Footer } from "@/components/ui/footer"
 import { Sidebar } from "./sidebar"
 import { TopNavigation } from "./top-navigation"
@@ -25,50 +23,7 @@ import { DepositTestContent } from "@/components/deposit-test/deposit-test-conte
 
 export function DashboardLayout() {
   const pathname = usePathname()
-  const router = useRouter()
-  const { isConnected } = useWalletStatus()
-  
-  // Get Cavos auth state
-  const cavosAuth = useCavosAuth()
-  const isCavosAuthenticated = cavosAuth?.isAuthenticated || false
-  
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Check if user is authenticated (either wallet or Cavos)
-  const isAuthenticated = isConnected || isCavosAuthenticated
-
-  // Redirect to home page when user is not authenticated
-  useEffect(() => {
-    // Define public routes that don't require authentication
-    const publicRoutes = ["/learn", "/marketplace"]
-    const isPublicRoute = publicRoutes.some(route => 
-      pathname === route || pathname.startsWith(`${route}/`)
-    )
-    
-    // Only redirect if we're in a protected route and user is not authenticated
-    const isProtectedRoute = pathname !== "/" && !pathname.startsWith("/#") && !isPublicRoute
-    
-    if (isProtectedRoute && !isAuthenticated) {
-      // Add a small delay to avoid immediate redirect on initial load
-      const timeoutId = setTimeout(() => {
-        router.push("/")
-      }, 100)
-      
-      return () => clearTimeout(timeoutId)
-    }
-  }, [isAuthenticated, pathname, router])
-
-  // Show nothing while redirecting to prevent flash of content
-  const publicRoutes = ["/learn", "/marketplace"]
-  const isPublicRoute = publicRoutes.some(route => 
-    pathname === route || pathname.startsWith(`${route}/`)
-  )
-  const isDashboardRoute = pathname !== "/" && !pathname.startsWith("/#")
-  const isProtectedRoute = isDashboardRoute && !isPublicRoute
-  
-  if (isProtectedRoute && !isAuthenticated) {
-    return null
-  }
 
   const renderContent = () => {
     if (pathname === "/") {

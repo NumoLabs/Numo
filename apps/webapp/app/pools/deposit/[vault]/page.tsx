@@ -4,6 +4,7 @@
 // import { Header } from "@/components/ui/header"
 // import { VaultDepositContent } from "@/components/pools/vault-deposit-content"
 import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout"
+import { CavosAuthGuard } from "@/components/auth"
 
 // type Props = {
 //   params: Promise<{ vault: string }>
@@ -31,7 +32,9 @@ export default async function DepositPage(
   // }
 
   return (
-    <DashboardLayout />
+    <CavosAuthGuard>
+      <DashboardLayout />
+    </CavosAuthGuard>
     // <div className="flex min-h-screen flex-col">
     //   <Header variant="dashboard" />
     //   <main className="flex-1 p-4 md:p-8 pt-6">
