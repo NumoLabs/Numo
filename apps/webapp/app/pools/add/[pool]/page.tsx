@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Sidebar } from "@/components/dashboard/layout/sidebar"
 import { TopNavigation } from "@/components/dashboard/layout/top-navigation"
 import { Footer } from "@/components/ui/footer"
+import { CavosAuthGuard } from "@/components/auth"
 
 // Mock data - in a real application this would come from an API
 const poolsData = {
@@ -116,7 +117,8 @@ export default function AddPoolToVaultPage() {
 
   if (!poolData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <CavosAuthGuard>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         <Sidebar sidebarOpen={false} setSidebarOpen={() => {}} />
         <div className="lg:pl-72">
           <TopNavigation setSidebarOpen={() => {}} />
@@ -132,7 +134,8 @@ export default function AddPoolToVaultPage() {
           </main>
           <Footer />
         </div>
-      </div>
+        </div>
+      </CavosAuthGuard>
     )
   }
 
@@ -164,7 +167,8 @@ export default function AddPoolToVaultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <CavosAuthGuard>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Sidebar sidebarOpen={false} setSidebarOpen={() => {}} />
 
       {/* Main content */}
@@ -384,6 +388,7 @@ export default function AddPoolToVaultPage() {
 
         <Footer />
       </div>
-    </div>
+      </div>
+    </CavosAuthGuard>
   )
 }

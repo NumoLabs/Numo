@@ -11,21 +11,15 @@ import { AmountInput } from "@/components/withdraw/amount-input"
 import { WithdrawSummary } from "@/components/withdraw/withdraw-summary"
 import { WithdrawActions } from "@/components/withdraw/withdraw-actions"
 import { useToast } from "@/hooks/use-toast"
-import { useWalletAuth } from "@/hooks/use-wallet-auth"
+import { CavosAuthGuard } from "@/components/auth"
 import { vaultBalance, withdrawOptions, calculateWithdrawEstimate, getWithdrawOptionById } from "@/lib/withdraw-data"
 
 export default function WithdrawPage() {
   const router = useRouter()
-  const { isAuthenticated, isProtectedRoute } = useWalletAuth()
   const [selectedOption, setSelectedOption] = useState("standard")
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
-
-  // Show nothing while redirecting to prevent flash of content
-  if (isProtectedRoute && !isAuthenticated) {
-    return null
-  }
 
   const selectedWithdrawOption = getWithdrawOptionById(selectedOption)
   const maxAmount = vaultBalance.totalBalance.replace(" BTC", "")
@@ -71,7 +65,8 @@ export default function WithdrawPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950">
+    <CavosAuthGuard>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-700 text-white">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -143,6 +138,7 @@ export default function WithdrawPage() {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </CavosAuthGuard>
   )
 }
