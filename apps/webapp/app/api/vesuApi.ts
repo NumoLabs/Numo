@@ -1,8 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchCryptoPrice } from '@/lib/utils';
-import type { VesuPool } from '@/types/VesuPools';
+import type { VesuPool, VesuAsset, ProcessedAsset } from '@/types/VesuPools';
 import type { VesuEarnPosition } from '@/types/VesuPositions';
 import axios from 'axios';
+
+// Helper function to process Vesu asset data for UI display
+export function processVesuAsset(asset: VesuAsset): ProcessedAsset {
+	const currentUtilization = (Number(asset.stats.currentUtilization.value) / 10 ** asset.stats.currentUtilization.decimals) * 100;
+	const apy = (Number(asset.stats.supplyApy.value) / 10 ** asset.stats.supplyApy.decimals) * 100;
+	const defiSpringApy = (Number(asset.stats.defiSpringSupplyApr.value) / 10 ** asset.stats.defiSpringSupplyApr.decimals) * 100;
+	const borrowApr = (Number(asset.stats.borrowApr.value) / 10 ** asset.stats.borrowApr.decimals) * 100;
+	const lstApr = (Number(asset.stats.lstApr.value) / 10 ** asset.stats.lstApr.decimals) * 100;
+	const totalSupplied = Number(asset.stats.totalSupplied.value) / 10 ** asset.stats.totalSupplied.decimals;
+	const totalDebt = Number(asset.stats.totalDebt.value) / 10 ** asset.stats.totalDebt.decimals;
+
+	return {
+		name: asset.name,
+		symbol: asset.symbol,
+		currentUtilization,
+		apy,
+		defiSpringApy,
+		borrowApr,
+		lstApr,
+		decimals: asset.decimals,
+		address: asset.address,
+		vTokenAddress: asset.vToken.address,
+		totalSupplied,
+		totalDebt,
+		canBeBorrowed: asset.stats.canBeBorrowed,
+	};
+}
 
 export async function getEarnPositions(address: string) {
 	if (!address) {
@@ -70,39 +97,65 @@ export async function getEarnPositions(address: string) {
 }
 
 export async function getVesuPools() {
-	// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
 	const { data } = (await axios.get(`https://api.vesu.xyz/pools`)).data;
 	return data
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		.filter((pool: any) => pool.isVerified)
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		.map((pool: any) => ({
 			id: pool.id,
 			name: pool.name,
-			address: pool.extensionContractAddress,
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			extensionContractAddress: pool.extensionContractAddress,
+			owner: pool.owner,
+			isVerified: pool.isVerified,
+			shutdownMode: pool.shutdownMode,
 			assets: pool.assets.map((asset: any) => ({
+				address: asset.address,
 				name: asset.name,
 				symbol: asset.symbol,
-				currentUtilization:
-					(Number(asset.stats.currentUtilization.value) /
-						10 ** Number(asset.stats.currentUtilization.decimals)) *
-					100,
-				apy:
-					(Number(asset.stats.supplyApy.value) /
-						10 ** Number(asset.stats.supplyApy.decimals)) *
-					100,
-				defiSpringApy:
-					(Number(asset.stats.defiSpringSupplyApr?.value || 0) /
-						10 **
-							Number(
-								asset.stats.defiSpringSupplyApr?.decimals || 0
-							)) *
-					100,
 				decimals: asset.decimals,
-				address: asset.address,
-				vTokenAddress: asset.vToken.address,
+				vToken: {
+					address: asset.vToken.address,
+					name: asset.vToken.name,
+					symbol: asset.vToken.symbol,
+					decimals: asset.vToken.decimals,
+				},
+				listedBlockNumber: asset.listedBlockNumber,
+				config: {
+					isLegacy: asset.config.isLegacy,
+					debtFloor: asset.config.debtFloor,
+					feeRate: asset.config.feeRate,
+					lastFullUtilizationRate: asset.config.lastFullUtilizationRate,
+					lastRateAccumulator: asset.config.lastRateAccumulator,
+					lastUpdated: asset.config.lastUpdated,
+					maxUtilization: asset.config.maxUtilization,
+					reserve: asset.config.reserve,
+					totalCollateralShares: asset.config.totalCollateralShares,
+					totalNominalDebt: asset.config.totalNominalDebt,
+				},
+				oracleConfig: {
+					pragmaKey: asset.oracleConfig.pragmaKey,
+					timeout: asset.oracleConfig.timeout,
+					numberOfSources: asset.oracleConfig.numberOfSources,
+					startTimeOffset: asset.oracleConfig.startTimeOffset,
+					timeWindow: asset.oracleConfig.timeWindow,
+					aggregationMode: asset.oracleConfig.aggregationMode,
+				},
+				interestRate: asset.interestRate,
+				stats: {
+					canBeBorrowed: asset.stats.canBeBorrowed,
+					totalSupplied: asset.stats.totalSupplied,
+					totalDebt: asset.stats.totalDebt,
+					currentUtilization: asset.stats.currentUtilization,
+					supplyApy: asset.stats.supplyApy,
+					defiSpringSupplyApr: asset.stats.defiSpringSupplyApr,
+					borrowApr: asset.stats.borrowApr,
+					lstApr: asset.stats.lstApr,
+				},
+				risk: {
+					url: asset.risk.url,
+					mdxUrl: asset.risk.mdxUrl,
+				},
 			})),
+			pairs: pool.pairs || [],
 		}));
 }
 
@@ -111,23 +164,13 @@ export async function getBestVesuPool(
 ): Promise<VesuPool | undefined> {
 	const pools = await getVesuPools();
 	let maxApy = 0;
-	let bestPool = undefined;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	// biome-ignore lint/complexity/noForEach: <explanation>
-		pools.forEach((pool: any) => {
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-				pool.assets.forEach((asset: any) => {
+	let bestPool: VesuPool | undefined = undefined;
+	
+	pools.forEach((pool) => {
+		pool.assets.forEach((asset) => {
 			if (asset.symbol === token) {
-				const apy =
-					(Number(asset.apy || 0) /
-						10 ** Number(asset.decimals || 0)) *
-					100;
-				const defiSpringApy =
-					(Number(asset.defiSpringSupplyApr || 0) /
-						10 ** Number(asset.decimals || 0)) *
-					100;
-				const totalApy = apy + defiSpringApy;
+				const processedAsset = processVesuAsset(asset);
+				const totalApy = processedAsset.apy + processedAsset.defiSpringApy;
 				if (totalApy > maxApy) {
 					maxApy = totalApy;
 					bestPool = pool;

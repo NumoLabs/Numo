@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Wallet, Users } from "lucide-react"
+import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Wallet, Users, Vault } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -17,6 +17,7 @@ const navigation = [
   {
     section: "Trading",
     items: [
+      { name: "Vaults", href: "/vault", icon: Vault, current: false },
       { name: "Custom Pools", href: "/pools", icon: Target, current: false },
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
       { name: "Deposit", href: "/deposit-test", icon: Wallet, current: false },
@@ -82,6 +83,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         className={cn(
                           "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                           pathname === item.href || 
+                          (item.href === "/vault" && pathname.startsWith("/vault")) ||
                           (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                           (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                             ? "bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange border-r-2 border-bitcoin-orange"
@@ -92,6 +94,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           className={cn(
                             "mr-3 h-5 w-5 transition-colors",
                             pathname === item.href || 
+                            (item.href === "/vault" && pathname.startsWith("/vault")) ||
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                               ? "text-bitcoin-orange"
@@ -139,6 +142,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           className={cn(
                             "group flex gap-x-3 rounded-xl px-3 py-3 text-sm font-semibold leading-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-md",
                             pathname === item.href || 
+                            (item.href === "/vault" && pathname.startsWith("/vault")) ||
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                               ? "bg-gradient-to-r from-bitcoin-orange/10 via-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange shadow-lg border border-bitcoin-orange/50"
@@ -148,11 +152,12 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           <item.icon
                             className={cn(
                               "h-5 w-5 shrink-0 transition-all duration-200",
-                                                          pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-bitcoin-orange scale-110"
-                              : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
+                              pathname === item.href || 
+                              (item.href === "/vault" && pathname.startsWith("/vault")) ||
+                              (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                              (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                                ? "text-bitcoin-orange scale-110"
+                                : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
                             )}
                           />
                           {item.name}
