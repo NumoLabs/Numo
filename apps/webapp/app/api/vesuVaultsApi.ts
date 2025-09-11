@@ -25,72 +25,16 @@ export async function getRealVesuVaults(): Promise<VaultStrategy[]> {
       pool.assets.some(asset => asset.symbol === 'WBTC')
     )
 
+    console.log('🔍 All pools:', pools.length)
+    console.log('🔍 WBTC pools found:', wbtcPools.length)
+    console.log('🔍 WBTC pool details:', wbtcPools.map(p => ({ id: p.id, name: p.name, assets: p.assets.map(a => a.symbol) })))
+
     console.log('🔍 WBTC pools found:', wbtcPools.length)
 
-    // If no real pools found, create a demo vault with real Vesu data
+    // If no WBTC pools found, return empty array instead of demo data
     if (wbtcPools.length === 0) {
-      console.log('No WBTC pools found, creating demo vault with real Vesu configuration')
-      
-      const demoVault: VaultStrategy = {
-        id: 'vesu-demo-vault',
-        name: 'Vesu Demo Vault',
-        description: 'Demo vault showcasing real Vesu protocol integration with WBTC',
-        riskLevel: 'Medium',
-        apy: 8.5,
-        totalValue: 2500.75,
-        createdAt: new Date().toISOString().split('T')[0],
-        lastRebalanced: new Date().toISOString(),
-        pools: [
-          {
-            poolId: 'genesis-pool',
-            poolName: 'Vesu Genesis Pool - WBTC Lending',
-            protocol: 'Vesu',
-            allocation: 100,
-            apy: 8.5,
-            tvl: 2500.75,
-            risk: 'Medium',
-            tokens: ['WBTC'],
-            address: '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac'
-          }
-        ],
-        performance: {
-          '1d': 0.15,
-          '7d': 1.2,
-          '30d': 6.8
-        },
-        tags: ['Demo', 'Vesu', 'WBTC', 'Real Data'],
-        verified: true,
-        featured: true,
-        creator: {
-          name: 'Vesu Protocol',
-          address: '0x0000000000000000000000000000000000000000000000000000000000000000',
-          verified: true
-        },
-        fees: {
-          management: 0.5,
-          performance: 10
-        },
-        minDeposit: 0.001,
-        maxDeposit: 1000,
-        totalDeposits: 2500.75,
-        totalWithdrawals: 0,
-        activeUsers: 42,
-        lastActivity: new Date().toISOString(),
-        status: 'active' as const,
-        apyHistory: {
-          '1d': 8.3,
-          '7d': 8.7,
-          '30d': 8.5
-        },
-        riskMetrics: {
-          volatility: 'Medium',
-          maxDrawdown: 8.5,
-          sharpeRatio: 1.8
-        }
-      }
-
-      vaults.push(demoVault)
-      return vaults
+      console.log('No WBTC pools found in Vesu API')
+      return []
     }
 
     wbtcPools.forEach((pool, index) => {
@@ -193,68 +137,8 @@ export async function getRealVesuVaults(): Promise<VaultStrategy[]> {
 
   } catch (error) {
     console.error('❌ Failed to generate real Vesu vaults:', error)
-    console.log('🔄 Creating demo vault as fallback...')
-    // Return demo vault if API fails
-    const demoVault: VaultStrategy = {
-      id: 'vesu-demo-vault',
-      name: 'Vesu Demo Vault',
-      description: 'Demo vault showcasing real Vesu protocol integration with WBTC',
-      riskLevel: 'Medium',
-      apy: 8.5,
-      totalValue: 2500.75,
-      createdAt: new Date().toISOString().split('T')[0],
-      lastRebalanced: new Date().toISOString(),
-      pools: [
-        {
-          poolId: 'genesis-pool',
-          poolName: 'Vesu Genesis Pool - WBTC Lending',
-          protocol: 'Vesu',
-          allocation: 100,
-          apy: 8.5,
-          tvl: 2500.75,
-          risk: 'Medium',
-          tokens: ['WBTC'],
-          address: '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac'
-        }
-      ],
-      performance: {
-        '1d': 0.15,
-        '7d': 1.2,
-        '30d': 6.8
-      },
-      tags: ['Demo', 'Vesu', 'WBTC', 'Real Data'],
-      verified: true,
-      featured: true,
-      creator: {
-        name: 'Vesu Protocol',
-        address: '0x0000000000000000000000000000000000000000000000000000000000000000',
-        verified: true
-      },
-      fees: {
-        management: 0.5,
-        performance: 10
-      },
-      minDeposit: 0.001,
-      maxDeposit: 1000,
-      totalDeposits: 2500.75,
-      totalWithdrawals: 0,
-      activeUsers: 42,
-      lastActivity: new Date().toISOString(),
-      status: 'active' as const,
-      apyHistory: {
-        '1d': 8.3,
-        '7d': 8.7,
-        '30d': 8.5
-      },
-      riskMetrics: {
-        volatility: 'Medium',
-        maxDrawdown: 8.5,
-        sharpeRatio: 1.8
-      }
-    }
-
-    console.log('✅ Returning demo vault:', demoVault)
-    return [demoVault]
+    // Return empty array if API fails instead of demo data
+    return []
   }
 }
 

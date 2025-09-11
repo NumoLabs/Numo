@@ -24,6 +24,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useVesuRebalance, type RebalanceStrategy } from "@/hooks/use-vesu-rebalance"
+import { useVesuPools } from "@/hooks/use-vesu-pools"
+import { processVesuAsset } from "@/app/api/vesuApi"
+import type { VesuPool, ProcessedAsset } from "@/types/VesuPools"
 
 interface VesuRebalanceManagerProps {
   contractAddress: string
@@ -103,7 +106,40 @@ export function VesuRebalanceManager({ contractAddress, onRebalanceComplete }: V
     isConnected
   } = useVesuRebalance(contractAddress)
 
+  const {
+    pools: vesuPools,
+    isLoading: isLoadingPools,
+    error: poolsError,
+    bestPool
+  } = useVesuPools()
+
   const selectedStrategyConfig = REBALANCE_STRATEGIES.find(s => s.id === selectedStrategy)
+
+  // Process Vesu pools data for display
+  const processedPools = vesuPools
+    .map((pool: VesuPool) => {
+      const wbtcAsset = pool.assets.find(asset => asset.symbol === 'WBTC')
+      if (!wbtcAsset) return null
+
+      const processedAsset = processVesuAsset(wbtcAsset)
+      const totalApy = processedAsset.apy + processedAsset.defiSpringApy
+      const tvl = processedAsset.totalSupplied
+
+      return {
+        poolId: pool.id,
+        poolName: pool.name,
+        protocol: 'Vesu',
+        allocation: 100, // This would come from the vault's actual allocation
+        apy: totalApy,
+        tvl: tvl,
+        risk: processedAsset.currentUtilization > 80 ? 'High' : 
+              processedAsset.currentUtilization > 50 ? 'Medium' : 'Low',
+        tokens: pool.assets.map(asset => asset.symbol),
+        address: pool.extensionContractAddress,
+        processedAsset
+      }
+    })
+    .filter((pool): pool is NonNullable<typeof pool> => pool !== null)
 
   // Auto rebalancing monitoring
   useEffect(() => {
@@ -236,6 +272,65 @@ export function VesuRebalanceManager({ contractAddress, onRebalanceComplete }: V
                   <Progress value={pool.maxWeight / 100} className="h-2" />
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Real Pool Data */}
+          {isLoadingPools ? (
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Available Pools</h4>
+              <div className="text-center py-4">
+                <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-600">Loading pool data...</p>
+              </div>
+            </div>
+          ) : poolsError ? (
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Available Pools</h4>
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-red-800">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span className="font-medium">Error loading pools</span>
+                </div>
+                <p className="text-xs text-red-700 mt-1">{poolsError}</p>
+              </div>
+            </div>
+          ) : processedPools.length > 0 && (
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Available Pools</h4>
+              <div className="space-y-2">
+                {processedPools.map((pool, index) => (
+                  <div key={pool.poolId} className="p-3 border rounded-lg bg-gray-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <h5 className="font-medium text-sm">{pool.poolName}</h5>
+                        <p className="text-xs text-gray-600">{pool.protocol}</p>
+                      </div>
+                      <Badge variant={pool.risk === 'High' ? 'destructive' : pool.risk === 'Medium' ? 'default' : 'secondary'}>
+                        {pool.risk}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-gray-600">APY:</span>
+                        <span className="ml-1 font-medium text-green-600">{pool.apy.toFixed(2)}%</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">TVL:</span>
+                        <span className="ml-1 font-medium">{pool.tvl.toFixed(2)} WBTC</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Tokens:</span>
+                        <span className="ml-1 font-medium">{pool.tokens.join(', ')}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Address:</span>
+                        <span className="ml-1 font-mono text-xs">{pool.address.slice(0, 8)}...</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
