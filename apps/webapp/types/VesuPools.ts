@@ -29,6 +29,13 @@ export interface ProcessedAsset {
 	decimals: number;
 	address: string;
 	vTokenAddress: string;
+	// Real configuration data from Vesu
+	floor?: number;
+	maxUtilization?: number;
+	targetUtilization?: number;
+	feeRate?: number;
+	zeroUtilizationRate?: string;
+	initialFullUtilizationRate?: string;
 }
 
 export interface VesuPool {

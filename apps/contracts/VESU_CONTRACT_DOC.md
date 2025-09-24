@@ -38,17 +38,17 @@ graph TB
 **Used Sepolia Addresses:**
 
 ```cairo
-// Vesu Singleton
-singleton: 0x01ecab07456147a8de92b9273dd6789893401e8462a737431493980d9be6827
+// Vesu Singleton V2 (Real Sepolia address)
+singleton: 0x2110b3cde727cd34407e257e1070857a06010cf02a14b1ee181612fb1b61c30
 
-// Extension (Pragma Oracle)  
-extension: 0x0571efca8cae0e426cb7052dad04badded0855b4cd6c6f475639af3356bc33fe
+// Extension PO V2 (Real Sepolia address)
+extension: 0x274669f178d303cdd92638ab2aee6d5cb75d72baf79606a02b749552fc17759
 
-// WBTC on Sepolia
-wbtc: 0xabbd6f1e590eb83addd87ba5ac27960d859b1f17d11a3c1cd6a0006704b1410
+// WBTC on Sepolia (Real address)
+wbtc: 0x63d32a3fa6074e72e7a1e06fe78c46a0c8473217773e19f11d8c8cbfc4ff8ca
 
-// Genesis Pool ID
-pool_id: 730993554056884283224259059297934576024721456828383733531590831263129347422
+// Genesis Pool ID (Real Sepolia pool)
+pool_id: 566154675190438152544449762131613456939576463701265245209877893089848934391
 ```
 
 ### 3. **Frontend Constants for Future Use**

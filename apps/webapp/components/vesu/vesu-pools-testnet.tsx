@@ -1,0 +1,235 @@
+// Vesu Pools Testnet Component
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useVesuPools, useVesuConfig } from '@/hooks/use-vesu';
+import { VesuTestnetBanner } from './vesu-testnet-banner';
+import { VesuWalletConnect } from './vesu-wallet-connect';
+import { formatApy, formatUtilization, calculateRiskLevel } from '@/lib/vesu-config';
+import { getVesuAssets, convertVesuAssetToPoolAsset } from '@/lib/vesu-real-data';
+import { useWalletStatus } from '@/hooks/use-wallet';
+import { 
+	TrendingUp, 
+	Users, 
+	Shield, 
+	AlertTriangle, 
+	RefreshCw,
+	ExternalLink 
+} from 'lucide-react';
+
+interface VesuPoolsTestnetProps {
+	onPoolSelect?: (pool: any) => void;
+	showTestnetBanner?: boolean;
+}
+
+export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: VesuPoolsTestnetProps) {
+  const { pools, loading, error, refreshPools } = useVesuPools();
+  const { isTestnetMode } = useVesuConfig();
+  const { isConnected } = useWalletStatus();
+  const [selectedPool, setSelectedPool] = useState<any>(null);
+
+  // Only use real pools from API - no fallback to mock data
+  const displayPools = pools;
+
+	const handlePoolSelect = (pool: any) => {
+		setSelectedPool(pool);
+		onPoolSelect?.(pool);
+	};
+
+	const getRiskColor = (risk: string) => {
+		switch (risk) {
+			case 'Low': return 'bg-green-100 text-green-800 border-green-200';
+			case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+			case 'High': return 'bg-orange-100 text-orange-800 border-orange-200';
+			case 'Critical': return 'bg-red-100 text-red-800 border-red-200';
+			default: return 'bg-gray-100 text-gray-800 border-gray-200';
+		}
+	};
+
+	const getRiskIcon = (risk: string) => {
+		switch (risk) {
+			case 'Low': return <Shield className="h-3 w-3" />;
+			case 'Medium': return <AlertTriangle className="h-3 w-3" />;
+			case 'High': return <AlertTriangle className="h-3 w-3" />;
+			case 'Critical': return <AlertTriangle className="h-3 w-3" />;
+			default: return <Shield className="h-3 w-3" />;
+		}
+	};
+
+	if (loading) {
+		return (
+			<div className="space-y-4">
+				{showTestnetBanner && <VesuTestnetBanner isTestnet={isTestnetMode} />}
+				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+					{Array.from({ length: 6 }).map((_, i) => (
+						<Card key={i}>
+							<CardHeader>
+								<Skeleton className="h-4 w-3/4" />
+								<Skeleton className="h-3 w-1/2" />
+							</CardHeader>
+							<CardContent>
+								<div className="space-y-2">
+									<Skeleton className="h-4 w-full" />
+									<Skeleton className="h-4 w-2/3" />
+									<Skeleton className="h-8 w-full" />
+								</div>
+							</CardContent>
+						</Card>
+					))}
+				</div>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="space-y-4">
+				{showTestnetBanner && <VesuTestnetBanner isTestnet={isTestnetMode} />}
+				<Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
+					<CardContent className="pt-6">
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<AlertTriangle className="h-4 w-4 text-red-600" />
+								<span className="text-red-800 dark:text-red-200">
+									Error loading Vesu pools: {error}
+								</span>
+							</div>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={refreshPools}
+								className="border-red-300 text-red-700 hover:bg-red-100"
+							>
+								<RefreshCw className="h-3 w-3 mr-1" />
+								Retry
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-6">
+			{showTestnetBanner && <VesuTestnetBanner isTestnet={isTestnetMode} />}
+			
+			{/* Wallet Connection */}
+			<VesuWalletConnect />
+			
+			<div className="flex items-center justify-between">
+				<div>
+					<h2 className="text-2xl font-bold tracking-tight">
+						Vesu Pools {isTestnetMode && '(Testnet)'}
+					</h2>
+					<p className="text-muted-foreground">
+						{isTestnetMode 
+							? 'Explore and interact with Vesu testnet pools for development and testing'
+							: 'Discover and participate in Vesu lending pools'
+						}
+					</p>
+				</div>
+				<Button variant="outline" onClick={refreshPools}>
+					<RefreshCw className="h-4 w-4 mr-2" />
+					Refresh
+				</Button>
+			</div>
+
+			{displayPools.length === 0 ? (
+				<Card>
+					<CardContent className="pt-6">
+						<div className="text-center py-8">
+							<Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+							<h3 className="text-lg font-semibold mb-2">No Real Pool Data Available</h3>
+							<p className="text-muted-foreground mb-4">
+								{isTestnetMode 
+									? 'Unable to fetch real Vesu testnet pool data from the API. Please check your connection and try again.'
+									: 'Unable to fetch real Vesu mainnet pool data from the API. Please check your connection and try again.'
+								}
+							</p>
+							<Button onClick={refreshPools} variant="outline">
+								<RefreshCw className="h-4 w-4 mr-2" />
+								Retry API Connection
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			) : (
+				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+					{displayPools.map((pool) => (
+						<Card 
+							key={pool.id} 
+							className={`cursor-pointer transition-all hover:shadow-md ${
+								selectedPool?.id === pool.id ? 'ring-2 ring-primary' : ''
+							}`}
+							onClick={() => handlePoolSelect(pool)}
+						>
+							<CardHeader>
+								<div className="flex items-center justify-between">
+									<CardTitle className="text-lg">{pool.name}</CardTitle>
+									<Badge variant="outline" className="text-xs">
+										{pool.assets.length} assets
+									</Badge>
+								</div>
+								<CardDescription>
+									Pool ID: {pool.id.slice(0, 8)}...
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<div className="space-y-3">
+									{pool.assets.map((asset: any, index: number) => {
+										const risk = calculateRiskLevel(asset.currentUtilization);
+										return (
+											<div key={index} className="space-y-2">
+												<div className="flex items-center justify-between">
+													<span className="font-medium">{asset.symbol}</span>
+													<Badge 
+														variant="outline" 
+														className={`text-xs ${getRiskColor(risk)}`}
+													>
+														{getRiskIcon(risk)}
+														<span className="ml-1">{risk}</span>
+													</Badge>
+												</div>
+												<div className="grid grid-cols-2 gap-2 text-sm">
+													<div>
+														<span className="text-muted-foreground">APY:</span>
+														<span className="ml-1 font-medium text-green-600">
+															{formatApy(asset.apy)}
+														</span>
+													</div>
+													<div>
+														<span className="text-muted-foreground">Utilization:</span>
+														<span className="ml-1 font-medium">
+															{formatUtilization(asset.currentUtilization)}
+														</span>
+													</div>
+												</div>
+												{asset.defiSpringApy > 0 && (
+													<div className="text-sm">
+														<span className="text-muted-foreground">Rewards APY:</span>
+														<span className="ml-1 font-medium text-blue-600">
+															{formatApy(asset.defiSpringApy)}
+														</span>
+													</div>
+												)}
+											</div>
+										);
+									})}
+									<Button 
+										className="w-full" 
+										variant={selectedPool?.id === pool.id ? "default" : "outline"}
+									>
+										{selectedPool?.id === pool.id ? 'Selected' : 'Select Pool'}
+									</Button>
+								</div>
+							</CardContent>
+						</Card>
+					))}
+				</div>
+			)}
+		</div>
+	);
+}

@@ -144,13 +144,13 @@ mod btc_vault {
     fn constructor(
         ref self: ContractState,
         owner: ContractAddress,
-        wbtc_token: ContractAddress, // Sepolia WBTC: 0xabbd6f1e590eb83addd87ba5ac27960d859b1f17d11a3c1cd6a0006704b1410
-        pool_id: felt252, // Genesis pool: 730993554056884283224259059297934576024721456828383733531590831263129347422
+        wbtc_token: ContractAddress, // Sepolia WBTC: 0x63d32a3fa6074e72e7a1e06fe78c46a0c8473217773e19f11d8c8cbfc4ff8ca
+        pool_id: felt252, // Genesis pool: 566154675190438152544449762131613456939576463701265245209877893089848934391
         rb_token: ContractAddress,
     ) {
-        // Sepolia Vesu contract addresses
-        self.singleton.write(0x01ecab07456147a8de92b9273dd6789893401e8462a737431493980d9be6827.try_into().unwrap());
-        self.extension.write(0x0571efca8cae0e426cb7052dad04badded0855b4cd6c6f475639af3356bc33fe.try_into().unwrap()); // Extension PO
+        // Sepolia Vesu contract addresses (Real addresses from vesu-v1)
+        self.singleton.write(0x2110b3cde727cd34407e257e1070857a06010cf02a14b1ee181612fb1b61c30.try_into().unwrap()); // Sepolia Singleton V2
+        self.extension.write(0x274669f178d303cdd92638ab2aee6d5cb75d72baf79606a02b749552fc17759.try_into().unwrap()); // Sepolia Extension PO V2
         
         // Vault configuration
         self.wbtc_token.write(wbtc_token);

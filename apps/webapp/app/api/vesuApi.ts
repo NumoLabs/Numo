@@ -1,16 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { fetchCryptoPrice } from '@/lib/utils';
+import { fetchCryptoPrice, getCurrentChainId } from '@/lib/utils';
 import type { VesuPool } from '@/types/VesuPools';
 import type { VesuEarnPosition } from '@/types/VesuPositions';
+import { getVesuConfig, buildVesuApiUrl, VESU_ENDPOINTS, calculateRiskLevel } from '@/lib/vesu-config';
 import axios from 'axios';
+
+// Get current Vesu configuration
+const getCurrentVesuConfig = () => {
+	const chainId = getCurrentChainId();
+	return getVesuConfig();
+};
 
 export async function getEarnPositions(address: string) {
 	if (!address) {
 		return [];
 	}
+	const config = getCurrentVesuConfig();
 	const { data } = (
 		await axios.get(
-			`https://api.vesu.xyz/positions?walletAddress=${address}`
+			buildVesuApiUrl(`${VESU_ENDPOINTS.POSITIONS}?walletAddress=${address}`)
 		)
 	).data;
 	const filteredData = data.filter(
@@ -43,11 +51,7 @@ export async function getEarnPositions(address: string) {
 				if (asset) {
 					poolApy = asset.apy;
 					rewardsApy = asset.defiSpringApy;
-					if (asset.currentUtilization > 80) {
-						risk = 'High';
-					} else if (asset.currentUtilization > 50) {
-						risk = 'Medium';
-					}
+					risk = calculateRiskLevel(asset.currentUtilization);
 				}
 			}
 
@@ -71,7 +75,7 @@ export async function getEarnPositions(address: string) {
 
 export async function getVesuPools() {
 	// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-	const { data } = (await axios.get(`https://api.vesu.xyz/pools`)).data;
+	const { data } = (await axios.get(buildVesuApiUrl(VESU_ENDPOINTS.POOLS))).data;
 	return data
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		.filter((pool: any) => pool.isVerified)
@@ -140,7 +144,7 @@ export async function getBestVesuPool(
 
 export async function getVesuTokens() {
 	// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-	const { data } = (await axios.get(`https://api.vesu.xyz/tokens`)).data;
+	const { data } = (await axios.get(buildVesuApiUrl(VESU_ENDPOINTS.TOKENS))).data;
 
 	return data;
 }

@@ -12,6 +12,19 @@ export const getAddresses = (chainId: string | undefined) => ({
 		chainId === 'SN_SEPOLIA'
 			? '0x053b40A647CEDfca6cA84f542A0fe36736031905A9639a7f19A3C1e66bFd5080'
 			: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
+	// Vesu Contract Addresses (Real addresses from vesu-v1)
+	VESU_SINGLETON:
+		chainId === 'SN_SEPOLIA'
+			? '0x2110b3cde727cd34407e257e1070857a06010cf02a14b1ee181612fb1b61c30' // Sepolia Singleton V2
+			: '0x2545b2e5d519fc230e9cd781046d3a64e092114f07e44771e0d719d148725ef', // Mainnet Singleton V2
+	VESU_EXTENSION:
+		chainId === 'SN_SEPOLIA'
+			? '0x274669f178d303cdd92638ab2aee6d5cb75d72baf79606a02b749552fc17759' // Sepolia Extension PO V2
+			: '0x7cf3881eb4a58e76b41a792fa151510e7057037d80eda334682bd3e73389ec0', // Mainnet Extension PO V2
+	WBTC:
+		chainId === 'SN_SEPOLIA'
+			? '0x63d32a3fa6074e72e7a1e06fe78c46a0c8473217773e19f11d8c8cbfc4ff8ca' // Sepolia WBTC
+			: '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac', // Mainnet WBTC
 });
 
 export const getBraavosChainId = (chainId: string) =>
@@ -43,3 +56,18 @@ export const getChainId = (chainId?: string) =>
 	chainId === 'SN_SEPOLIA'
 		? constants.NetworkName.SN_SEPOLIA
 		: constants.NetworkName.SN_MAIN;
+
+// Vesu API Configuration
+export const getVesuApiUrl = (chainId?: string) =>
+	chainId === 'SN_SEPOLIA'
+		? 'https://api-testnet.vesu.xyz' // Vesu testnet API
+		: 'https://api.vesu.xyz'; // Vesu mainnet API
+
+// Vesu Pool Configuration (Real pool IDs from vesu-v1)
+export const getVesuPoolConfig = (chainId?: string) => ({
+	apiUrl: getVesuApiUrl(chainId),
+	genesisPoolId: chainId === 'SN_SEPOLIA'
+		? '566154675190438152544449762131613456939576463701265245209877893089848934391' // Sepolia Genesis Pool
+		: '2198503327643286920898110335698706244522220458610657370981979460625005526824', // Mainnet Genesis Pool - CORRECTED
+	network: chainId === 'SN_SEPOLIA' ? 'testnet' : 'mainnet',
+});
