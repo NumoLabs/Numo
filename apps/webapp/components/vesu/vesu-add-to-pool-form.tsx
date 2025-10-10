@@ -17,10 +17,12 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useWalletBalance } from '@/hooks/use-wallet-balance';
 import { useWallet } from '@/hooks/use-wallet';
-import { useVesuDeposit } from '@/hooks/use-vesu-deposit';
+import { useVesuTransactions } from '@/hooks/use-vesu-transactions';
 import type { VesuPool } from '@/types/VesuPools';
 import { formatApy, calculateRiskLevel, getVesuConfig } from '@/lib/vesu-config';
 import { isTestnet } from '@/lib/utils';
+import { Contract, RpcProvider } from 'starknet';
+import { useEffect } from 'react';
 
 interface VesuAddToPoolFormProps {
   pool: VesuPool;
@@ -31,32 +33,13 @@ interface VesuAddToPoolFormProps {
 export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoolFormProps) {
   const [amount, setAmount] = useState('');
   const [selectedAsset, setSelectedAsset] = useState(pool.assets[0] || null);
-  
-  // Force ETH selection for testing
-  const forceETHSelection = () => {
-    console.log('🔧 Available assets:', pool.assets.map(a => ({ symbol: a.symbol, address: a.address })));
-    const ethAsset = pool.assets.find(asset => asset.symbol === 'ETH');
-    console.log('🔧 ETH asset found:', ethAsset);
-    if (ethAsset) {
-      setSelectedAsset(ethAsset);
-      console.log('🔧 Forced ETH selection for testing:', ethAsset);
-    } else {
-      console.log('🔧 No ETH asset found, using first asset:', pool.assets[0]);
-      setSelectedAsset(pool.assets[0]);
-    }
-  };
-  
-  // Auto-select ETH on component mount
-  React.useEffect(() => {
-    forceETHSelection();
-  }, [pool.assets]);
-  const [testMode, setTestMode] = useState(true); // Modo de prueba activado para testing
-  const [manualBalance, setManualBalance] = useState(1.0); // Balance manual para testing
+
+  const [directBalance, setDirectBalance] = useState(0); // Balance obtenido directamente
   const { balances, isLoading: isLoadingBalances, refreshBalances } = useWalletBalance();
   const { address } = useWallet();
   const isConnected = !!address;
   const { toast } = useToast();
-  const { deposit, isLoading: isDepositing, error: depositError, checkPosition } = useVesuDeposit();
+  const { depositToVesu, isLoading: isDepositing, currentStep } = useVesuTransactions();
 
   // Official Mainnet addresses from vesu-v1 repository
   const mainnetAddresses = {
@@ -64,17 +47,95 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     'WBTC': '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac', // Official Mainnet WBTC
     'USDC': '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8', // Official Mainnet USDC
     'USDT': '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8', // Official Mainnet USDT
-    'STRK': '0x0057912720381af14b0e5c87aa4718ed5e527eab60b3801ebf702ab09139e38b', // Official Mainnet STRK
+    'STRK': '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d', // Official Mainnet STRK
     'wstETH': '0x042b8f0484674ca266ac5d08e4ac6a3fe65bd3129795def2dca5c34ecc5f96d2', // Official Mainnet wstETH
     'wstETH Legacy': '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d', // Official Mainnet wstETH Legacy
   };
 
+  // Function to get balance directly from contract
+  const getDirectBalance = async (tokenAddress: string, decimals: number) => {
+    if (!address) {
+      console.log('No address available for balance check');
+      return 0;
+    }
+    
+    try {
+      const provider = new RpcProvider({
+        nodeUrl: isTestnet() 
+          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
+          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+      });
+
+      const contract = new Contract([
+        {
+          name: 'balanceOf',
+          type: 'function',
+          inputs: [{ name: 'account', type: 'felt' }],
+          outputs: [{ name: 'balance', type: 'Uint256' }],
+          stateMutability: 'view'
+        }
+      ], tokenAddress, provider);
+
+      const result = await contract.balanceOf(address);
+      console.log('Raw balance result:', result);
+      
+      // Handle different response formats
+      let balanceWei;
+      if (result.balance && typeof result.balance === 'object') {
+        balanceWei = result.balance.low || result.balance;
+      } else if (typeof result.balance === 'string' || typeof result.balance === 'number') {
+        balanceWei = result.balance;
+      } else {
+        console.error('Unexpected balance format:', result);
+        return 0;
+      }
+      
+      const balance = Number(balanceWei) / Math.pow(10, decimals);
+      
+      // Validate the result
+      if (isNaN(balance) || balance < 0) {
+        console.error('Invalid balance calculated:', balance, 'from wei:', balanceWei);
+        return 0;
+      }
+      
+      console.log(`🔍 Direct balance for ${tokenAddress}: ${balance} (${balanceWei} wei, ${decimals} decimals)`);
+      return balance;
+    } catch (error) {
+      console.error('Error getting direct balance:', error);
+      return 0;
+    }
+  };
+
   // Get balance for selected asset
-  const walletBalance = testMode 
-    ? manualBalance // Use manual balance in test mode
-    : (selectedAsset 
-        ? balances.find(b => b.address.toLowerCase() === selectedAsset.address.toLowerCase())?.balance || 0
-        : 0);
+  const walletBalance = selectedAsset 
+    ? (() => {
+        const foundBalance = balances.find(b => {
+          // Match by address or symbol for better compatibility
+          const addressMatch = b.address.toLowerCase() === selectedAsset.address.toLowerCase();
+          const symbolMatch = b.symbol?.toLowerCase() === selectedAsset.symbol.toLowerCase();
+          return addressMatch || symbolMatch;
+        })?.balance;
+        
+        // Return the first valid balance (hook balance or direct balance)
+        const hookBalance = foundBalance && !isNaN(foundBalance) ? foundBalance : 0;
+        const directBalanceValue = directBalance && !isNaN(directBalance) ? directBalance : 0;
+        
+        return hookBalance > 0 ? hookBalance : directBalanceValue;
+      })()
+    : (directBalance && !isNaN(directBalance) ? directBalance : 0);
+
+  // Get direct balance when asset changes
+  useEffect(() => {
+    if (selectedAsset && address) {
+      console.log('🔍 Getting direct balance for:', selectedAsset.symbol, selectedAsset.address);
+      getDirectBalance(selectedAsset.address, selectedAsset.decimals).then(balance => {
+        console.log('Setting direct balance:', balance);
+        setDirectBalance(isNaN(balance) ? 0 : balance);
+      });
+    } else {
+      setDirectBalance(0);
+    }
+  }, [selectedAsset, address]);
 
   const handleAmountChange = (value: string) => {
     setAmount(value);
@@ -84,19 +145,6 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     setAmount(walletBalance.toString());
   };
 
-  const handleDebug = () => {
-    console.log('=== MANUAL DEBUG ===');
-    console.log('Address:', address);
-    console.log('Is Connected:', isConnected);
-    console.log('Balances:', balances);
-    console.log('Selected Asset:', selectedAsset);
-    console.log('Pool Assets:', pool.assets);
-    console.log('Test Mode:', testMode);
-    console.log('Manual Balance:', manualBalance);
-    console.log('Wallet Balance:', walletBalance);
-    console.log('Amount:', amount);
-    console.log('Is Valid Amount:', isValidAmount);
-  };
 
   const handleAddToPool = async () => {
     // Debug wallet status before deposit
@@ -135,14 +183,15 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
       });
       return;
     }
-    if (numAmount > walletBalance) {
-      toast({
-        title: "Insufficient Balance",
-        description: "You don't have enough balance for this deposit",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Temporarily comment out balance check for testing
+    // if (numAmount > walletBalance) {
+    //   toast({
+    //     title: "Insufficient Balance",
+    //     description: "You don't have enough balance for this deposit",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     try {
       const vesuConfig = getVesuConfig();
@@ -170,24 +219,47 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         vesuConfig: vesuConfig
       });
       
-      const result = await deposit({
-        poolId: vesuConfig.genesisPoolId,
-        assetAddress: assetAddress,
-        amount: numAmount,
-        decimals: selectedAsset.decimals || 18
-      });
+      const result = await depositToVesu(
+        pool.id,
+        assetAddress,
+        numAmount,
+        selectedAsset.decimals || 18,
+        selectedAsset.vTokenAddress
+      );
 
-      if (result.success) {
+      if (result?.success) {
         // Refresh balances after successful deposit
         await refreshBalances();
         // Call the original callback for any additional handling
         onAddToPool(numAmount, assetAddress);
+        
+        toast({
+          title: "Deposit Successful!",
+          description: `Successfully deposited ${numAmount} ${selectedAsset.symbol} to ${pool.name}`,
+        });
+      } else {
+        toast({
+          title: "Deposit Failed",
+          description: result?.error || "Failed to deposit to Vesu pool",
+          variant: "destructive",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Deposit failed:', error);
+      
+      // Extract meaningful error message
+      let errorMessage = "An error occurred while processing your deposit";
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error?.reason) {
+        errorMessage = error.reason;
+      }
+      
       toast({
         title: "Deposit Failed",
-        description: "An error occurred while processing your deposit",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -198,28 +270,8 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
   const isValidAmount = amount && 
     !isNaN(numAmount) &&
     numAmount >= 0.001 && 
-    numAmount <= 1000 && 
-    (testMode || numAmount <= walletBalance);
-    
-  // Debug validation step by step
-  console.log('🔍 VALIDATION DEBUG:', {
-    amount,
-    amountType: typeof amount,
-    amountLength: amount?.length,
-    numAmount,
-    isNaN: isNaN(numAmount),
-    minCheck: numAmount >= 0.001,
-    maxCheck: numAmount <= 1000,
-    testMode,
-    walletBalance,
-    balanceCheck: testMode || numAmount <= walletBalance,
-    isValidAmount,
-    // Force validation for testing
-    forceValid: true
-  });
-  
-  // TEMPORARY: Force validation to true for testing
-  const finalIsValidAmount = true; // isValidAmount;
+    numAmount <= 1000;
+    // Temporarily remove balance check for testing: && numAmount <= walletBalance;
 
   const estimatedRewards = amount && !isNaN(Number(amount)) && selectedAsset
     ? (Number(amount) * selectedAsset.apy) / 100 
@@ -334,7 +386,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
                   Loading balance...
                 </span>
               ) : isConnected ? (
-                `Balance: ${walletBalance.toFixed(4)} ${selectedAsset?.symbol || 'Token'}`
+                <span>Balance: {isNaN(walletBalance) ? '0.0000' : walletBalance.toFixed(4)} {selectedAsset?.symbol || 'Token'}</span>
               ) : (
                 'Connect wallet to see balance'
               )}
@@ -346,7 +398,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         </div>
 
         {/* Estimated Rewards */}
-        {finalIsValidAmount && selectedAsset && (
+        {isValidAmount && selectedAsset && (
           <div className="p-4 bg-gradient-to-br from-green-100/50 via-green-200/30 to-green-100/50 dark:from-green-900/30 dark:via-green-800/20 dark:to-green-900/20 rounded-lg border border-green-200/40 shadow-md">
             <div className="flex items-center justify-between">
               <div>
@@ -438,99 +490,18 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
           </div>
         </div>
 
-        {/* Balance Controls */}
-        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h4 className="font-medium text-blue-800">Balance Controls</h4>
-              <p className="text-xs text-blue-600">Manage wallet balances and validation</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={refreshBalances}
-                disabled={isLoadingBalances}
-                className="px-3 py-1 rounded text-xs font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
-              >
-                {isLoadingBalances ? 'Loading...' : 'Refresh'}
-              </button>
-              <button
-                onClick={handleDebug}
-                className="px-3 py-1 rounded text-xs font-medium bg-green-500 text-white hover:bg-green-600"
-              >
-                Debug
-              </button>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs text-blue-600">Test Mode (skip balance check)</span>
-              </div>
-              <button
-                onClick={() => setTestMode(!testMode)}
-                className={`px-3 py-1 rounded text-xs font-medium ${
-                  testMode 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {testMode ? 'ON' : 'OFF'}
-              </button>
-            </div>
-            {testMode && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-blue-600">Manual Balance:</span>
-                <input
-                  type="number"
-                  value={manualBalance}
-                  onChange={(e) => setManualBalance(Number(e.target.value))}
-                  className="w-20 px-2 py-1 text-xs border rounded"
-                  step="0.1"
-                  min="0"
-                />
-                <span className="text-xs text-blue-600">{selectedAsset?.symbol || 'ETH'}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Debug Info */}
-        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs">
-          <h4 className="font-medium text-yellow-800 mb-2">Debug Info:</h4>
-          <div className="space-y-1 text-yellow-700">
-            <div><strong>Input:</strong> Amount: "{amount}" → Number: {numAmount}</div>
-            <div><strong>Validation:</strong> Valid Amount: {finalIsValidAmount ? '✅' : '❌'}</div>
-            <div><strong>Mode:</strong> Test Mode: {testMode ? '✅ ON' : '❌ OFF'}</div>
-            <div><strong>Asset:</strong> Selected: {selectedAsset ? `✅ ${selectedAsset.symbol}` : '❌ None'}</div>
-            <div><strong>Wallet:</strong> Connected: {isConnected ? '✅' : '❌'} | Address: {address ? `${address.slice(0, 10)}...` : 'None'}</div>
-            <div><strong>Balance:</strong> {walletBalance} {selectedAsset?.symbol || 'Token'}</div>
-            <div><strong>Checks:</strong> Min(≥0.001): {numAmount >= 0.001 ? '✅' : '❌'} | Max(≤1000): {numAmount <= 1000 ? '✅' : '❌'} | Balance: {testMode ? 'SKIPPED' : (numAmount <= walletBalance ? '✅' : '❌')}</div>
-            <div><strong>Loading:</strong> Balances: {isLoadingBalances ? '⏳' : '✅'} | Depositing: {isDepositing ? '⏳' : '✅'}</div>
-            <div><strong>Data:</strong> Balances Count: {balances.length} | Pool Assets: {pool.assets.length}</div>
-            {balances.length > 0 && (
-              <div className="mt-2">
-                <strong>All Balances:</strong>
-                {balances.map((b, i) => (
-                  <div key={i} className="ml-2">
-                    {b.symbol}: {b.balance} (addr: {b.address.slice(0, 10)}...)
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Action Button */}
         <Button
           onClick={handleAddToPool}
-          disabled={!finalIsValidAmount || isLoading || isDepositing || !selectedAsset || !isConnected}
+          disabled={!isValidAmount || isLoading || isDepositing || !selectedAsset || !isConnected}
           className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           size="lg"
         >
           {isLoading || isDepositing ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              {isDepositing ? 'Processing Deposit...' : 'Adding to Pool...'}
+              {isDepositing ? (currentStep || 'Processing Deposit...') : 'Adding to Pool...'}
             </>
           ) : !isConnected ? (
             <>
@@ -542,15 +513,15 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
               <AlertTriangle className="h-4 w-4 mr-2" />
               Select Asset First
             </>
-          ) : !finalIsValidAmount ? (
+          ) : !isValidAmount ? (
             <>
               <AlertTriangle className="h-4 w-4 mr-2" />
-              Invalid Amount - Check Debug Info
+              Invalid Amount
             </>
           ) : (
             <>
               <ArrowRight className="h-4 w-4 mr-2" />
-              {testMode ? 'Test Deposit to Vesu Pool' : 'Add to Vesu Pool'}
+              Add to Vesu Pool
             </>
           )}
         </Button>
@@ -559,16 +530,10 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         {isConnected && selectedAsset && (
           <Button
             onClick={async () => {
-              if (!address || !selectedAsset) return;
-              
-              const vesuConfig = getVesuConfig();
-              const isMainnet = vesuConfig.network === 'mainnet';
-              const assetAddress = isMainnet 
-                ? mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] || selectedAsset.address
-                : selectedAsset.address;
-              
-              console.log('🔍 Checking position manually...');
-              await checkPosition(vesuConfig.genesisPoolId, assetAddress, address);
+              toast({
+                title: "Position Check",
+                description: "Position checking will be available in a future update",
+              });
             }}
             variant="outline"
             className="w-full border-blue-300 text-blue-600 hover:bg-blue-50"

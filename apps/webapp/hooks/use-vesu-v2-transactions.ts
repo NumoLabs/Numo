@@ -1,20 +1,21 @@
+// Vesu V2 Transactions Hook
 import { useState, useCallback } from 'react';
 import { useAccount } from '@starknet-react/core';
 import { RpcProvider } from 'starknet';
 import { useToast } from '@/hooks/use-toast';
-import { getVesuConfig } from '@/lib/vesu-config';
+import { getVesuV2Config } from '@/lib/vesu-config';
 import { parseVesuAmount, isTestnet } from '@/lib/utils';
-import { vesuTransactionFlow } from '@/lib/vesu-real-implementation';
+import { vesuV2TransactionFlow } from '@/lib/vesu-real-implementation';
 
-export function useVesuTransactions() {
+export function useVesuV2Transactions() {
   const { address, account } = useAccount();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>('');
 
-  const vesuConfig = getVesuConfig();
+  const vesuV2Config = getVesuV2Config();
 
-  const depositToVesu = useCallback(async (
+  const depositToVesuV2 = useCallback(async (
     poolId: string,
     assetAddress: string,
     amount: number,
@@ -31,7 +32,7 @@ export function useVesuTransactions() {
     }
 
     setIsLoading(true);
-    setCurrentStep('Preparing transaction...');
+    setCurrentStep('Preparing V2 transaction...');
 
     try {
       // Create provider for transaction execution
@@ -42,16 +43,16 @@ export function useVesuTransactions() {
       });
 
       // Step 1: Approve token spending
-      setCurrentStep('Approving token spending...');
+      setCurrentStep('Approving token spending for V2...');
       toast({
-        title: "Step 1: Approve Token",
+        title: "Step 1: Approve Token (V2)",
         description: "Please approve the token spending in your wallet",
       });
 
-      // Use real Vesu transaction flow
-      setCurrentStep('Starting Vesu deposit transaction...');
+      // Use Vesu V2 transaction flow
+      setCurrentStep('Starting Vesu V2 deposit transaction...');
       
-      const result = await vesuTransactionFlow.deposit(
+      const result = await vesuV2TransactionFlow.deposit(
         poolId,
         assetAddress,
         amount,
@@ -62,11 +63,11 @@ export function useVesuTransactions() {
         vTokenAddress
       );
       
-      setCurrentStep('Transaction completed successfully!');
+      setCurrentStep('V2 Transaction completed successfully!');
       
       toast({
-        title: "Deposit Successful!",
-        description: `Successfully deposited to Vesu pool. Transaction: ${result.depositTx.slice(0, 10)}...`,
+        title: "V2 Deposit Successful!",
+        description: `Successfully deposited to Vesu V2 pool. Transaction: ${result.depositTx.slice(0, 10)}...`,
       });
       
       return {
@@ -76,10 +77,10 @@ export function useVesuTransactions() {
       };
 
     } catch (error: any) {
-      console.error('Vesu deposit error:', error);
+      console.error('Vesu V2 deposit error:', error);
       
       // Extract meaningful error message
-      let errorMessage = "An error occurred during the transaction";
+      let errorMessage = "An error occurred during the V2 transaction";
       
       if (error?.message) {
         errorMessage = error.message;
@@ -92,12 +93,12 @@ export function useVesuTransactions() {
       }
       
       toast({
-        title: "Transaction Failed",
+        title: "V2 Transaction Failed",
         description: errorMessage,
         variant: "destructive",
       });
 
-      setCurrentStep('Transaction failed');
+      setCurrentStep('V2 Transaction failed');
       
       return {
         success: false,
@@ -107,9 +108,9 @@ export function useVesuTransactions() {
       setIsLoading(false);
       setCurrentStep('');
     }
-  }, [account, address, vesuConfig, toast]);
+  }, [account, address, vesuV2Config, toast]);
 
-  const withdrawFromVesu = useCallback(async (
+  const withdrawFromVesuV2 = useCallback(async (
     poolId: string,
     assetAddress: string,
     amount: number,
@@ -126,7 +127,7 @@ export function useVesuTransactions() {
     }
 
     setIsLoading(true);
-    setCurrentStep('Preparing withdrawal...');
+    setCurrentStep('Preparing V2 withdrawal...');
 
     try {
       // Create provider for transaction execution
@@ -137,16 +138,16 @@ export function useVesuTransactions() {
       });
 
       // For withdrawal, we use negative collateral_delta
-      setCurrentStep('Withdrawing from Vesu pool...');
+      setCurrentStep('Withdrawing from Vesu V2 pool...');
       toast({
-        title: "Withdrawing from Pool",
+        title: "Withdrawing from V2 Pool",
         description: "Please confirm the withdrawal transaction in your wallet",
       });
 
-      // Use real Vesu withdrawal flow
-      setCurrentStep('Starting Vesu withdrawal transaction...');
+      // Use Vesu V2 withdrawal flow
+      setCurrentStep('Starting Vesu V2 withdrawal transaction...');
       
-      const result = await vesuTransactionFlow.withdraw(
+      const result = await vesuV2TransactionFlow.withdraw(
         poolId,
         assetAddress,
         amount,
@@ -158,15 +159,15 @@ export function useVesuTransactions() {
       );
 
       if (!result.withdrawalTx) {
-        throw new Error('Withdrawal transaction failed');
+        throw new Error('V2 Withdrawal transaction failed');
       }
 
       toast({
-        title: "Withdrawal Successful!",
-        description: `Successfully withdrew from Vesu pool. Transaction: ${result.withdrawalTx.slice(0, 10)}...`,
+        title: "V2 Withdrawal Successful!",
+        description: `Successfully withdrew from Vesu V2 pool. Transaction: ${result.withdrawalTx.slice(0, 10)}...`,
       });
 
-      setCurrentStep('Withdrawal completed successfully!');
+      setCurrentStep('V2 Withdrawal completed successfully!');
       
       return {
         success: true,
@@ -174,10 +175,10 @@ export function useVesuTransactions() {
       };
 
     } catch (error: any) {
-      console.error('Vesu withdrawal error:', error);
+      console.error('Vesu V2 withdrawal error:', error);
       
       // Extract meaningful error message
-      let errorMessage = "An error occurred during the withdrawal";
+      let errorMessage = "An error occurred during the V2 withdrawal";
       
       if (error?.message) {
         errorMessage = error.message;
@@ -190,12 +191,12 @@ export function useVesuTransactions() {
       }
       
       toast({
-        title: "Withdrawal Failed",
+        title: "V2 Withdrawal Failed",
         description: errorMessage,
         variant: "destructive",
       });
 
-      setCurrentStep('Withdrawal failed');
+      setCurrentStep('V2 Withdrawal failed');
       
       return {
         success: false,
@@ -205,16 +206,16 @@ export function useVesuTransactions() {
       setIsLoading(false);
       setCurrentStep('');
     }
-  }, [account, address, vesuConfig, toast]);
+  }, [account, address, vesuV2Config, toast]);
 
-  const getVTokenBalance = useCallback(async (vTokenAddress: string) => {
+  const getVTokenV2Balance = useCallback(async (vTokenAddress: string) => {
     if (!address) {
-      console.warn('⚠️ No wallet address available for vToken balance check');
+      console.warn('⚠️ No wallet address available for V2 vToken balance check');
       return { shares: "0", assets: "0" };
     }
 
     if (!vTokenAddress) {
-      console.error('❌ No vToken address provided for balance check');
+      console.error('❌ No vToken address provided for V2 balance check');
       return { shares: "0", assets: "0" };
     }
 
@@ -225,9 +226,9 @@ export function useVesuTransactions() {
           : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
-      return await vesuTransactionFlow.getVTokenBalance(vTokenAddress, address, provider);
+      return await vesuV2TransactionFlow.getVTokenBalance(vTokenAddress, address, provider);
     } catch (error) {
-      console.error('❌ Error getting vToken balance:', error);
+      console.error('❌ Error getting V2 vToken balance:', error);
       console.error('❌ Error details:', {
         vTokenAddress,
         address,
@@ -238,9 +239,9 @@ export function useVesuTransactions() {
   }, [address]);
 
   return {
-    depositToVesu,
-    withdrawFromVesu,
-    getVTokenBalance,
+    depositToVesuV2,
+    withdrawFromVesuV2,
+    getVTokenV2Balance,
     isLoading,
     currentStep,
     isConnected: !!address && !!account

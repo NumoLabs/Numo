@@ -11,8 +11,10 @@ import { useToast } from '@/hooks/use-toast'
 import { VesuPoolCard } from "@/components/pools-vault/vesu-pool-card"
 import { AddToPoolForm } from "@/components/pools-vault/add-to-pool-form"
 import { VesuPoolsTestnet, VesuPoolDetailCard, VesuAddToPoolForm } from "@/components/vesu"
+import { VesuV2Pools } from "@/components/vesu/vesu-v2-pools"
 import { useVesuConfig } from "@/hooks/use-vesu"
 import { useVesuTransactions } from "@/hooks/use-vesu-transactions"
+import { useVesuV2Transactions } from "@/hooks/use-vesu-v2-transactions"
 
 interface PoolData {
   id: string
@@ -42,6 +44,7 @@ export function PoolsVaultContent() {
   const { toast } = useToast()
   const { isTestnetMode } = useVesuConfig()
   const { depositToVesu, isLoading: isTransactionLoading, currentStep } = useVesuTransactions()
+  const { depositToVesuV2, withdrawFromVesuV2, getVTokenV2Balance, isLoading: isLoadingV2, currentStep: currentStepV2 } = useVesuV2Transactions()
 
   // Function to check if selected pool is a Vesu pool
   const isVesuPool = selectedVesuPool !== null
@@ -89,6 +92,26 @@ export function PoolsVaultContent() {
       return
     }
 
+    // Validate amount
+    if (!amount || amount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid amount to deposit",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate asset address
+    if (!assetAddress) {
+      toast({
+        title: "Invalid Asset",
+        description: "Please select a valid asset",
+        variant: "destructive",
+      })
+      return
+    }
+
     // Find the selected asset to get its decimals
     const selectedAsset = selectedVesuPool.assets.find((asset: any) => asset.address === assetAddress)
     if (!selectedAsset) {
@@ -100,12 +123,31 @@ export function PoolsVaultContent() {
       return
     }
 
+    // Validate vToken address
+    if (!selectedAsset.vTokenAddress) {
+      toast({
+        title: "Invalid vToken",
+        description: "vToken address not found for selected asset",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
+      console.log('🚀 Starting Vesu deposit with params:', {
+        poolId: selectedVesuPool.id,
+        assetAddress,
+        amount,
+        decimals: selectedAsset.decimals,
+        vTokenAddress: selectedAsset.vTokenAddress
+      });
+
       const result = await depositToVesu(
         selectedVesuPool.id,
         assetAddress,
         amount,
-        selectedAsset.decimals
+        selectedAsset.decimals,
+        selectedAsset.vTokenAddress
       )
 
       if (result?.success) {
@@ -113,11 +155,29 @@ export function PoolsVaultContent() {
           title: "Deposit Successful!",
           description: `Successfully deposited ${amount} ${selectedAsset.symbol} to ${selectedVesuPool.name}`,
         })
+      } else {
+        toast({
+          title: "Deposit Failed",
+          description: result?.error || "Failed to deposit to Vesu pool",
+          variant: "destructive",
+        })
       }
     } catch (error: any) {
+      console.error('❌ Vesu deposit error in component:', error);
+      
+      // Extract meaningful error message
+      let errorMessage = "Failed to deposit to Vesu pool";
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error?.reason) {
+        errorMessage = error.reason;
+      }
+      
       toast({
         title: "Deposit Failed",
-        description: error.message || "Failed to deposit to Vesu pool",
+        description: errorMessage,
         variant: "destructive",
       })
     }
@@ -157,12 +217,18 @@ export function PoolsVaultContent() {
 
           {/* Tabs - Only Real Vesu Pools */}
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-1 lg:w-[300px]">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[600px]">
               <TabsTrigger 
                 value="vesu-testnet"
                 className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
               >
-                Vesu Pools (Real Data Only)
+                Vesu V1 Pools
+              </TabsTrigger>
+              <TabsTrigger 
+                value="vesu-v2"
+                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:via-emerald-500 data-[state=active]:to-green-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+              >
+                Vesu V2 Pools
               </TabsTrigger>
             </TabsList>
 
@@ -173,8 +239,22 @@ export function PoolsVaultContent() {
                   setSelectedVesuPool(pool);
                   setSelectedPool(pool.id);
                   toast({
-                    title: "Vesu Pool Selected",
+                    title: "Vesu V1 Pool Selected",
                     description: `You have selected ${pool.name} for testing.`,
+                  });
+                }}
+                showTestnetBanner={true}
+              />
+            </TabsContent>
+
+            <TabsContent value="vesu-v2" className="space-y-6">
+              <VesuV2Pools 
+                onPoolSelect={(pool) => {
+                  setSelectedVesuPool(pool);
+                  setSelectedPool(pool.id);
+                  toast({
+                    title: "Vesu V2 Pool Selected",
+                    description: `You have selected ${pool.name} V2 pool for testing.`,
                   });
                 }}
                 showTestnetBanner={true}

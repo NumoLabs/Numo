@@ -131,8 +131,9 @@ export function useWalletBalance(): UseWalletBalanceReturn {
         // Use test assets if Vesu assets are not available
         const testBalancePromises = testAssets.map(async (asset) => {
           console.log(`Starting test balance fetch for ${asset.token.symbol}...`);
+          console.log(`🔍 Fetching balance for ${asset.token.symbol} at ${asset.token.address}`);
           const balance = await getBalance(asset.token.address, asset.token.decimals, asset.token.symbol);
-          console.log(`Completed test balance fetch for ${asset.token.symbol}: ${balance}`);
+          console.log(`✅ ${asset.token.symbol} balance result:`, balance);
           return {
             symbol: asset.token.symbol,
             balance,

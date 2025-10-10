@@ -242,6 +242,7 @@ interface DepositParams {
   assetAddress: string;
   amount: number;
   decimals: number;
+  assetSymbol?: string;
 }
 
 interface DepositResult {
@@ -311,8 +312,29 @@ export function useVesuDeposit() {
       // Use the account from wallet context
       const starknetAccount = account;
 
+      // Normalize asset address for mainnet if symbol matches known canonical addresses
+      const knownMainnetAddresses: Record<string, string> = {
+        ETH: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        WBTC: '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac',
+        USDC: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
+        USDT: '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
+        STRK: '0x0057912720381af14b0e5c87aa4718ed5e527eab60b3801ebf702ab09139e38b',
+        wstETH: '0x042b8f0484674ca266ac5d08e4ac6a3fe65bd3129795def2dca5c34ecc5f96d2',
+        'wstETH Legacy': '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+      };
+      const isMainnetNetwork = vesuConfig.network === 'mainnet';
+      const assetSymbolKey = params.assetSymbol && Object.keys(knownMainnetAddresses).find(k => k.toLowerCase() === params.assetSymbol?.toLowerCase());
+      const normalizedAssetAddress = isMainnetNetwork && assetSymbolKey ? knownMainnetAddresses[assetSymbolKey] : params.assetAddress;
+
+      console.log('🔧 Asset address normalization:', {
+        provided: params.assetAddress,
+        symbol: params.assetSymbol,
+        normalized: normalizedAssetAddress,
+        isMainnetNetwork,
+      });
+
       // Step 1: Approve token spending
-      const tokenContract = new Contract(ERC20_ABI, params.assetAddress, provider);
+      const tokenContract = new Contract(ERC20_ABI, normalizedAssetAddress, provider);
       tokenContract.connect(starknetAccount);
 
       const amountInWei = parseVesuAmount(params.amount, params.decimals);
@@ -321,7 +343,7 @@ export function useVesuDeposit() {
         spender: vesuConfig.singletonAddress,
         amount: amountInWei,
         amountBigInt: BigInt(amountInWei),
-        asset: params.assetAddress,
+        asset: normalizedAssetAddress,
         assetAddressLength: params.assetAddress?.length,
         isTestnet: isTestnet(),
         vesuConfig: vesuConfig,
@@ -339,7 +361,7 @@ export function useVesuDeposit() {
       });
       
       const approvalResult = await starknetAccount.execute({
-        contractAddress: params.assetAddress,
+        contractAddress: normalizedAssetAddress,
         entrypoint: 'approve',
         calldata: CallData.compile([
           vesuConfig.singletonAddress,
@@ -381,7 +403,7 @@ export function useVesuDeposit() {
       console.log('🔧 Creating deposit parameters...');
       const depositParams = await createVesuDepositParams(
         params.poolId,
-        params.assetAddress,
+        normalizedAssetAddress,
         params.amount,
         params.decimals,
         address
@@ -425,80 +447,53 @@ export function useVesuDeposit() {
 
         let depositResult;
       try {
-        console.log('🔧 Calling modify_position with individual parameters...');
-        
-        // Prepare calldata
-        console.log('🔧 Preparing calldata with parameters:');
-        console.log('  - pool_id:', depositParams.pool_id, '-> BigInt:', BigInt(depositParams.pool_id));
-        console.log('  - collateral_asset:', depositParams.collateral_asset);
-        console.log('  - debt_asset:', depositParams.debt_asset);
-        console.log('  - user:', depositParams.user);
-        console.log('  - collateral.value:', depositParams.collateral.value);
-        console.log('  - debt.value:', depositParams.debt.value);
-        console.log('  - data.length:', depositParams.data.length);
-        
-        console.log('🔧 About to compile calldata with struct...');
-        
-        // Create the struct with proper format
-        const modifyPositionParams = {
-          pool_id: BigInt(depositParams.pool_id),
+        console.log('🔧 Calling modify_position using ABI populate...');
+        console.log('🔧 Deposit params:', {
+          pool_id: depositParams.pool_id,
           collateral_asset: depositParams.collateral_asset,
           debt_asset: depositParams.debt_asset,
           user: depositParams.user,
-          collateral: depositParams.collateral, // Use the already created VesuAmount
-          debt: depositParams.debt, // Use the already created VesuAmount
+          collateral: depositParams.collateral,
+          debt: depositParams.debt,
           data: depositParams.data
+        });
+
+        // First, let's verify the pool exists by calling extension
+        try {
+          const extension = await singletonContract.call('extension', [depositParams.pool_id]);
+          console.log('✅ Pool extension found:', extension);
+        } catch (extensionError) {
+          console.error('❌ Pool extension not found:', extensionError);
+          throw new Error(`Pool ${depositParams.pool_id} does not exist or is not accessible`);
+        }
+
+        // Ensure pool_id is a felt hex string (no BigInt conversion)
+        const normalizedParams = {
+          ...depositParams,
+          pool_id: depositParams.pool_id, // keep as hex string
         };
-        
-        console.log('🔧 ModifyPositionParams struct:', modifyPositionParams);
-        
-        console.log('🔧 About to call modify_position directly...');
-        
+
+        // Populate calldata using ABI to avoid serialization issues
+        const populated = await singletonContract.populate('modify_position', [normalizedParams]);
+        console.log('🔧 Populated calldata:', populated.calldata);
+
         // Add timeout and better error handling
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Transaction timeout after 120 seconds')), 120000);
         });
-        
-        console.log('🔧 Starting modify_position call with timeout...');
-        console.log('🔧 Contract method available:', typeof singletonContract.modify_position);
-        console.log('🔧 Contract address:', singletonContract.address);
-        console.log('🔧 Account connected:', !!singletonContract.account);
-        
-        // Try using starknetAccount.execute instead of direct contract call
-        try {
-          console.log('🔧 Using starknetAccount.execute for modify_position...');
-          // Convert BigInt to string for logging
-          const loggableParams = {
-            ...modifyPositionParams,
-            pool_id: modifyPositionParams.pool_id.toString()
-          };
-          console.log('🔧 Parameters being sent:', JSON.stringify(loggableParams, null, 2));
-          
-          const startTime = Date.now();
-          
-          // Use starknetAccount.execute with the contract call
-          const call = {
+
+        const startTime = Date.now();
+        depositResult = await Promise.race([
+          starknetAccount.execute({
             contractAddress: vesuConfig.singletonAddress,
             entrypoint: 'modify_position',
-            calldata: CallData.compile([modifyPositionParams])
-          };
-          
-          console.log('🔧 Executing call:', call);
-          
-          depositResult = await Promise.race([
-            starknetAccount.execute(call),
-            timeoutPromise
-          ]);
-          const endTime = Date.now();
-          console.log(`🔧 starknetAccount.execute returned after ${endTime - startTime}ms:`, depositResult);
-        } catch (methodError) {
-          console.error('🔧 Error in starknetAccount.execute call:', methodError);
-          console.log('🔧 Error type:', typeof methodError);
-          console.log('🔧 Error message:', methodError instanceof Error ? methodError.message : String(methodError));
-          console.log('🔧 Error stack:', methodError instanceof Error ? methodError.stack : 'No stack trace');
-          throw methodError;
-        }
-        
+            calldata: populated.calldata,
+          }),
+          timeoutPromise,
+        ]);
+        const endTime = Date.now();
+        console.log(`🔧 execute(modify_position) returned after ${endTime - startTime}ms:`, depositResult);
+
         console.log('✅ modify_position call completed successfully!');
         console.log('🔧 Deposit result:', depositResult);
       } catch (modifyError) {

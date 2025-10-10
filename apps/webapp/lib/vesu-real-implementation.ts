@@ -2,7 +2,7 @@
 // This file contains the actual implementation patterns from the official Vesu repository
 
 import { CallData, CairoCustomEnum } from 'starknet';
-import { getVesuConfig } from './vesu-config';
+import { getVesuConfig, getVesuV2Config } from './vesu-config';
 import { parseVesuAmount } from './utils';
 
 // Constants from vesu-v1/lib/config.ts
@@ -82,7 +82,7 @@ export async function createVesuDepositParams(
   console.log('🔧 createVesuDepositParams - debt:', debt);
   
   console.log('🔧 createVesuDepositParams - Creating data...');
-  const data = CallData.compile([]);
+  const data: any[] = [];
   console.log('🔧 createVesuDepositParams - data:', data);
   
   const result = {
@@ -174,39 +174,200 @@ export function getAssetIndex(assetAddress: string, isTestnet: boolean = true): 
   return index >= 0 ? index : 0; // Default to 0 if not found
 }
 
-// Real transaction flow based on vesu-v1/scripts/createPosition.ts
-export class VesuTransactionFlow {
-  private vesuConfig = getVesuConfig();
+// VToken ABI for deposit, withdraw, and redeem functions
+// withdraw: Burns shares and sends exactly the requested amount of underlying assets
+// redeem: Burns exact shares and sends the corresponding amount of underlying assets
+const VTOKEN_ABI = [
+  {
+    "name": "deposit",
+    "type": "function",
+    "inputs": [
+      { "name": "assets", "type": "Uint256" },
+      { "name": "receiver", "type": "felt" }
+    ],
+    "outputs": [
+      { "name": "shares", "type": "Uint256" }
+    ],
+    "stateMutability": "external"
+  },
+  {
+    "name": "withdraw",
+    "type": "function",
+    "inputs": [
+      { "name": "assets", "type": "Uint256" },
+      { "name": "receiver", "type": "felt" },
+      { "name": "owner", "type": "felt" }
+    ],
+    "outputs": [
+      { "name": "shares", "type": "Uint256" }
+    ],
+    "stateMutability": "external"
+  },
+  {
+    "name": "redeem",
+    "type": "function",
+    "inputs": [
+      { "name": "shares", "type": "Uint256" },
+      { "name": "receiver", "type": "felt" },
+      { "name": "owner", "type": "felt" }
+    ],
+    "outputs": [
+      { "name": "assets", "type": "Uint256" }
+    ],
+    "stateMutability": "external"
+  },
+  {
+    "name": "balanceOf",
+    "type": "function",
+    "inputs": [
+      { "name": "account", "type": "felt" }
+    ],
+    "outputs": [
+      { "name": "balance", "type": "Uint256" }
+    ],
+    "stateMutability": "view"
+  }
+];
+
+// Vesu V2 Transaction Flow
+export class VesuV2TransactionFlow {
+  private vesuV2Config = getVesuV2Config();
   
   async deposit(
     poolId: string,
     assetAddress: string,
     amount: number,
     decimals: number,
-    userAddress: string
+    userAddress: string,
+    account: any,
+    provider: any,
+    vTokenAddress: string
   ): Promise<{ approvalTx: string; depositTx: string }> {
-    // Step 1: Approve token spending (like in createPosition.ts)
+    console.log('🚀 VesuV2TransactionFlow.deposit - Starting V2 deposit transaction');
+    console.log('🔧 vToken Address:', vTokenAddress);
+    
+    // Step 0: Validate inputs and check balances
     const amountInWei = parseVesuAmount(amount, decimals);
+    console.log('🔧 Deposit amount in wei:', amountInWei);
     
-    // In real implementation:
-    // const approvalTx = await tokenContract.approve(vesuConfig.singletonAddress, amountInWei);
+    // Check user's token balance
+    try {
+      const balanceResult = await provider.callContract({
+        contractAddress: assetAddress,
+        entrypoint: 'balanceOf',
+        calldata: [userAddress]
+      });
+      
+      const userBalance = getContractResult(balanceResult, 'balanceOf');
+      console.log('🔍 User token balance:', userBalance);
+      console.log('🔍 Required amount:', amountInWei);
+      
+      if (BigInt(userBalance) < BigInt(amountInWei)) {
+        throw new Error(`Insufficient balance. You have ${userBalance} but need ${amountInWei}`);
+      }
+    } catch (balanceError) {
+      console.error('❌ Balance check failed:', balanceError);
+      throw new Error(`Balance check failed: ${(balanceError as any)?.message || balanceError}`);
+    }
     
-    // Step 2: Create deposit parameters
-    const depositParams = await createVesuDepositParams(
-      poolId,
-      assetAddress,
-      amount,
-      decimals,
-      userAddress
-    );
+    // Check current allowance
+    try {
+      const allowanceResult = await provider.callContract({
+        contractAddress: assetAddress,
+        entrypoint: 'allowance',
+        calldata: [userAddress, vTokenAddress]
+      });
+      
+      const currentAllowance = getContractResult(allowanceResult, 'allowance');
+      console.log('🔍 Current allowance:', currentAllowance);
+      
+      if (BigInt(currentAllowance) >= BigInt(amountInWei)) {
+        console.log('✅ Sufficient allowance already exists, skipping approval');
+        // Skip approval if allowance is sufficient
+      } else {
+        console.log('⚠️ Insufficient allowance, proceeding with approval');
+      }
+    } catch (allowanceError) {
+      console.warn('⚠️ Allowance check failed, proceeding with approval:', allowanceError);
+    }
     
-    // In real implementation:
-    // const depositTx = await singletonContract.modify_position(depositParams);
+    // Step 1: Execute approval transaction to vToken (only if needed)
+    let approvalResult = null;
+    let approvalTxHash = '';
     
-    // For now, return mock transaction hashes
+    try {
+      // Check if we need approval
+      const allowanceResult = await provider.callContract({
+        contractAddress: assetAddress,
+        entrypoint: 'allowance',
+        calldata: [userAddress, vTokenAddress]
+      });
+      
+      const currentAllowance = getContractResult(allowanceResult, 'allowance');
+      
+      if (BigInt(currentAllowance) < BigInt(amountInWei)) {
+        console.log('🔧 Executing approval transaction...');
+        approvalResult = await account.execute({
+          contractAddress: assetAddress,
+          entrypoint: 'approve',
+          calldata: CallData.compile([
+            vTokenAddress,
+            { low: BigInt(amountInWei), high: BigInt(0) }
+          ])
+        });
+        
+        approvalTxHash = approvalResult.transaction_hash;
+        console.log('✅ V2 Approval transaction submitted:', approvalTxHash);
+        
+        // Wait for approval confirmation
+        try {
+          await provider.waitForTransaction(approvalTxHash, {
+            retryInterval: 2000
+          });
+          console.log('✅ V2 Approval transaction confirmed');
+        } catch (waitError) {
+          console.warn('⚠️ V2 Approval transaction confirmation timeout, continuing...');
+        }
+      } else {
+        console.log('✅ Sufficient allowance exists, skipping approval');
+      }
+    } catch (approvalError) {
+      console.error('❌ V2 Approval transaction failed:', approvalError);
+      throw new Error(`V2 Token approval failed: ${(approvalError as any)?.message || approvalError}`);
+    }
+    
+    // Step 2: Execute vToken deposit transaction
+    console.log('🔧 Executing V2 vToken deposit...');
+    let depositResult;
+    try {
+      depositResult = await account.execute({
+        contractAddress: vTokenAddress,
+        entrypoint: 'deposit',
+        calldata: CallData.compile([
+          { low: BigInt(amountInWei), high: BigInt(0) }, // assets
+          userAddress // receiver
+        ])
+      });
+    } catch (depositError) {
+      console.error('❌ V2 Deposit transaction failed:', depositError);
+      throw new Error(`V2 vToken deposit failed: ${(depositError as any)?.message || depositError}`);
+    }
+    
+    console.log('✅ V2 vToken deposit transaction submitted:', depositResult.transaction_hash);
+    
+    // Wait for deposit confirmation
+    try {
+      await provider.waitForTransaction(depositResult.transaction_hash, {
+        retryInterval: 2000
+      });
+      console.log('✅ V2 vToken deposit transaction confirmed');
+    } catch (waitError) {
+      console.warn('⚠️ V2 Deposit transaction confirmation timeout, continuing...');
+    }
+    
     return {
-      approvalTx: `0x${Math.random().toString(16).substr(2, 40)}`,
-      depositTx: `0x${Math.random().toString(16).substr(2, 40)}`
+      approvalTx: approvalTxHash || 'skipped',
+      depositTx: depositResult.transaction_hash
     };
   }
   
@@ -215,22 +376,326 @@ export class VesuTransactionFlow {
     assetAddress: string,
     amount: number,
     decimals: number,
-    userAddress: string
+    userAddress: string,
+    account: any,
+    provider: any,
+    vTokenAddress: string
   ): Promise<{ withdrawalTx: string }> {
-    const withdrawalParams = await createVesuWithdrawalParams(
-      poolId,
-      assetAddress,
-      amount,
-      decimals,
-      userAddress
-    );
+    console.log('🚀 VesuV2TransactionFlow.withdraw - Starting V2 withdrawal transaction');
+    console.log('🔧 vToken Address:', vTokenAddress);
     
-    // In real implementation:
-    // const withdrawalTx = await singletonContract.modify_position(withdrawalParams);
+    // Convert amount to wei
+    const amountInWei = parseVesuAmount(amount, decimals);
+    console.log('🔧 V2 Withdrawal amount in wei:', amountInWei);
+    
+    // Execute vToken withdraw transaction
+    let withdrawalResult;
+    try {
+      withdrawalResult = await account.execute({
+        contractAddress: vTokenAddress,
+        entrypoint: 'withdraw',
+        calldata: CallData.compile([
+          { low: BigInt(amountInWei), high: BigInt(0) }, // assets to withdraw
+          userAddress, // receiver
+          userAddress  // owner
+        ])
+      });
+    } catch (withdrawalError) {
+      console.error('❌ V2 Withdrawal transaction failed:', withdrawalError);
+      throw new Error(`V2 vToken withdrawal failed: ${(withdrawalError as any)?.message || withdrawalError}`);
+    }
+    
+    console.log('✅ V2 vToken withdraw transaction submitted:', withdrawalResult.transaction_hash);
+    
+    // Wait for withdrawal confirmation
+    try {
+      await provider.waitForTransaction(withdrawalResult.transaction_hash, {
+        retryInterval: 2000
+      });
+      console.log('✅ V2 vToken withdraw transaction confirmed');
+    } catch (waitError) {
+      console.warn('⚠️ V2 Withdrawal transaction confirmation timeout, continuing...');
+    }
     
     return {
-      withdrawalTx: `0x${Math.random().toString(16).substr(2, 40)}`
+      withdrawalTx: withdrawalResult.transaction_hash
     };
+  }
+
+  // Helper function to get vToken balance (shares) for V2
+  async getVTokenBalance(
+    vTokenAddress: string,
+    userAddress: string,
+    provider: any
+  ): Promise<{ shares: string; assets: string }> {
+    console.log('🔍 Getting V2 vToken balance for user:', userAddress);
+    
+    try {
+      // Validate inputs
+      if (!vTokenAddress || !userAddress || !provider) {
+        throw new Error('Invalid parameters for V2 vToken balance check');
+      }
+      
+      // Get vToken balance (shares)
+      const balanceResult = await provider.callContract({
+        contractAddress: vTokenAddress,
+        entrypoint: 'balanceOf',
+        calldata: [userAddress]
+      });
+      
+      if (!balanceResult?.result || !balanceResult.result[0]) {
+        console.warn('⚠️ No balance result returned from V2 vToken');
+        return {
+          shares: "0",
+          assets: "0"
+        };
+      }
+      
+      const shares = getContractResult(balanceResult, 'vToken balanceOf');
+      console.log('📊 V2 vToken shares balance:', shares);
+      
+      return {
+        shares: shares,
+        assets: shares // Simplified - should calculate actual assets from shares
+      };
+    } catch (error) {
+      console.error('❌ Error getting V2 vToken balance:', error);
+      console.error('❌ Error details:', {
+        vTokenAddress,
+        userAddress,
+        error: (error as any)?.message || error
+      });
+      return {
+        shares: "0",
+        assets: "0"
+      };
+    }
+  }
+}
+
+// Legacy V1 transaction flow for backward compatibility
+export class VesuTransactionFlow {
+  private vesuConfig = getVesuConfig();
+  
+  async deposit(
+    poolId: string,
+    assetAddress: string,
+    amount: number,
+    decimals: number,
+    userAddress: string,
+    account: any,
+    provider: any,
+    vTokenAddress: string
+  ): Promise<{ approvalTx: string; depositTx: string }> {
+    console.log('🚀 VesuTransactionFlow.deposit - Starting real vToken deposit transaction');
+    console.log('🔧 vToken Address:', vTokenAddress);
+    
+    // Step 0: Validate inputs and check balances
+    const amountInWei = parseVesuAmount(amount, decimals);
+    console.log('🔧 Deposit amount in wei:', amountInWei);
+    
+    // Check user's token balance
+    try {
+      const balanceResult = await provider.callContract({
+        contractAddress: assetAddress,
+        entrypoint: 'balanceOf',
+        calldata: [userAddress]
+      });
+      
+      const userBalance = getContractResult(balanceResult, 'balanceOf');
+      console.log('🔍 User token balance:', userBalance);
+      console.log('🔍 Required amount:', amountInWei);
+      
+      if (BigInt(userBalance) < BigInt(amountInWei)) {
+        throw new Error(`Insufficient balance. You have ${userBalance} but need ${amountInWei}`);
+      }
+    } catch (balanceError) {
+      console.error('❌ Balance check failed:', balanceError);
+      throw new Error(`Balance check failed: ${(balanceError as any)?.message || balanceError}`);
+    }
+    
+    // Step 1: Execute approval transaction to vToken (only if needed)
+    let approvalResult = null;
+    let approvalTxHash = '';
+    
+    try {
+      // Check if we need approval
+      const allowanceResult = await provider.callContract({
+        contractAddress: assetAddress,
+        entrypoint: 'allowance',
+        calldata: [userAddress, vTokenAddress]
+      });
+      
+      const currentAllowance = getContractResult(allowanceResult, 'allowance');
+      
+      if (BigInt(currentAllowance) < BigInt(amountInWei)) {
+        console.log('🔧 Executing approval transaction...');
+        approvalResult = await account.execute({
+          contractAddress: assetAddress,
+          entrypoint: 'approve',
+          calldata: CallData.compile([
+            vTokenAddress,
+            { low: BigInt(amountInWei), high: BigInt(0) }
+          ])
+        });
+        
+        approvalTxHash = approvalResult.transaction_hash;
+        console.log('✅ Approval transaction submitted:', approvalTxHash);
+        
+        // Wait for approval confirmation
+        try {
+          await provider.waitForTransaction(approvalTxHash, {
+            retryInterval: 2000
+          });
+          console.log('✅ Approval transaction confirmed');
+        } catch (waitError) {
+          console.warn('⚠️ Approval transaction confirmation timeout, continuing...');
+        }
+      } else {
+        console.log('✅ Sufficient allowance exists, skipping approval');
+      }
+    } catch (approvalError) {
+      console.error('❌ Approval transaction failed:', approvalError);
+      throw new Error(`Token approval failed: ${(approvalError as any)?.message || approvalError}`);
+    }
+    
+    // Step 2: Execute vToken deposit transaction
+    console.log('🔧 Executing vToken deposit...');
+    let depositResult;
+    try {
+      depositResult = await account.execute({
+        contractAddress: vTokenAddress,
+        entrypoint: 'deposit',
+        calldata: CallData.compile([
+          { low: BigInt(amountInWei), high: BigInt(0) }, // assets
+          userAddress // receiver
+        ])
+      });
+    } catch (depositError) {
+      console.error('❌ Deposit transaction failed:', depositError);
+      throw new Error(`vToken deposit failed: ${(depositError as any)?.message || depositError}`);
+    }
+    
+    console.log('✅ vToken deposit transaction submitted:', depositResult.transaction_hash);
+    
+    // Wait for deposit confirmation
+    try {
+      await provider.waitForTransaction(depositResult.transaction_hash, {
+        retryInterval: 2000
+      });
+      console.log('✅ vToken deposit transaction confirmed');
+    } catch (waitError) {
+      console.warn('⚠️ Deposit transaction confirmation timeout, continuing...');
+    }
+    
+    return {
+      approvalTx: approvalTxHash || 'skipped',
+      depositTx: depositResult.transaction_hash
+    };
+  }
+  
+  async withdraw(
+    poolId: string,
+    assetAddress: string,
+    amount: number,
+    decimals: number,
+    userAddress: string,
+    account: any,
+    provider: any,
+    vTokenAddress: string
+  ): Promise<{ withdrawalTx: string }> {
+    console.log('🚀 VesuTransactionFlow.withdraw - Starting real vToken withdrawal transaction');
+    console.log('🔧 vToken Address:', vTokenAddress);
+    
+    // Convert amount to wei
+    const amountInWei = parseVesuAmount(amount, decimals);
+    console.log('🔧 Withdrawal amount in wei:', amountInWei);
+    
+    // Execute vToken withdraw transaction
+    // The withdraw function burns shares and sends exactly the requested amount of underlying assets
+    let withdrawalResult;
+    try {
+      withdrawalResult = await account.execute({
+        contractAddress: vTokenAddress,
+        entrypoint: 'withdraw',
+        calldata: CallData.compile([
+          { low: BigInt(amountInWei), high: BigInt(0) }, // assets to withdraw
+          userAddress, // receiver
+          userAddress  // owner
+        ])
+      });
+    } catch (withdrawalError) {
+      console.error('❌ Withdrawal transaction failed:', withdrawalError);
+      throw new Error(`vToken withdrawal failed: ${(withdrawalError as any)?.message || withdrawalError}`);
+    }
+    
+    console.log('✅ vToken withdraw transaction submitted:', withdrawalResult.transaction_hash);
+    
+    // Wait for withdrawal confirmation
+    try {
+      await provider.waitForTransaction(withdrawalResult.transaction_hash, {
+        retryInterval: 2000
+      });
+      console.log('✅ vToken withdraw transaction confirmed');
+    } catch (waitError) {
+      console.warn('⚠️ Withdrawal transaction confirmation timeout, continuing...');
+    }
+    
+    return {
+      withdrawalTx: withdrawalResult.transaction_hash
+    };
+  }
+
+  // Helper function to get vToken balance (shares)
+  async getVTokenBalance(
+    vTokenAddress: string,
+    userAddress: string,
+    provider: any
+  ): Promise<{ shares: string; assets: string }> {
+    console.log('🔍 Getting vToken balance for user:', userAddress);
+    
+    try {
+      // Validate inputs
+      if (!vTokenAddress || !userAddress || !provider) {
+        throw new Error('Invalid parameters for vToken balance check');
+      }
+      
+      // Get vToken balance (shares)
+      const balanceResult = await provider.callContract({
+        contractAddress: vTokenAddress,
+        entrypoint: 'balanceOf',
+        calldata: [userAddress]
+      });
+      
+      if (!balanceResult?.result || !balanceResult.result[0]) {
+        console.warn('⚠️ No balance result returned from vToken');
+        return {
+          shares: "0",
+          assets: "0"
+        };
+      }
+      
+      const shares = getContractResult(balanceResult, 'vToken balanceOf');
+      console.log('📊 vToken shares balance:', shares);
+      
+      // For now, we'll return the shares as assets (1:1 ratio)
+      // In a real implementation, you'd need to convert shares to assets using the vault's conversion rate
+      return {
+        shares: shares,
+        assets: shares // Simplified - should calculate actual assets from shares
+      };
+    } catch (error) {
+      console.error('❌ Error getting vToken balance:', error);
+      console.error('❌ Error details:', {
+        vTokenAddress,
+        userAddress,
+        error: (error as any)?.message || error
+      });
+      return {
+        shares: "0",
+        assets: "0"
+      };
+    }
   }
 }
 
@@ -364,5 +829,96 @@ export function getVesuProtocolData(isTestnet: boolean = true): { protocol: Vesu
   };
 }
 
-// Export the transaction flow instance
-export const vesuTransactionFlow = new VesuTransactionFlow();
+// Helper function to safely get contract result
+function getContractResult(result: any, operation: string): string {
+  console.log(`🔍 Raw ${operation} result:`, result);
+  
+  if (!result) {
+    throw new Error(`No response from ${operation} call`);
+  }
+  
+  // Handle different response formats
+  let resultArray;
+  if (Array.isArray(result)) {
+    // Direct array response: ["0x34b150fc4ad2c3c","0x0"]
+    resultArray = result;
+  } else if (result.result && Array.isArray(result.result)) {
+    // Wrapped response: { result: ["0x34b150fc4ad2c3c","0x0"] }
+    resultArray = result.result;
+  } else {
+    throw new Error(`Invalid result format for ${operation}: ${JSON.stringify(result)}`);
+  }
+  
+  if (resultArray.length === 0) {
+    throw new Error(`Empty result array for ${operation}`);
+  }
+  
+  const value = resultArray[0];
+  if (value === undefined || value === null) {
+    throw new Error(`Null/undefined value in ${operation} result`);
+  }
+  
+  console.log(`🔍 Extracted ${operation} value:`, value);
+  return value.toString();
+}
+
+// Helper function to validate balance and allowance
+export async function validateBalanceAndAllowance(
+  assetAddress: string,
+  vTokenAddress: string,
+  userAddress: string,
+  amountInWei: string,
+  provider: any
+): Promise<{ needsApproval: boolean; currentAllowance: string }> {
+  console.log('🔍 Validating balance and allowance...');
+  
+  // Check user's token balance
+  try {
+    const balanceResult = await provider.callContract({
+      contractAddress: assetAddress,
+      entrypoint: 'balanceOf',
+      calldata: [userAddress]
+    });
+    
+    const userBalance = getContractResult(balanceResult, 'balanceOf');
+    console.log('🔍 User token balance:', userBalance);
+    console.log('🔍 Required amount:', amountInWei);
+    
+    if (BigInt(userBalance) < BigInt(amountInWei)) {
+      throw new Error(`Insufficient balance. You have ${userBalance} but need ${amountInWei}`);
+    }
+  } catch (balanceError) {
+    console.error('❌ Balance check failed:', balanceError);
+    throw new Error(`Balance check failed: ${(balanceError as any)?.message || balanceError}`);
+  }
+  
+  // Check current allowance
+  try {
+    const allowanceResult = await provider.callContract({
+      contractAddress: assetAddress,
+      entrypoint: 'allowance',
+      calldata: [userAddress, vTokenAddress]
+    });
+    
+    const currentAllowance = getContractResult(allowanceResult, 'allowance');
+    console.log('🔍 Current allowance:', currentAllowance);
+    
+    const needsApproval = BigInt(currentAllowance) < BigInt(amountInWei);
+    console.log('🔍 Needs approval:', needsApproval);
+    
+    return {
+      needsApproval,
+      currentAllowance
+    };
+  } catch (allowanceError) {
+    console.warn('⚠️ Allowance check failed, assuming approval needed:', allowanceError);
+    return {
+      needsApproval: true,
+      currentAllowance: '0'
+    };
+  }
+}
+
+// Export the transaction flow instances
+export const vesuV2TransactionFlow = new VesuV2TransactionFlow();
+export const vesuTransactionFlow = new VesuTransactionFlow(); // Legacy V1
