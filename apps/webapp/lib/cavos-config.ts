@@ -2,11 +2,11 @@ import { CavosAuth, getBalanceOf } from 'cavos-service-sdk'
 
 // Environment variables setup
 const config = {
-  appId: process.env.NEXT_PUBLIC_CAVOS_APP_ID!, // Your app ID (safe for frontend)
-  orgSecret: process.env.NEXT_PUBLIC_CAVOS_ORG_SECRET!, // Your organization secret (backend only)
-  apiKey: process.env.NEXT_PUBLIC_CAVOS_API_KEY!, // Your API key for wallet operations (backend only)
+  appId: process.env.NEXT_PUBLIC_CAVOS_APP_ID!,
+  orgSecret: process.env.NEXT_PUBLIC_CAVOS_ORG_SECRET!,
+  apiKey: process.env.NEXT_PUBLIC_CAVOS_API_KEY!,
   baseURL: 'https://services.cavos.xyz/api/v1/external',
-  defaultNetwork: 'sepolia' // or 'mainnet'
+  defaultNetwork: 'mainnet' // or 'sepolia'
 }
 
 // Validate required environment variables
@@ -44,7 +44,7 @@ export const createCavosAuth = () => {
   return new CavosAuth(config.defaultNetwork, config.appId)
 }
 
-// Authentication flow helper using local API route (for frontend use)
+// Authentication flow helper using local API route
 export const authenticateUser = async (email: string, password: string) => {
   try {
     // Try to register new user first using local API route
@@ -97,7 +97,7 @@ export const authenticateUser = async (email: string, password: string) => {
   }
 }
 
-// Direct SDK authentication (for server-side use)
+// Direct SDK authentication 
 export const authenticateUserDirect = async (email: string, password: string) => {
   try {
     // Register new user
@@ -193,7 +193,7 @@ export const refreshUserToken = async (refreshToken: string) => {
   }
 }
 
-// Transaction execution helper (legacy name for backward compatibility)
+// Transaction execution helper 
 export const executeUserTransaction = async (
   walletAddress: string,
   calls: unknown[],
