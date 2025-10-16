@@ -103,14 +103,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
             </Button>
           </nav>
           <div className="flex items-center gap-6 ml-auto pl-12">
-            {address && (
-              <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </Button>
-              </Link>
-            )}
             <WalletConnector />
           </div>
         </div>

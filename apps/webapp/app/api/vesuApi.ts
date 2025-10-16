@@ -95,42 +95,44 @@ export async function getVesuV2Pools() {
 		const { data } = (await axios.get(buildVesuV2ApiUrl(VESU_V2_ENDPOINTS.POOLS))).data;
 		return data
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			.filter((pool: any) => pool.isVerified && pool.version === 'v2')
+			.filter((pool: any) => pool?.isVerified && pool?.version === 'v2')
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			.map((pool: any) => ({
-				id: pool.id,
-				name: pool.name,
-				address: pool.poolFactoryAddress, // V2 uses pool factory instead of extension
-				version: pool.version,
+				id: pool?.id ?? 'unknown',
+				name: pool?.name ?? 'Unknown V2 Pool',
+				address: pool?.poolFactoryAddress ?? '', // V2 uses pool factory instead of extension
+				version: pool?.version ?? 'v2',
 				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-				assets: pool.assets.map((asset: any) => ({
-					name: asset.name,
-					symbol: asset.symbol,
-					currentUtilization:
-						(Number(asset.stats.currentUtilization.value) /
-							10 ** Number(asset.stats.currentUtilization.decimals)) *
-						100,
-					apy:
-						(Number(asset.stats.supplyApy.value) /
-							10 ** Number(asset.stats.supplyApy.decimals)) *
-						100,
-					defiSpringApy:
-						(Number(asset.stats.defiSpringSupplyApr?.value || 0) /
-							10 **
-								Number(
-									asset.stats.defiSpringSupplyApr?.decimals || 0
-								)) *
-						100,
-					decimals: asset.decimals,
-					address: asset.address,
-					vTokenAddress: asset.vToken.address,
-					// V2 specific fields
-					vaultAddress: asset.vault?.address,
-					strategyAddress: asset.strategy?.address,
-					riskLevel: asset.riskLevel,
-					maxDeposit: asset.maxDeposit,
-					minDeposit: asset.minDeposit,
-				})),
+				assets: (pool?.assets ?? []).map((asset: any) => {
+					// Add null safety checks for asset stats
+					const stats = asset?.stats ?? {};
+					const currentUtilizationStats = stats?.currentUtilization ?? {};
+					const supplyApyStats = stats?.supplyApy ?? {};
+					const defiSpringStats = stats?.defiSpringSupplyApr ?? {};
+					
+					return {
+						name: asset?.name ?? 'Unknown Asset',
+						symbol: asset?.symbol ?? 'UNKNOWN',
+						currentUtilization: currentUtilizationStats?.value && currentUtilizationStats?.decimals
+							? (Number(currentUtilizationStats.value) / 10 ** Number(currentUtilizationStats.decimals)) * 100
+							: 0,
+						apy: supplyApyStats?.value && supplyApyStats?.decimals
+							? (Number(supplyApyStats.value) / 10 ** Number(supplyApyStats.decimals)) * 100
+							: 0,
+						defiSpringApy: defiSpringStats?.value && defiSpringStats?.decimals
+							? (Number(defiSpringStats.value) / 10 ** Number(defiSpringStats.decimals)) * 100
+							: 0,
+						decimals: asset?.decimals ?? 18,
+						address: asset?.address ?? '',
+						vTokenAddress: asset?.vToken?.address ?? '',
+						// V2 specific fields
+						vaultAddress: asset?.vault?.address,
+						strategyAddress: asset?.strategy?.address,
+						riskLevel: asset?.riskLevel ?? 'Unknown',
+						maxDeposit: asset?.maxDeposit ?? 0,
+						minDeposit: asset?.minDeposit ?? 0,
+					};
+				}),
 			}));
 	} catch (error) {
 		console.warn('⚠️ V2 API not available, using mock V2 data:', error);
@@ -249,40 +251,47 @@ function getMockVesuV2Pools() {
 
 // Legacy V1 function for backward compatibility
 export async function getVesuPools() {
-	// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
-	const { data } = (await axios.get(buildVesuApiUrl(VESU_ENDPOINTS.POOLS))).data;
-	return data
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		.filter((pool: any) => pool.isVerified)
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		.map((pool: any) => ({
-			id: pool.id,
-			name: pool.name,
-			address: pool.extensionContractAddress,
+	try {
+		// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
+		const { data } = (await axios.get(buildVesuApiUrl(VESU_ENDPOINTS.POOLS))).data;
+		return data
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-			assets: pool.assets.map((asset: any) => ({
-				name: asset.name,
-				symbol: asset.symbol,
-				currentUtilization:
-					(Number(asset.stats.currentUtilization.value) /
-						10 ** Number(asset.stats.currentUtilization.decimals)) *
-					100,
-				apy:
-					(Number(asset.stats.supplyApy.value) /
-						10 ** Number(asset.stats.supplyApy.decimals)) *
-					100,
-				defiSpringApy:
-					(Number(asset.stats.defiSpringSupplyApr?.value || 0) /
-						10 **
-							Number(
-								asset.stats.defiSpringSupplyApr?.decimals || 0
-							)) *
-					100,
-				decimals: asset.decimals,
-				address: asset.address,
-				vTokenAddress: asset.vToken.address,
-			})),
-		}));
+			.filter((pool: any) => pool?.isVerified)
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			.map((pool: any) => ({
+				id: pool?.id ?? 'unknown',
+				name: pool?.name ?? 'Unknown Pool',
+				address: pool?.extensionContractAddress ?? '',
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				assets: (pool?.assets ?? []).map((asset: any) => {
+					// Add null safety checks for asset stats
+					const stats = asset?.stats ?? {};
+					const currentUtilizationStats = stats?.currentUtilization ?? {};
+					const supplyApyStats = stats?.supplyApy ?? {};
+					const defiSpringStats = stats?.defiSpringSupplyApr ?? {};
+					
+					return {
+						name: asset?.name ?? 'Unknown Asset',
+						symbol: asset?.symbol ?? 'UNKNOWN',
+						currentUtilization: currentUtilizationStats?.value && currentUtilizationStats?.decimals
+							? (Number(currentUtilizationStats.value) / 10 ** Number(currentUtilizationStats.decimals)) * 100
+							: 0,
+						apy: supplyApyStats?.value && supplyApyStats?.decimals
+							? (Number(supplyApyStats.value) / 10 ** Number(supplyApyStats.decimals)) * 100
+							: 0,
+						defiSpringApy: defiSpringStats?.value && defiSpringStats?.decimals
+							? (Number(defiSpringStats.value) / 10 ** Number(defiSpringStats.decimals)) * 100
+							: 0,
+						decimals: asset?.decimals ?? 18,
+						address: asset?.address ?? '',
+						vTokenAddress: asset?.vToken?.address ?? '',
+					};
+				}),
+			}));
+	} catch (error) {
+		console.error('Error fetching Vesu pools:', error);
+		throw new Error('Failed to fetch Vesu pools data');
+	}
 }
 
 // Vesu V2 specific functions

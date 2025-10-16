@@ -40,10 +40,10 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 
 	const getRiskColor = (risk: string) => {
 		switch (risk) {
-			case 'Low': return 'bg-green-100 text-green-800 border-green-200';
-			case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-			case 'High': return 'bg-orange-100 text-orange-800 border-orange-200';
-			case 'Critical': return 'bg-red-100 text-red-800 border-red-200';
+			case 'Low': return 'bg-green-500 text-white border-green-600';
+			case 'Medium': return 'bg-yellow-500 text-white border-yellow-600';
+			case 'High': return 'bg-red-500 text-white border-red-600';
+			case 'Critical': return 'bg-red-600 text-white border-red-700';
 			default: return 'bg-gray-100 text-gray-800 border-gray-200';
 		}
 	};
@@ -158,33 +158,45 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 				</Card>
 			) : (
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{displayPools.map((pool) => (
-						<Card 
-							key={pool.id} 
-							className={`cursor-pointer transition-all hover:shadow-md ${
-								selectedPool?.id === pool.id ? 'ring-2 ring-primary' : ''
-							}`}
-							onClick={() => handlePoolSelect(pool)}
-						>
-							<CardHeader>
-								<div className="flex items-center justify-between">
-									<CardTitle className="text-lg">{pool.name}</CardTitle>
-									<Badge variant="outline" className="text-xs">
-										{pool.assets.length} assets
-									</Badge>
-								</div>
-								<CardDescription>
-									Pool ID: {pool.id.slice(0, 8)}...
-								</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<div className="space-y-3">
-									{pool.assets.map((asset: any, index: number) => {
-										const risk = calculateRiskLevel(asset.currentUtilization);
+					{displayPools.map((pool) => {
+						// Add null safety checks for pool properties
+						const poolName = pool?.name ?? 'Unknown Pool';
+						const poolId = pool?.id ?? 'unknown';
+						const assets = pool?.assets ?? [];
+						
+						return (
+							<Card 
+								key={poolId} 
+								className={`cursor-pointer transition-all hover:shadow-md ${
+									selectedPool?.id === poolId ? 'ring-2 ring-primary' : ''
+								}`}
+								onClick={() => handlePoolSelect(pool)}
+							>
+								<CardHeader>
+									<div className="flex items-center justify-between">
+										<CardTitle className="text-lg">{poolName}</CardTitle>
+										<Badge variant="outline" className="text-xs">
+											{assets.length} assets
+										</Badge>
+									</div>
+									<CardDescription>
+										Pool ID: {poolId.slice(0, 8)}...
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<div className="space-y-3">
+										{assets.map((asset: any, index: number) => {
+										// Add null safety checks for asset properties
+										const currentUtilization = asset?.currentUtilization ?? 0;
+										const apy = asset?.apy ?? 0;
+										const defiSpringApy = asset?.defiSpringApy ?? 0;
+										const symbol = asset?.symbol ?? 'Unknown';
+										
+										const risk = calculateRiskLevel(currentUtilization);
 										return (
 											<div key={index} className="space-y-2">
 												<div className="flex items-center justify-between">
-													<span className="font-medium">{asset.symbol}</span>
+													<span className="font-medium">{symbol}</span>
 													<Badge 
 														variant="outline" 
 														className={`text-xs ${getRiskColor(risk)}`}
@@ -197,37 +209,38 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 													<div>
 														<span className="text-muted-foreground">APY:</span>
 														<span className="ml-1 font-medium text-green-600">
-															{formatApy(asset.apy)}
+															{formatApy(apy)}
 														</span>
 													</div>
 													<div>
 														<span className="text-muted-foreground">Utilization:</span>
 														<span className="ml-1 font-medium">
-															{formatUtilization(asset.currentUtilization)}
+															{formatUtilization(currentUtilization)}
 														</span>
 													</div>
 												</div>
-												{asset.defiSpringApy > 0 && (
+												{defiSpringApy > 0 && (
 													<div className="text-sm">
 														<span className="text-muted-foreground">Rewards APY:</span>
 														<span className="ml-1 font-medium text-blue-600">
-															{formatApy(asset.defiSpringApy)}
+															{formatApy(defiSpringApy)}
 														</span>
 													</div>
 												)}
 											</div>
 										);
-									})}
-									<Button 
-										className="w-full" 
-										variant={selectedPool?.id === pool.id ? "default" : "outline"}
-									>
-										{selectedPool?.id === pool.id ? 'Selected' : 'Select Pool'}
-									</Button>
-								</div>
-							</CardContent>
-						</Card>
-					))}
+										})}
+										<Button 
+											className="w-full" 
+											variant={selectedPool?.id === poolId ? "default" : "outline"}
+										>
+											{selectedPool?.id === poolId ? 'Selected' : 'Select Pool'}
+										</Button>
+									</div>
+								</CardContent>
+							</Card>
+						);
+					})}
 				</div>
 			)}
 		</div>

@@ -53,6 +53,12 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "bitcoin-orange": "hsl(var(--bitcoin-orange))",
+        "bitcoin-gold": "hsl(var(--bitcoin-gold))",
+        "bitcoin-black": "hsl(var(--bitcoin-black))",
+        "bitcoin-dark-gray": "hsl(var(--bitcoin-dark-gray))",
+        "bitcoin-medium-gray": "hsl(var(--bitcoin-medium-gray))",
+        "bitcoin-light-gray": "hsl(var(--bitcoin-light-gray))",
       },
       borderRadius: {
         lg: "var(--radius)",

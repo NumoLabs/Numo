@@ -192,7 +192,7 @@ export function PoolsVaultContent() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-bitcoin-orange to-bitcoin-gold bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold tracking-tight text-white">
                 Pool Vaults
               </h1>
               <p className="text-muted-foreground mt-2">
@@ -202,11 +202,11 @@ export function PoolsVaultContent() {
           </div>
 
           {/* Info Banner */}
-          <div className="rounded-lg border p-4 bg-gradient-to-r from-blue-100/10 to-purple-100/10 dark:from-blue-900/5 dark:to-purple-900/5 border-blue-300/30 dark:border-blue-700/20">
+          <div className="rounded-lg border-2 p-4 bg-gradient-to-r from-orange-100/10 to-yellow-100/10 dark:from-orange-900/5 dark:to-yellow-900/5 border-orange-400 dark:border-orange-500 shadow-lg shadow-orange-500/20">
             <div className="flex items-start gap-3">
-              <Users className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <Users className="h-5 w-5 text-bitcoin-orange mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
-                <p className="font-medium text-blue-600 dark:text-blue-400">Real Vesu Pool Data Only</p>
+                <p className="font-medium text-white">Real Vesu Pool Data Only</p>
                 <p className="text-sm text-foreground">
                   This interface shows only real data from Vesu Protocol. All APY, utilization rates, and pool statistics 
                   are fetched directly from the official Vesu API. No simulated or mock data is displayed.
@@ -220,13 +220,13 @@ export function PoolsVaultContent() {
             <TabsList className="grid w-full grid-cols-2 lg:w-[600px]">
               <TabsTrigger 
                 value="vesu-testnet"
-                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
               >
                 Vesu V1 Pools
               </TabsTrigger>
               <TabsTrigger 
                 value="vesu-v2"
-                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:via-emerald-500 data-[state=active]:to-green-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
               >
                 Vesu V2 Pools
               </TabsTrigger>

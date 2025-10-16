@@ -271,7 +271,6 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     !isNaN(numAmount) &&
     numAmount >= 0.001 && 
     numAmount <= 1000;
-    // Temporarily remove balance check for testing: && numAmount <= walletBalance;
 
   const estimatedRewards = amount && !isNaN(Number(amount)) && selectedAsset
     ? (Number(amount) * selectedAsset.apy) / 100 
@@ -279,10 +278,10 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'Low': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'High': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'Critical': return 'bg-red-100 text-red-800 border-red-200';
+      case 'Low': return 'bg-green-500 text-white border-green-600';
+      case 'Medium': return 'bg-yellow-500 text-white border-yellow-600';
+      case 'High': return 'bg-red-500 text-white border-red-600';
+      case 'Critical': return 'bg-red-600 text-white border-red-700';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };

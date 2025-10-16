@@ -174,6 +174,11 @@ export const VESU_RISK_LEVELS = {
 
 // Calculate risk level based on utilization
 export function calculateRiskLevel(utilization: number): string {
+	// Handle edge cases: null, undefined, NaN, or negative values
+	if (utilization == null || isNaN(utilization) || utilization < 0) {
+		return VESU_RISK_LEVELS.LOW;
+	}
+	
 	if (utilization >= 90) return VESU_RISK_LEVELS.CRITICAL;
 	if (utilization >= 80) return VESU_RISK_LEVELS.HIGH;
 	if (utilization >= 50) return VESU_RISK_LEVELS.MEDIUM;
@@ -182,10 +187,18 @@ export function calculateRiskLevel(utilization: number): string {
 
 // Format APY for display
 export function formatApy(apy: number): string {
+	// Handle edge cases: null, undefined, NaN
+	if (apy == null || isNaN(apy)) {
+		return '0.00%';
+	}
 	return `${apy.toFixed(2)}%`;
 }
 
 // Format utilization for display
 export function formatUtilization(utilization: number): string {
+	// Handle edge cases: null, undefined, NaN
+	if (utilization == null || isNaN(utilization)) {
+		return '0.0%';
+	}
 	return `${utilization.toFixed(1)}%`;
 }
