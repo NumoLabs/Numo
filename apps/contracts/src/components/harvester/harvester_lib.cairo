@@ -1,4 +1,4 @@
-use numo_contracts::interfaces::IEkuboDistributor::{Claim};
+use numo_contracts::interfaces::IDistributor::{Claim};
 use numo_contracts::components::swap::{AvnuMultiRouteSwap, AvnuMultiRouteSwapImpl};
 use numo_contracts::components::harvester::interface::{IClaimTrait};
 use starknet::{ContractAddress};

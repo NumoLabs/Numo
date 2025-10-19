@@ -23,7 +23,7 @@ pub mod test_vesu_rebalance {
         IVesuMigrateDispatcherTrait
     };
     use numo_contracts::interfaces::IERC4626::{IERC4626Dispatcher, IERC4626DispatcherTrait};
-    use numo_contracts::interfaces::IEkuboDistributor::{Claim};
+    use numo_contracts::interfaces::IDistributor::{Claim};
     use numo_contracts::components::harvester::reward_shares::{
         IRewardShareDispatcher, IRewardShareDispatcherTrait
     };

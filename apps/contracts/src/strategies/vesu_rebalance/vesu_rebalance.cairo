@@ -1,7 +1,7 @@
 #[starknet::contract]
 mod VesuRebalance {
     use starknet::{ContractAddress, get_contract_address, get_block_number};
-    use starknet::contract_address::{contract_address_const};
+    use core::traits::TryInto;
     use numo_contracts::helpers::ERC20Helper;
     use numo_contracts::components::common::CommonComp;
     use numo_contracts::components::vesu::{vesuStruct, vesuSettingsImpl};
@@ -27,7 +27,7 @@ mod VesuRebalance {
     use openzeppelin::token::erc20::interface::IERC20Mixin;
     use numo_contracts::components::erc4626::{ERC4626Component};
     use alexandria_storage::list::{List, ListTrait};
-    use numo_contracts::interfaces::IEkuboDistributor::{Claim};
+    use numo_contracts::interfaces::IDistributor::{Claim};
     use numo_contracts::components::swap::{AvnuMultiRouteSwap};
     use numo_contracts::components::harvester::defi_spring_default_style::{
         SNFStyleClaimSettings, ClaimImpl as DefaultClaimImpl
@@ -329,7 +329,7 @@ mod VesuRebalance {
             let config = HarvestConfig {};
             // just dummy config, not used
             let snfSettings = SNFStyleClaimSettings {
-                rewardsContract: contract_address_const::<0>()
+                rewardsContract: 0.try_into().unwrap()
             };
 
             let from_token = swapInfo.token_from_address;

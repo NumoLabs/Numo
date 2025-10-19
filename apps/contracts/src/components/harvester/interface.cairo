@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use numo_contracts::interfaces::IEkuboDistributor::{Claim};
+use numo_contracts::interfaces::IDistributor::{Claim};
 
 #[derive(Drop, Copy, Serde)]
 pub struct ClaimResult {

@@ -9,7 +9,7 @@ pub struct Claim {
 }
 
 #[starknet::interface]
-pub trait IEkuboDistributor<TContractState> {
+pub trait IDistributor<TContractState> {
     fn claim(ref self: TContractState, claim: Claim, proof: Span<felt252>) -> bool;
     fn get_token(self: @TContractState) -> IERC20Dispatcher;
 }

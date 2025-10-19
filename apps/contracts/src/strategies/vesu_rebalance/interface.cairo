@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use numo_contracts::interfaces::IEkuboDistributor::{Claim};
+use numo_contracts::interfaces::IDistributor::{Claim};
 use numo_contracts::components::swap::{AvnuMultiRouteSwap};
 
 #[derive(PartialEq, Copy, Drop, Serde, Default)]

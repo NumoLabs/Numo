@@ -1,5 +1,5 @@
 use numo_contracts::components::harvester::interface::{IClaimTrait, ClaimResult};
-use numo_contracts::interfaces::IEkuboDistributor::{Claim};
+use numo_contracts::interfaces::IDistributor::{Claim};
 use starknet::{ContractAddress, get_contract_address};
 use openzeppelin::token::erc20::interface::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use numo_contracts::helpers::constants;

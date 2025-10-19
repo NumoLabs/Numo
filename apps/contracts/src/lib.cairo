@@ -26,7 +26,7 @@ pub mod interfaces {
     pub mod IERC4626;
     pub mod IVesu;
     pub mod lendcomp;
-    pub mod IEkuboDistributor;
+    pub mod IDistributor;
 }
 
 pub mod strategies {

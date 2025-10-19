@@ -4,7 +4,7 @@ use snforge_std::{
 use starknet::contract_address::contract_address_const;
 use snforge_std::{DeclareResultTrait};
 use starknet::{ContractAddress, get_contract_address};
-use numo_contracts::interfaces::IEkuboDistributor::{IEkuboDistributorDispatcher};
+use numo_contracts::interfaces::IDistributor::{IDistributorDispatcher};
 use numo_contracts::components::harvester::defi_spring_default_style::{
     ISNFClaimTraitDispatcher
 };
@@ -22,7 +22,7 @@ pub fn deploy_access_control() -> ContractAddress {
     return address;
 }
 
-pub fn deploy_defi_spring_ekubo() -> IEkuboDistributorDispatcher {
+pub fn deploy_defi_spring_ekubo() -> IDistributorDispatcher {
     let cls = declare("DefiSpringEkuboMock").unwrap().contract_class();
 
     let mut calldata: Array<felt252> = array![];
@@ -30,7 +30,7 @@ pub fn deploy_defi_spring_ekubo() -> IEkuboDistributorDispatcher {
 
     // load strk into the contract
     load_strk(address);
-    return IEkuboDistributorDispatcher { contract_address: address };
+    return IDistributorDispatcher { contract_address: address };
 }
 
 pub fn deploy_snf_spring_ekubo() -> ISNFClaimTraitDispatcher {

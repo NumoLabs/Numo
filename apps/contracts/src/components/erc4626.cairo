@@ -3,7 +3,6 @@
 
 /// # ERC4626 Component
 ///
-/// ADD MEEEEEEEEEEEEEEEEE AHHHH
 #[starknet::component]
 pub mod ERC4626Component {
     use core::num::traits::{Bounded, Zero};
