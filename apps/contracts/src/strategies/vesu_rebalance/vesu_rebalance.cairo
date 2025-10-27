@@ -414,12 +414,12 @@ mod VesuRebalance {
 
                 // migrate
                 // approve vTokens to v2
-                let bal = ERC20Helper::balanceOf(old_v_token, get_contract_address());
+                let bal = ERC20Helper::vtoken_balance_of(old_v_token, get_contract_address());
                 if (bal > 0) {
-                    ERC20Helper::approve(old_v_token, new_v_token, bal);
+                    ERC20Helper::vtoken_approve(old_v_token, new_v_token, bal);
                     let v2Disp = IVesuTokenV2Dispatcher { contract_address: new_v_token };
                     v2Disp.migrate_v_token();
-                    let newBal = ERC20Helper::balanceOf(new_v_token, get_contract_address());
+                    let newBal = ERC20Helper::vtoken_balance_of(new_v_token, get_contract_address());
                     assert(newBal == bal, 'Invalid vToken v2 balance');
                 }
 
@@ -499,7 +499,7 @@ mod VesuRebalance {
 
         fn _calculate_amount_in_pool(self: @ContractState, v_token: ContractAddress) -> u256 {
             let this = get_contract_address();
-            let v_token_bal = ERC20Helper::balanceOf(v_token, this);
+            let v_token_bal = ERC20Helper::vtoken_balance_of(v_token, this);
             IERC4626Dispatcher { contract_address: v_token }.convert_to_assets(v_token_bal)
         }
 
@@ -575,7 +575,7 @@ mod VesuRebalance {
                 if (!found) {
                     // its ok to remove pool if its empty
                     let v_token = pool.v_token;
-                    let v_token_bal = ERC20Helper::balanceOf(v_token, get_contract_address());
+                    let v_token_bal = ERC20Helper::vtoken_balance_of(v_token, get_contract_address());
                     assert(v_token_bal == 0, Errors::INVALID_POOL_CONFIG);
                 }
                 old_index += 1;
@@ -617,6 +617,15 @@ mod VesuRebalance {
             // as just before transaction, using total_supply now is ok bcz total_assets is
             // also as of now
             let total_supply = self.total_supply();
+            
+            // Handle first deposit case when total_supply is 0
+            if total_supply == 0 {
+                // For first deposit, set initial index and return without collecting fees
+                let initial_index: u256 = DEFAULT_INDEX.into();
+                self.previous_index.write(initial_index.try_into().unwrap());
+                return;
+            }
+            
             let curr_index = (assets * DEFAULT_INDEX.into()) / total_supply;
             if curr_index < prev_index.into() {
                 let new_index = ((assets - 1) * DEFAULT_INDEX.into()) / total_supply;
@@ -650,12 +659,12 @@ mod VesuRebalance {
                 let v_token = *allowed_pools.at(i).v_token;
                 let vault_disp = IERC4626Dispatcher { contract_address: v_token };
                 let v_shares_required = vault_disp.convert_to_shares(fee_loop.into());
-                let v_token_bal = ERC20Helper::balanceOf(v_token, this);
+                let v_token_bal = ERC20Helper::vtoken_balance_of(v_token, this);
                 if v_shares_required <= v_token_bal {
-                    ERC20Helper::transfer(v_token, fee_receiver, v_shares_required);
+                    ERC20Helper::vtoken_transfer(v_token, fee_receiver, v_shares_required);
                     break;
                 } else {
-                    ERC20Helper::transfer(v_token, fee_receiver, v_token_bal);
+                    ERC20Helper::vtoken_transfer(v_token, fee_receiver, v_token_bal);
                     fee_loop -= vault_disp.convert_to_assets(v_token_bal).try_into().unwrap();
                 }
                 i += 1;
@@ -663,7 +672,11 @@ mod VesuRebalance {
 
             // adjust the fee taken and update index
             // -1 to round down
-            let new_index = ((assets - fee.into() - 1) * DEFAULT_INDEX.into()) / total_supply;
+            let new_index = if total_supply == 0 {
+                DEFAULT_INDEX.into()
+            } else {
+                ((assets - fee.into() - 1) * DEFAULT_INDEX.into()) / total_supply
+            };
             self.previous_index.write(new_index.try_into().unwrap());
 
             self
@@ -702,7 +715,7 @@ mod VesuRebalance {
 
             match action.feature {
                 Feature::DEPOSIT => {
-                    ERC20Helper::approve(self.asset(), *v_token, action.amount);
+                    ERC20Helper::vtoken_approve(self.asset(), *v_token, action.amount);
                     IERC4626Dispatcher { contract_address: *v_token }.deposit(action.amount, this);
                 },
                 Feature::WITHDRAW => {
@@ -923,9 +936,15 @@ mod VesuRebalance {
             // deposit normally
             let default_pool_index = contract_state.settings.default_pool_index.read();
             let v_token = *pool_ids_array.at(default_pool_index.into()).v_token;
-            ERC20Helper::approve(self.asset(), v_token, assets);
+            ERC20Helper::vtoken_approve(self.asset(), v_token, assets);
             IERC4626Dispatcher { contract_address: v_token }.deposit(assets, this);
-            contract_state._collect_fees(contract_state.total_supply() - shares);
+            let current_total_supply = contract_state.total_supply();
+            let fee_shares = if current_total_supply > shares {
+                current_total_supply - shares
+            } else {
+                0
+            };
+            contract_state._collect_fees(fee_shares);
         }
 
         /// @notice Handles pre-withdrawal operations to ensure liquidity availability.
@@ -1006,7 +1025,7 @@ mod VesuRebalance {
             let pool_ids_array = self._get_pool_data();
             let default_pool_index = self.settings.default_pool_index.read();
             let v_token = *pool_ids_array.at(default_pool_index.into()).v_token;
-            ERC20Helper::approve(self.asset(), v_token, amt);
+            ERC20Helper::vtoken_approve(self.asset(), v_token, amt);
             IERC4626Dispatcher { contract_address: v_token }.deposit(amt, get_contract_address());
 
             let total_shares = self.total_supply();

@@ -149,7 +149,7 @@ fn avnuSwap(
     assert(swapInfo.integrator_fee_amount_bps == 0, 'require avnu fee bps 0');
     assert(swapInfo.beneficiary == this, 'invalid swap beneficiary');
 
-    let avnuAddress = constants::AVNU_EX();
+    let avnuAddress = constants::AVNU_EX_MAINNET();
     IERC20Dispatcher { contract_address: swapInfo.token_from_address }
         .approve(avnuAddress, token_from_amount);
     let swapped = IAvnuDispatcher { contract_address: avnuAddress }

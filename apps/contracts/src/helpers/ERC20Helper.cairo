@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use openzeppelin::token::erc20::interface::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 
 pub fn balanceOf(token: ContractAddress, address: ContractAddress) -> u256 {
     dispatcher(token).balanceOf(address)
@@ -54,4 +55,44 @@ pub fn total_supply(token: ContractAddress) -> u256 {
 
 pub fn allowance(token: ContractAddress, owner: ContractAddress, spender: ContractAddress) -> u256 {
     dispatcher(token).allowance(owner, spender)
+}
+
+// VToken specific functions using IERC20Dispatcher
+pub fn vtoken_balance_of(token: ContractAddress, address: ContractAddress) -> u256 {
+    vtoken_dispatcher(token).balance_of(address)
+}
+
+fn vtoken_dispatcher(token: ContractAddress) -> IERC20Dispatcher {
+    IERC20Dispatcher { contract_address: token }
+}
+
+pub fn vtoken_approve(token: ContractAddress, spender: ContractAddress, amount: u256) {
+    if (amount != 0) {
+        let approved = vtoken_dispatcher(token).approve(spender, amount);
+        assert(approved, 'VToken approval failed');
+    }
+}
+
+pub fn vtoken_transfer_from(
+    token: ContractAddress, from: ContractAddress, to: ContractAddress, amount: u256
+) {
+    if (amount != 0) {
+        let transferred = vtoken_dispatcher(token).transfer_from(from, to, amount);
+        assert(transferred, 'VToken transfer failed');
+    }
+}
+
+pub fn vtoken_transfer(token: ContractAddress, to: ContractAddress, amount: u256) {
+    if (amount != 0) {
+        let transferred = vtoken_dispatcher(token).transfer(to, amount);
+        assert(transferred, 'VToken transfer failed');
+    }
+}
+
+pub fn vtoken_allowance(token: ContractAddress, owner: ContractAddress, spender: ContractAddress) -> u256 {
+    vtoken_dispatcher(token).allowance(owner, spender)
+}
+
+pub fn vtoken_total_supply(token: ContractAddress) -> u256 {
+    vtoken_dispatcher(token).total_supply()
 }

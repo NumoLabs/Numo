@@ -11,6 +11,10 @@ pub fn VESU_SINGLETON_ADDRESS() -> ContractAddress {
     0x2545b2e5d519fc230e9cd781046d3a64e092114f07e44771e0d719d148725ef.try_into().unwrap()
 }
 
+pub fn VESU_SINGLETON_ADDRESS_SEPOLIA() -> ContractAddress {
+    0x01ecab07456147a8de92b9273dd6789893401e8462a737431493980d9be6827.try_into().unwrap()
+}
+
 pub fn EKUBO_FEE_COLLECTOR() -> ContractAddress {
     0x053c69eDcB1a65A8687Ec7Ad8fC23fD7cc815186fE4380bb6A5bf31df52361FF.try_into().unwrap()
 }
@@ -51,12 +55,24 @@ pub fn STRK_ADDRESS() -> ContractAddress {
     0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d.try_into().unwrap()
 }
 
-pub fn wBTC_ADDRESS() -> ContractAddress {
-    0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac.try_into().unwrap()
+pub fn STRK_ADDRESS_SEPOLIA() -> ContractAddress {
+    0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d.try_into().unwrap()
 }
 
-pub fn AVNU_EX() -> ContractAddress {
+pub fn wBTC_ADDRESS() -> ContractAddress {
+    0x03Fe2b97C1Fd336E750087D68B9b867997Fd64a2661fF3ca5A7C771641e8e7AC.try_into().unwrap()
+}
+
+pub fn wBTC_ADDRESS_SEPOLIA() -> ContractAddress {
+    0x04861ba938aed21f2cd7740acd3765ac4d2974783a3218367233de0153490cb6.try_into().unwrap()
+}
+
+pub fn AVNU_EX_MAINNET() -> ContractAddress {
     0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f.try_into().unwrap()
+}
+
+pub fn AVNU_EX_SEPOLIA() -> ContractAddress {
+    0x02c56e8b00dbe2a71e57472685378fc8988bba947e9a99b26a00fade2b4fe7c2.try_into().unwrap()
 }
 
 pub fn ZSTRK_ADDRESS() -> ContractAddress {
@@ -227,4 +243,46 @@ pub fn EKUBO_POSITIONS() -> ContractAddress {
 
 pub fn EKUBO_POSITIONS_NFT() -> ContractAddress {
     0x07b696af58c967c1b14c9dde0ace001720635a660a8e90c565ea459345318b30.try_into().unwrap()
+}
+
+// Vesu V2 Contract Addresses
+pub fn VESU_V2_ORACLE() -> ContractAddress {
+    0xfe4bfb1b353ba51eb34dff963017f94af5a5cf8bdf3dfc191c504657f3c05.try_into().unwrap()
+}
+
+pub fn VESU_V2_POOL_FACTORY() -> ContractAddress {
+    0x3760f903a37948f97302736f89ce30290e45f441559325026842b7a6fb388c0.try_into().unwrap()
+}
+
+pub fn VESU_V2_MULTIPLY() -> ContractAddress {
+    0x7964760e90baa28841ec94714151e03fbc13321797e68a874e88f27c9d58513.try_into().unwrap()
+}
+
+pub fn VESU_V2_LIQUIDATE() -> ContractAddress {
+    0x6b895ba904fb8f02ed0d74e343161de48e611e9e771be4cc2c997501dbfb418.try_into().unwrap()
+}
+
+// Vesu V2 Pools
+pub fn VESU_V2_PRIME_POOL() -> ContractAddress {
+    0x451fe483d5921a2919ddd81d0de6696669bccdacd859f72a4fba7656b97c3b5.try_into().unwrap()
+}
+
+pub fn VESU_V2_RE7_USDC_CORE_POOL() -> ContractAddress {
+    0x3976cac265a12609934089004df458ea29c776d77da423c96dc761d09d24124.try_into().unwrap()
+}
+
+pub fn VESU_V2_RE7_USDC_PRIME_POOL() -> ContractAddress {
+    0x2eef0c13b10b487ea5916b54c0a7f98ec43fb3048f60fdeedaf5b08f6f88aaf.try_into().unwrap()
+}
+
+pub fn VESU_V2_RE7_USDC_FRONTIER_POOL() -> ContractAddress {
+    0x5c03e7e0ccfe79c634782388eb1e6ed4e8e2a013ab0fcc055140805e46261bd.try_into().unwrap()
+}
+
+pub fn VESU_V2_RE7_XBTC_POOL() -> ContractAddress {
+    0x3a8416bf20d036df5b1cf3447630a2e1cb04685f6b0c3a70ed7fb1473548ecf.try_into().unwrap()
+}
+
+pub fn VESU_V2_RE7_USDC_STABLE_CORE_POOL() -> ContractAddress {
+    0x73702fce24aba36da1eac539bd4bae62d4d6a76747b7cdd3e016da754d7a135.try_into().unwrap()
 }
