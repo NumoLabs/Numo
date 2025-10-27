@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getVesuConfig, getVesuConfigByChainId, type VesuConfig } from '@/lib/vesu-config';
 import { getCurrentChainId, isTestnet } from '@/lib/utils';
-import { getVesuPools, getEarnPositions, getVesuTokens } from '@/app/api/vesuApi';
+import { getVesuPools, getVesuV2EarnPositions as getEarnPositions, getVesuTokens } from '@/app/api/vesuApi';
 import type { VesuPool } from '@/types/VesuPools';
 import type { VesuEarnPosition } from '@/types/VesuPositions';
 
