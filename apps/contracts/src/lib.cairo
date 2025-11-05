@@ -27,6 +27,7 @@ pub mod interfaces {
     pub mod IVesu;
     pub mod lendcomp;
     pub mod IDistributor;
+    pub mod IPool;
 }
 
 pub mod strategies {

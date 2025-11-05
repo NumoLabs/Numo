@@ -11,7 +11,7 @@ pub enum Feature {
 
 #[derive(PartialEq, Drop, Copy, Serde)]
 pub struct Action {
-    pub pool_id: felt252,
+    pub pool_id: ContractAddress,
     pub feature: Feature,
     // should be asset() when borrowing not enabled
     pub token: ContractAddress,
@@ -20,7 +20,7 @@ pub struct Action {
 
 #[derive(Drop, Copy, Serde, starknet::Store)]
 pub struct PoolProps {
-    pub pool_id: felt252, // vesu pool id
+    pub pool_id: ContractAddress, // vesu pool id
     pub max_weight: u32, // in bps relative to total_assets
     pub v_token: ContractAddress,
 }
