@@ -7,7 +7,7 @@ use starknet::{ContractAddress};
 #[derive(Drop, Copy, Serde, starknet::Store, starknet::Event)]
 pub struct RewardsInfo {
     pub amount: u128, // (e.g. STRK for Auto STRK, USDC for Auto USDC)
-    pub shares: u128, // shares of underlying contract (e.g. frmzSTRK)
+    pub shares: u128, // shares of underlying contract (e.g. numoSTRK)
     pub total_round_points: u128, // total points of round which is compared with user shares round to compute user shares
     pub block_number: u64, // When rewards were harvested
 }
@@ -38,9 +38,9 @@ pub mod RewardShareComponent {
 
     /// Terminology
     /// 1. shares: underlying shares of contract which is minted to represent user's share in
-    /// contract (e.g. frmzSTRK)
+    /// contract (e.g. numoSTRK)
     /// 2. harvest_shares: new shares of underlying asset already distributed to user denominated in
-    /// underlying shares (e.g. frmzSTRK)
+    /// underlying shares (e.g. numoSTRK)
     /// 3. shares_round: shares of user representing part of their share in a given round
     /// 4. for a given round, harvest_shares = (shares_round / total_round_points) * shares
 
@@ -50,7 +50,7 @@ pub mod RewardShareComponent {
         // rewardsInfo gets add when ever there is harvesting
         rewards_info: starknet::storage::Map<u32, RewardsInfo>, // index => RewardsInfo
         rewards_len: u32,
-        total_underlying_shares: u128, // total new shares of underlying contract (e.g. in frmzSTRK)
+        total_underlying_shares: u128, // total new shares of underlying contract (e.g. in numoSTRK)
         user_rewards_info: starknet::storage::Map<
             ContractAddress, UserRewardsInfo
         >, // (user) => UserRewardsInfo
@@ -182,7 +182,7 @@ pub mod RewardShareComponent {
         fn update_harvesting_rewards(
             ref self: ComponentState<TContractState>,
             amount: u128, // e.g. USDC reward
-            shares: u128, // in lp token terms of the contract (e.g. frmzUSDC) that corresponds to amount
+            shares: u128, // in lp token terms of the contract (e.g. numoUSDC) that corresponds to amount
             total_shares: u128,
         ) {
             let mut len = self.rewards_len.read();
@@ -228,7 +228,7 @@ pub mod RewardShareComponent {
             pending_shares: u128, // pending lp shares
             pending_shares_last_block: u64,
             pending_round_points: u128, // pending shares of user in current round
-            total_shares: u128, // total lp shares (prev) (e.g. totalSupply frmzSTRK)
+            total_shares: u128, // total lp shares (prev) (e.g. totalSupply numoSTRK)
         ) {
             let user_rewards = self.user_rewards_info.read(user);
             let mut current_index = self.rewards_len.read(); // bcz user will get rewards from here
