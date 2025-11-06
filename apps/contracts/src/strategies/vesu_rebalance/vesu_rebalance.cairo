@@ -4,10 +4,6 @@ mod VesuRebalance {
     use core::traits::TryInto;
     use numo_contracts::helpers::ERC20Helper;
     use numo_contracts::components::common::CommonComp;
-    use numo_contracts::components::vesu::{vesuStruct, vesuSettingsImpl};
-    use numo_contracts::interfaces::IVesu::{
-        IStonDispatcher
-    };
     use numo_contracts::interfaces::IPool::{IPoolDispatcher, IPoolDispatcherTrait};
     use numo_contracts::components::harvester::reward_shares::{
         RewardShareComponent, IRewardShare
@@ -99,7 +95,7 @@ mod VesuRebalance {
         allowed_pools: List<PoolProps>,
         settings: Settings,
         previous_index: u128,
-        vesu_settings: vesuStruct,
+        oracle: ContractAddress,
         is_incentives_on: bool,
     }
 
@@ -150,7 +146,7 @@ mod VesuRebalance {
         access_control: ContractAddress,
         allowed_pools: Array<PoolProps>,
         settings: Settings,
-        vesu_settings: vesuStruct,
+        oracle: ContractAddress,
     ) {
         self.erc4626.initializer(asset);
         self.erc20.initializer(name, symbol);
@@ -158,7 +154,7 @@ mod VesuRebalance {
         self._set_pool_settings(allowed_pools);
 
         self.settings.write(settings);
-        self.vesu_settings.write(vesu_settings);
+        self.oracle.write(oracle);
 
         // default index 10**18 (i.e. 1)
         self.previous_index.write(DEFAULT_INDEX);
@@ -171,21 +167,21 @@ mod VesuRebalance {
 
     #[abi(embed_v0)]
     impl ExternalImpl of IVesuRebal<ContractState> {
-        /// @notice Rebalances users position in vesu to optimize yield
+        /// @notice Rebalances users position in Vesu V2 pools to optimize yield
         /// @dev This function computes the yield before and after rebalancing, collects fees,
         /// executes rebalancing actions, and performs post-rebalance validations.
+        /// In V2, yield is calculated directly from pool contracts without needing singleton.
         /// @param actions Array of actions to be performed for rebalancing
         fn rebalance(ref self: ContractState, actions: Array<Action>) {
-            // perform rebalance
             self.common.assert_not_paused();
             self._collect_fees(self.total_supply());
 
-            // rebalance
+            // Calculate yield before and after rebalance
             let (yield_before_rebalance, _) = self.compute_yield();
             self._rebal_loop(actions);
             let (yield_after_rebalance, _) = self.compute_yield();
 
-            // post rebalance validations
+            // Post rebalance validations
             let this = get_contract_address();
             // Note: While interest_rate per pool is exact (from pool contract), the weighted average
             // uses integer division which loses precision. For small amounts, rounding can cause
@@ -234,31 +230,31 @@ mod VesuRebalance {
             IERC4626Dispatcher { contract_address: v_token }.withdraw(withdraw_amount, this, this);
         }
 
-        /// @notice Rebalances users position in vesu to balance weights
-        /// @dev This function computes the yield before and after rebalancing, collects fees,
-        /// executes rebalancing actions, and performs post-rebalance validations.
+        /// @notice Rebalances users position in Vesu V2 pools to balance weights
+        /// @dev This function collects fees and executes rebalancing actions to balance pool weights.
+        /// Unlike rebalance(), this function does not validate yield improvement, only weight constraints.
         /// @param actions Array of actions to be performed for rebalancing
         fn rebalance_weights(ref self: ContractState, actions: Array<Action>) {
-            // perform rebalance
             self.common.assert_relayer_role();
             self.common.assert_not_paused();
 
             self._collect_fees(self.total_supply());
             self._rebal_loop(actions);
 
-            // post rebalance validations
+            // Post rebalance validations
             let this = get_contract_address();
             self._assert_max_weights();
             assert(ERC20Helper::balanceOf(self.asset(), this) == 0, Errors::UNUTILIZED_ASSET);
         }
 
-        // @notice computes overall yeild across all allowed pools. 
-        // @dev Iterates through allowed pools, calculates yield per pool, and aggregates.
-        // The yield per pool is exact (obtained directly from pool contract), but the weighted
-        // average calculation uses integer division which loses precision. For small amounts,
-        // this can cause rounding differences between yield_before and yield_after even when
-        // the actual yield improves. Therefore, we use >= instead of > for validation.
-        // @return (u256, u256) - The weighted average yield and the total amount across pools.
+        /// @notice Computes overall yield across all allowed Vesu V2 pools
+        /// @dev Iterates through allowed pools, calculates yield per pool directly from pool contracts,
+        /// and aggregates into weighted average. In V2, we query pool contracts directly without singleton.
+        /// The yield per pool is exact (obtained directly from pool contract), but the weighted
+        /// average calculation uses integer division which loses precision. For small amounts,
+        /// this can cause rounding differences between yield_before and yield_after even when
+        /// the actual yield improves. Therefore, we use >= instead of > for validation.
+        /// @return (u256, u256) - The weighted average yield and the total amount across pools.
         fn compute_yield(self: @ContractState) -> (u256, u256) {
             let allowed_pools = self._get_pool_data();
             let mut i = 0;
@@ -353,7 +349,7 @@ mod VesuRebalance {
                     proof,
                     snfSettings,
                     swapInfo,
-                    IPriceOracleDispatcher { contract_address: self.vesu_settings.read().oracle }
+                    IPriceOracleDispatcher { contract_address: self.oracle.read() }
                 );
             let post_bal = self.total_assets();
             assert(post_bal > pre_bal, Errors::INVALID_HARVEST);
@@ -380,25 +376,17 @@ mod VesuRebalance {
 
     #[abi(embed_v0)]
     impl VesuMigrateImpl of IVesuMigrate<ContractState> {
+        /// @notice Migrates vault to Vesu V2 pool tokens
+        /// @dev In V2, we only update pool tokens (vTokens) and oracle. Singleton is not used.
+        /// @param new_singleton Unused in V2, kept for interface compatibility
+        /// @param new_pool_tokens Array of new V2 pool token addresses to migrate to
         fn vesu_migrate(
             ref self: ContractState,
-            new_singleton: ContractAddress,
+            new_singleton: ContractAddress, // Unused in V2, kept for interface compatibility
             new_pool_tokens: Array<ContractAddress>,
         ) {
             self.common.assert_admin_role();
 
-            // Note: new_singleton is kept for backward compatibility but not used in rebalance operations
-            // The oracle is still used for harvest operations
-            let vesu_settings = self.vesu_settings.read();
-            let mut new_vesu_settings = vesuStruct {
-                pool_id: vesu_settings.pool_id,
-                debt: vesu_settings.debt,
-                col: vesu_settings.col,
-                oracle: vesu_settings.oracle,
-                // Keep singleton for backward compatibility, but not used in rebalance operations
-                singleton: IStonDispatcher { contract_address: new_singleton, },
-            };
-            self.vesu_settings.write(new_vesu_settings);
 
             // update allowed pools
             let mut allowed_pools = self.get_allowed_pools();
@@ -512,22 +500,24 @@ mod VesuRebalance {
             IERC4626Dispatcher { contract_address: v_token }.convert_to_assets(v_token_bal)
         }
 
+        /// @notice Calculates the interest rate for a specific Vesu V2 pool
+        /// @dev In Vesu V2, we query pool contracts directly for utilization, asset_config, and interest_rate.
+        /// No singleton is needed. The yield is calculated as interest_rate * utilization.
+        /// @param pool_id The contract address of the Vesu V2 pool
+        /// @return The effective yield rate (interest_rate * utilization) for the pool
         fn _interest_rate_per_pool(self: @ContractState, pool_id: ContractAddress) -> u256 {
-            // In Vesu V2, we can get utilization and asset_config directly from the pool contract
-            // without needing the singleton
-            
             let asset = self.asset();
             
-            // Get pool contract directly
+            // Get pool contract directly (V2 uses pool addresses instead of pool IDs)
             let pool = IPoolDispatcher { contract_address: pool_id };
             
-            // Get real utilization from pool contract
+            // Get utilization from pool contract
             let utilization = pool.utilization(asset);
             
             // Get asset config from pool contract
             let asset_config = pool.asset_config(asset);
             
-            // Get interest rate from pool contract using real values
+            // Get interest rate from pool contract
             // interest_rate is the per-second rate in SCALE (10^27)
             // It needs to be multiplied by utilization to get the effective yield rate
             let interest_rate = pool.interest_rate(

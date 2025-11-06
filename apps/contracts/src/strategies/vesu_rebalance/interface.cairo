@@ -68,9 +68,13 @@ pub trait IVesuTokenV2<TContractState> {
 
 #[starknet::interface]
 pub trait IVesuMigrate<TContractState> {
+    /// @notice Migrates vault to Vesu V2 pool tokens
+    /// @dev In V2, new_singleton parameter is unused but kept for interface compatibility
+    /// @param new_singleton Unused in V2, kept for interface compatibility
+    /// @param new_pool_tokens Array of new V2 pool token addresses to migrate to
     fn vesu_migrate(
         ref self: TContractState,
-        new_singleton: ContractAddress,
+        new_singleton: ContractAddress, // Unused in V2
         new_pool_tokens: Array<ContractAddress>,
     );
 }

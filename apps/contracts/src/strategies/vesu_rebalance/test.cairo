@@ -81,14 +81,9 @@ pub mod test_vesu_rebalance {
         }
     }
 
-    fn get_vesu_settings() -> vesuStruct {
-        vesuStruct {
-            singleton: IStonDispatcher { contract_address: constants::VESU_SINGLETON_ADDRESS(), },
-            pool_id: contract_address_const::<0x00>().into(),
-            debt: contract_address_const::<0x00>(),
-            col: constants::STRK_ADDRESS(),
-            oracle: constants::ORACLE_OURS()
-        }
+    // In V2, we only need oracle for harvest operations
+    fn get_oracle() -> ContractAddress {
+        constants::ORACLE_OURS()
     }
 
     fn VAULT_NAME() -> ByteArray {
@@ -125,8 +120,8 @@ pub mod test_vesu_rebalance {
         let accessControl = test_utils::deploy_access_control();
         let vesu_rebal = declare("VesuRebalance").unwrap().contract_class();
         let settings = get_settings();
-        let mut vesu_settings = get_vesu_settings();
-        vesu_settings.col = asset;
+        // In V2, constructor only needs oracle (not vesuStruct)
+        let oracle = get_oracle();
         let mut calldata: Array<felt252> = array![];
         calldata.append_serde(VAULT_NAME());
         calldata.append_serde(VAULT_SYMBOL());
@@ -134,7 +129,7 @@ pub mod test_vesu_rebalance {
         calldata.append(accessControl.into());
         allowed_pools.serialize(ref calldata);
         settings.serialize(ref calldata);
-        vesu_settings.serialize(ref calldata);
+        calldata.append(oracle.into());
 
         let (address, _) = vesu_rebal.deploy(@calldata).expect('Vesu vault deploy failed');
 
