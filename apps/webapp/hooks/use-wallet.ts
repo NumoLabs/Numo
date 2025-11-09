@@ -3,7 +3,6 @@ import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 
 interface WalletContextType {
   address: string | undefined
-  account: any // AccountInterface from starknet
   connect: ReturnType<typeof useConnect>['connect']
   disconnect: ReturnType<typeof useDisconnect>['disconnect']
   connectors: ReturnType<typeof useConnect>['connectors']

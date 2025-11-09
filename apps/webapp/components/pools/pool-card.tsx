@@ -22,13 +22,13 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
   const getRiskColor = (level: string) => {
     switch (level.toLowerCase()) {
       case "low":
-        return "bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:text-white border-green-600"
+        return "bg-green-100 text-green-800 hover:bg-green-100/80 dark:bg-green-800/30 dark:text-green-300"
       case "medium":
-        return "bg-yellow-500 text-white hover:bg-yellow-600 dark:bg-yellow-600 dark:text-white border-yellow-600"
+        return "bg-amber-100 text-amber-800 hover:bg-amber-100/80 dark:bg-amber-800/30 dark:text-amber-300"
       case "medium-high":
-        return "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-600 dark:text-white border-orange-600"
+        return "bg-orange-100 text-orange-800 hover:bg-orange-100/80 dark:bg-orange-800/30 dark:text-orange-300"
       case "high":
-        return "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:text-white border-red-600"
+        return "bg-red-100 text-red-800 hover:bg-red-100/80 dark:bg-red-800/30 dark:text-red-300"
       default:
         return "bg-gray-100 text-gray-800 hover:bg-gray-100/80 dark:bg-gray-800/30 dark:text-gray-300"
     }
