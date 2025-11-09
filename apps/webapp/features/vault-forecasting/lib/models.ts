@@ -28,21 +28,35 @@ export function movingAverageForecast(
   // Project forward
   const expectedValue = lastPrice * (1 + trend * (horizonDays / 30)); // Monthly trend scaling
   
-  // Confidence bands (±1σ)
+  // Confidence bands (±1σ) - return as arrays for compatibility
+  const lowerValue = expectedValue * (1 - volatility);
+  const upperValue = expectedValue * (1 + volatility);
   const confidenceBand = {
-    lower: expectedValue * (1 - volatility),
-    upper: expectedValue * (1 + volatility)
+    lower: [lowerValue],
+    upper: [upperValue]
   };
+  
+  // Generate forecast points
+  const forecast: PricePoint[] = [];
+  const lastTimestamp = series[series.length - 1]?.timestamp || Date.now();
+  for (let day = 1; day <= horizonDays; day++) {
+    const timestamp = lastTimestamp + (day * 24 * 60 * 60 * 1000);
+    const projectedPrice = lastPrice * (1 + trend * (day / 30));
+    forecast.push({
+      timestamp,
+      price: projectedPrice
+    });
+  }
   
   return {
     model: 'movingAverage',
     horizonDays,
-    expectedValue,
+    forecast,
     confidenceBand,
-    metadata: {
-      dataPoints: series.length,
+    metrics: {
+      expectedReturn: trend * (horizonDays / 30),
       volatility,
-      lastUpdate: series[series.length - 1]?.timestamp || Date.now()
+      sharpeRatio: (trend * (horizonDays / 30)) / volatility || 0
     }
   };
 }
@@ -75,20 +89,35 @@ export function emaForecast(
   
   const expectedValue = lastPrice * (1 + trend * (horizonDays / 30));
   
+  // Confidence bands (±1σ) - return as arrays for compatibility
+  const lowerValue = expectedValue * (1 - volatility);
+  const upperValue = expectedValue * (1 + volatility);
   const confidenceBand = {
-    lower: expectedValue * (1 - volatility),
-    upper: expectedValue * (1 + volatility)
+    lower: [lowerValue],
+    upper: [upperValue]
   };
+  
+  // Generate forecast points
+  const forecast: PricePoint[] = [];
+  const lastTimestamp = series[series.length - 1]?.timestamp || Date.now();
+  for (let day = 1; day <= horizonDays; day++) {
+    const timestamp = lastTimestamp + (day * 24 * 60 * 60 * 1000);
+    const projectedPrice = lastPrice * (1 + trend * (day / 30));
+    forecast.push({
+      timestamp,
+      price: projectedPrice
+    });
+  }
   
   return {
     model: 'ema',
     horizonDays,
-    expectedValue,
+    forecast,
     confidenceBand,
-    metadata: {
-      dataPoints: series.length,
+    metrics: {
+      expectedReturn: trend * (horizonDays / 30),
       volatility,
-      lastUpdate: series[series.length - 1]?.timestamp || Date.now()
+      sharpeRatio: (trend * (horizonDays / 30)) / volatility || 0
     }
   };
 }
@@ -116,21 +145,39 @@ export function volAdjustedProjection(
   
   const expectedValue = lastPrice * Math.pow(1 + adjustedReturn, horizonDays);
   
-  // Confidence bands based on volatility
+  // Confidence bands based on volatility - return as arrays for compatibility
+  const volMultiplier = Math.sqrt(horizonDays / 365);
+  const lowerValue = expectedValue * (1 - volatility * volMultiplier);
+  const upperValue = expectedValue * (1 + volatility * volMultiplier);
   const confidenceBand = {
-    lower: expectedValue * (1 - volatility * Math.sqrt(horizonDays / 365)),
-    upper: expectedValue * (1 + volatility * Math.sqrt(horizonDays / 365))
+    lower: [lowerValue],
+    upper: [upperValue]
   };
+  
+  // Generate forecast points
+  const forecast: PricePoint[] = [];
+  const lastTimestamp = series[series.length - 1]?.timestamp || Date.now();
+  for (let day = 1; day <= horizonDays; day++) {
+    const timestamp = lastTimestamp + (day * 24 * 60 * 60 * 1000);
+    const projectedPrice = lastPrice * Math.pow(1 + adjustedReturn, day);
+    forecast.push({
+      timestamp,
+      price: projectedPrice
+    });
+  }
+  
+  // Calculate expected return for metrics
+  const expectedReturn = adjustedReturn * horizonDays;
   
   return {
     model: 'volAdjusted',
     horizonDays,
-    expectedValue,
+    forecast,
     confidenceBand,
-    metadata: {
-      dataPoints: series.length,
+    metrics: {
+      expectedReturn,
       volatility,
-      lastUpdate: series[series.length - 1]?.timestamp || Date.now()
+      sharpeRatio: expectedReturn / volatility || 0
     }
   };
 }

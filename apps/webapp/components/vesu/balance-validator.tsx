@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,16 +47,7 @@ export function BalanceValidator({
   const [validationDetails, setValidationDetails] = useState<ValidationDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!address || !assetAddress || !vTokenAddress || amount <= 0) {
-      setIsLoading(false);
-      return;
-    }
-
-    validateBalance();
-  }, [address, assetAddress, vTokenAddress, amount, decimals]);
-
-  const validateBalance = async () => {
+  const validateBalance = useCallback(async () => {
     if (!address) return;
 
     setIsLoading(true);
@@ -79,7 +70,10 @@ export function BalanceValidator({
         calldata: [address]
       });
       
-      const userBalance = balanceResult.result[0];
+      // Handle different response formats
+      const userBalance = Array.isArray(balanceResult) 
+        ? balanceResult[0] 
+        : (balanceResult as { result?: string[] }).result?.[0] || balanceResult[0];
       
       // Check current allowance
       const allowanceResult = await provider.callContract({
@@ -88,7 +82,10 @@ export function BalanceValidator({
         calldata: [address, vTokenAddress]
       });
       
-      const currentAllowance = allowanceResult.result[0];
+      // Handle different response formats
+      const currentAllowance = Array.isArray(allowanceResult)
+        ? allowanceResult[0]
+        : (allowanceResult as { result?: string[] }).result?.[0] || allowanceResult[0];
       const needsApproval = BigInt(currentAllowance) < BigInt(amountInWei);
       const isValid = BigInt(userBalance) >= BigInt(amountInWei);
 
@@ -121,7 +118,16 @@ export function BalanceValidator({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [address, assetAddress, vTokenAddress, amount, decimals, onValidationComplete]);
+
+  useEffect(() => {
+    if (!address || !assetAddress || !vTokenAddress || amount <= 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    validateBalance();
+  }, [address, assetAddress, vTokenAddress, amount, decimals, validateBalance]);
 
   const formatAmount = (amount: string, decimals: number) => {
     const num = BigInt(amount);
@@ -241,7 +247,7 @@ export function BalanceValidator({
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                You don't have enough tokens to complete this transaction. 
+                You don&apos;t have enough tokens to complete this transaction. 
                 Please add more tokens to your wallet or reduce the amount.
               </AlertDescription>
             </Alert>
@@ -251,7 +257,7 @@ export function BalanceValidator({
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                Your balance is sufficient, but you'll need to approve the vToken contract 
+                Your balance is sufficient, but you&apos;ll need to approve the vToken contract 
                 to spend your tokens before depositing.
               </AlertDescription>
             </Alert>

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+// Badge is available but not currently used in this component
 import { 
   Wallet, 
   Loader2, 
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useWallet, useWalletStatus } from '@/hooks/use-wallet';
 import { useToast } from '@/hooks/use-toast';
+import type { Connector } from '@starknet-react/core';
 
 interface VesuWalletConnectProps {
   onWalletConnect?: (address: string) => void;
@@ -26,7 +27,7 @@ export function VesuWalletConnect({ onWalletConnect, onWalletDisconnect }: VesuW
   const { toast } = useToast();
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
-  const handleConnect = async (connector: any) => {
+  const handleConnect = async (connector: Connector) => {
     setIsConnectingWallet(true);
     try {
       await connect({ connector });
@@ -35,10 +36,11 @@ export function VesuWalletConnect({ onWalletConnect, onWalletDisconnect }: VesuW
         title: "Wallet Connected",
         description: "StarkNet wallet connected successfully for Vesu pools",
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to connect wallet. Please try again.";
       toast({
         title: "Connection Failed",
-        description: error.message || "Failed to connect wallet. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -54,10 +56,11 @@ export function VesuWalletConnect({ onWalletConnect, onWalletDisconnect }: VesuW
         title: "Wallet Disconnected",
         description: "StarkNet wallet disconnected successfully",
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to disconnect wallet.";
       toast({
         title: "Disconnect Failed",
-        description: error.message || "Failed to disconnect wallet.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -173,7 +176,7 @@ export function VesuWalletConnect({ onWalletConnect, onWalletDisconnect }: VesuW
         
         <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
           <AlertTriangle className="h-3 w-3" />
-          <span>Make sure you're on StarkNet Sepolia testnet</span>
+          <span>Make sure you&apos;re on StarkNet Sepolia testnet</span>
         </div>
         
         <div className="text-center">

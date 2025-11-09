@@ -84,7 +84,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           pathname === item.href || 
                           (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                           (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                            ? "bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange border-r-2 border-bitcoin-orange"
+                            ? "bg-gray-800 text-white"
                             : "text-gray-300 hover:bg-gray-800 hover:text-white",
                         )}
                       >
@@ -94,7 +94,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                             pathname === item.href || 
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-bitcoin-orange"
+                              ? "text-white"
                               : "text-gray-400 group-hover:text-gray-300",
                           )}
                         />
@@ -141,18 +141,18 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                             pathname === item.href || 
                             (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                             (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "bg-gradient-to-r from-bitcoin-orange/10 via-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange shadow-lg border border-bitcoin-orange/50"
+                              ? "bg-gray-800 text-white shadow-lg"
                               : "text-gray-300 hover:bg-gradient-to-r hover:from-gray-800/80 hover:to-gray-700/80 hover:text-white",
                           )}
                         >
                           <item.icon
                             className={cn(
                               "h-5 w-5 shrink-0 transition-all duration-200",
-                                                          pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-bitcoin-orange scale-110"
-                              : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
+                              pathname === item.href || 
+                              (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
+                              (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                                ? "text-white scale-110"
+                                : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
                             )}
                           />
                           {item.name}

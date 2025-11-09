@@ -8,11 +8,12 @@ import { SummaryTable } from '../../features/vault-forecasting/components/Summar
 import { useVaultSnapshot } from '../../features/vault-forecasting/hooks/useVaultSnapshot';
 import { usePragmaPrice } from '../../features/vault-forecasting/hooks/usePragmaPrice';
 import { usePragmaHistory } from '../../features/vault-forecasting/hooks/usePragmaHistory';
-import { 
-  movingAverageForecast, 
-  emaForecast, 
-  volAdjustedProjection 
-} from '../../features/vault-forecasting/lib/models';
+// Forecasting models are available but not currently used in this component
+// import { 
+//   movingAverageForecast, 
+//   emaForecast, 
+//   volAdjustedProjection 
+// } from '../../features/vault-forecasting/lib/models';
 import type { ForecastModel, ForecastParams, ForecastResult, PricePoint } from '../../features/vault-forecasting/types';
 import ForecastHero from "./forecast-hero";
 
@@ -26,14 +27,14 @@ export function ForecastContent() {
 
   const [forecastResult, setForecastResult] = useState<ForecastResult | undefined>();
 
-  // Helper function to safely format addresses
-  const formatAddress = (address: any): string => {
-    if (!address) return 'Not available';
-    if (typeof address === 'string') {
-      return `${address.slice(0, 10)}...${address.slice(-8)}`;
-    }
-    return 'Invalid address format';
-  };
+  // Helper function to safely format addresses (currently unused but kept for future use)
+  // const formatAddress = (address: string | undefined): string => {
+  //   if (!address) return 'Not available';
+  //   if (typeof address === 'string') {
+  //     return `${address.slice(0, 10)}...${address.slice(-8)}`;
+  //   }
+  //   return 'Invalid address format';
+  // };
 
   // Get vault address from environment
   const vaultAddress = process.env.NEXT_PUBLIC_VAULT_ADDRESS;
@@ -69,7 +70,7 @@ export function ForecastContent() {
     // Create a simple forecast based on vault data
     // We'll use the price per share trend and TVL data
     const currentPrice = vaultSnapshot.data.pricePerShare;
-    const currentTvl = vaultSnapshot.data.tvl;
+    // const currentTvl = vaultSnapshot.data.tvl; // Currently unused
     const currentTime = Date.now();
     
     // Generate forecast points based on vault performance

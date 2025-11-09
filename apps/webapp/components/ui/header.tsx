@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Menu } from "lucide-react"
+import { Menu } from "lucide-react"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"

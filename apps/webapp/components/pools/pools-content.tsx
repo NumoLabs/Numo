@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import { Filter, Info, Plus, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -9,25 +8,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PoolCard } from "@/components/pools/pool-card"
 import { VaultCard } from "@/components/pools/vault-card"
 import { poolsData } from "@/lib/pools-data"
-import { getVesuPools } from "@/app/api/vesuApi"
-import { calculateRiskLevel } from "@/lib/vesu-config"
+// getVesuPools and calculateRiskLevel are available but not currently used in this component
+// import { getVesuPools } from "@/app/api/vesuApi"
+// import { calculateRiskLevel } from "@/lib/vesu-config"
 
 export function PoolsContent() {
-  const [vesuPools, setVesuPools] = useState<any[]>([])
+  // Vesu pools are fetched but not currently displayed in this component
+  // const [vesuPools, setVesuPools] = useState<unknown[]>([])
 
-  useEffect(() => {
-    let mounted = true
-    getVesuPools()
-      .then((data) => {
-        if (mounted) setVesuPools(data)
-      })
-      .catch(() => {
-        if (mounted) setVesuPools([])
-      })
-    return () => {
-      mounted = false
-    }
-  }, [])
+  // Vesu pools fetching is disabled until needed
+  // useEffect(() => {
+  //   let mounted = true
+  //   getVesuPools()
+  //     .then((data) => {
+  //       if (mounted) setVesuPools(data)
+  //     })
+  //     .catch(() => {
+  //       if (mounted) setVesuPools([])
+  //     })
+  //   return () => {
+  //     mounted = false
+  //   }
+  // }, [])
 
   return (
     <div className="space-y-6">

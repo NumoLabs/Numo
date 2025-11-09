@@ -6,37 +6,37 @@ import {
   Users, 
   Shield, 
   Zap, 
-  DollarSign,
   AlertTriangle,
   Activity
 } from 'lucide-react';
 import type { VesuPool } from '@/types/VesuPools';
-import { formatApy, formatUtilization, calculateRiskLevel } from '@/lib/vesu-config';
+import { formatApy, formatUtilization } from '@/lib/vesu-config';
 
 interface VesuPoolDetailCardProps {
   pool: VesuPool;
 }
 
 export function VesuPoolDetailCard({ pool }: VesuPoolDetailCardProps) {
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'Low': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'High': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'Critical': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // Risk color and icon functions are available but not currently used
+  // const getRiskColor = (risk: string) => {
+  //   switch (risk) {
+  //     case 'Low': return 'bg-green-100 text-green-800 border-green-200';
+  //     case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  //     case 'High': return 'bg-orange-100 text-orange-800 border-orange-200';
+  //     case 'Critical': return 'bg-red-100 text-red-800 border-red-200';
+  //     default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  //   }
+  // };
 
-  const getRiskIcon = (risk: string) => {
-    switch (risk) {
-      case 'Low': return <Shield className="h-4 w-4" />;
-      case 'Medium': return <AlertTriangle className="h-4 w-4" />;
-      case 'High': return <AlertTriangle className="h-4 w-4" />;
-      case 'Critical': return <AlertTriangle className="h-4 w-4" />;
-      default: return <Shield className="h-4 w-4" />;
-    }
-  };
+  // const getRiskIcon = (risk: string) => {
+  //   switch (risk) {
+  //     case 'Low': return <Shield className="h-4 w-4" />;
+  //     case 'Medium': return <AlertTriangle className="h-4 w-4" />;
+  //     case 'High': return <AlertTriangle className="h-4 w-4" />;
+  //     case 'Critical': return <AlertTriangle className="h-4 w-4" />;
+  //     default: return <Shield className="h-4 w-4" />;
+  //   }
+  // };
 
   // Only show real data - no calculations with mock data
   const hasRealData = pool.assets.some(asset => asset.apy > 0 || asset.currentUtilization > 0);

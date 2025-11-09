@@ -1,37 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { fetchCryptoPrice, getCurrentChainId } from '@/lib/utils';
+import { fetchCryptoPrice } from '@/lib/utils';
 import type { VesuPool } from '@/types/VesuPools';
 import type { VesuEarnPosition } from '@/types/VesuPositions';
 import { 
-	getVesuV2Config, 
 	buildVesuV2ApiUrl, 
 	VESU_V2_ENDPOINTS, 
 	calculateRiskLevel,
 	// Legacy V1 imports for backward compatibility
-	getVesuConfig, 
 	buildVesuApiUrl, 
 	VESU_ENDPOINTS
 } from '@/lib/vesu-config';
 import axios from 'axios';
 
-// Get current Vesu V2 configuration
-const getCurrentVesuV2Config = () => {
-	const chainId = getCurrentChainId();
-	return getVesuV2Config();
-};
+// Configuration functions are available but not currently used
+// const getCurrentVesuV2Config = () => {
+// 	return getVesuV2Config();
+// };
 
-// Get current Vesu configuration (V1 - Legacy)
-const getCurrentVesuConfig = () => {
-	const chainId = getCurrentChainId();
-	return getVesuConfig();
-};
+// const getCurrentVesuConfig = () => {
+// 	return getVesuConfig();
+// };
 
 // Vesu V2 API Functions
 export async function getVesuV2EarnPositions(address: string) {
 	if (!address) {
 		return [];
 	}
-	const config = getCurrentVesuV2Config();
 	const { data } = (
 		await axios.get(
 			buildVesuV2ApiUrl(`${VESU_V2_ENDPOINTS.POSITIONS}?walletAddress=${address}`)
@@ -311,7 +305,7 @@ export async function getVesuV2Rewards(address: string) {
 		return data;
 	} catch (error) {
 		console.warn('⚠️ V2 Rewards API not available, using mock data:', error);
-		return getMockVesuV2Rewards(address);
+		return getMockVesuV2Rewards();
 	}
 }
 
@@ -373,7 +367,7 @@ function getMockVesuV2Strategies() {
 	];
 }
 
-function getMockVesuV2Rewards(address: string) {
+function getMockVesuV2Rewards() {
 	return [
 		{
 			id: 'reward-1',

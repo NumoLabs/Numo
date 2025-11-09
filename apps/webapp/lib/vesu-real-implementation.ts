@@ -1,7 +1,7 @@
 // Real Vesu Implementation based on vesu-v1 repository
 // This file contains the actual implementation patterns from the official Vesu repository
 
-import { CallData, CairoCustomEnum } from 'starknet';
+import { CallData, CairoCustomEnum, type AccountInterface, type RpcProvider } from 'starknet';
 import { getVesuConfig, getVesuV2Config } from './vesu-config';
 import { parseVesuAmount } from './utils';
 
@@ -29,7 +29,7 @@ export interface VesuModifyPositionParams {
   user: string;
   collateral: VesuAmount;
   debt: VesuAmount;
-  data: any[];
+  data: unknown[];
 }
 
 // Helper function to create Vesu Amount (based on vesu-v1/lib/model.ts)
@@ -82,7 +82,7 @@ export async function createVesuDepositParams(
   console.log('🔧 createVesuDepositParams - debt:', debt);
   
   console.log('🔧 createVesuDepositParams - Creating data...');
-  const data: any[] = [];
+  const data: unknown[] = [];
   console.log('🔧 createVesuDepositParams - data:', data);
   
   const result = {
@@ -177,6 +177,8 @@ export function getAssetIndex(assetAddress: string, isTestnet: boolean = true): 
 // VToken ABI for deposit, withdraw, and redeem functions
 // withdraw: Burns shares and sends exactly the requested amount of underlying assets
 // redeem: Burns exact shares and sends the corresponding amount of underlying assets
+// Currently unused but kept for reference
+/*
 const VTOKEN_ABI = [
   {
     "name": "deposit",
@@ -228,6 +230,7 @@ const VTOKEN_ABI = [
     "stateMutability": "view"
   }
 ];
+*/
 
 // Vesu V2 Transaction Flow
 export class VesuV2TransactionFlow {
@@ -239,8 +242,8 @@ export class VesuV2TransactionFlow {
     amount: number,
     decimals: number,
     userAddress: string,
-    account: any,
-    provider: any,
+    account: AccountInterface,
+    provider: RpcProvider,
     vTokenAddress: string
   ): Promise<{ approvalTx: string; depositTx: string }> {
     console.log('🚀 VesuV2TransactionFlow.deposit - Starting V2 deposit transaction');
@@ -267,7 +270,8 @@ export class VesuV2TransactionFlow {
       }
     } catch (balanceError) {
       console.error('❌ Balance check failed:', balanceError);
-      throw new Error(`Balance check failed: ${(balanceError as any)?.message || balanceError}`);
+      const errorMessage = balanceError instanceof Error ? balanceError.message : String(balanceError);
+      throw new Error(`Balance check failed: ${errorMessage}`);
     }
     
     // Check current allowance
@@ -325,7 +329,7 @@ export class VesuV2TransactionFlow {
             retryInterval: 2000
           });
           console.log('✅ V2 Approval transaction confirmed');
-        } catch (waitError) {
+        } catch {
           console.warn('⚠️ V2 Approval transaction confirmation timeout, continuing...');
         }
       } else {
@@ -333,7 +337,8 @@ export class VesuV2TransactionFlow {
       }
     } catch (approvalError) {
       console.error('❌ V2 Approval transaction failed:', approvalError);
-      throw new Error(`V2 Token approval failed: ${(approvalError as any)?.message || approvalError}`);
+      const errorMessage = approvalError instanceof Error ? approvalError.message : String(approvalError);
+      throw new Error(`V2 Token approval failed: ${errorMessage}`);
     }
     
     // Step 2: Execute vToken deposit transaction
@@ -350,7 +355,8 @@ export class VesuV2TransactionFlow {
       });
     } catch (depositError) {
       console.error('❌ V2 Deposit transaction failed:', depositError);
-      throw new Error(`V2 vToken deposit failed: ${(depositError as any)?.message || depositError}`);
+      const errorMessage = depositError instanceof Error ? depositError.message : String(depositError);
+      throw new Error(`V2 vToken deposit failed: ${errorMessage}`);
     }
     
     console.log('✅ V2 vToken deposit transaction submitted:', depositResult.transaction_hash);
@@ -361,7 +367,7 @@ export class VesuV2TransactionFlow {
         retryInterval: 2000
       });
       console.log('✅ V2 vToken deposit transaction confirmed');
-    } catch (waitError) {
+    } catch {
       console.warn('⚠️ V2 Deposit transaction confirmation timeout, continuing...');
     }
     
@@ -377,8 +383,8 @@ export class VesuV2TransactionFlow {
     amount: number,
     decimals: number,
     userAddress: string,
-    account: any,
-    provider: any,
+    account: AccountInterface,
+    provider: RpcProvider,
     vTokenAddress: string
   ): Promise<{ withdrawalTx: string }> {
     console.log('🚀 VesuV2TransactionFlow.withdraw - Starting V2 withdrawal transaction');
@@ -402,7 +408,8 @@ export class VesuV2TransactionFlow {
       });
     } catch (withdrawalError) {
       console.error('❌ V2 Withdrawal transaction failed:', withdrawalError);
-      throw new Error(`V2 vToken withdrawal failed: ${(withdrawalError as any)?.message || withdrawalError}`);
+      const errorMessage = withdrawalError instanceof Error ? withdrawalError.message : String(withdrawalError);
+      throw new Error(`V2 vToken withdrawal failed: ${errorMessage}`);
     }
     
     console.log('✅ V2 vToken withdraw transaction submitted:', withdrawalResult.transaction_hash);
@@ -413,7 +420,7 @@ export class VesuV2TransactionFlow {
         retryInterval: 2000
       });
       console.log('✅ V2 vToken withdraw transaction confirmed');
-    } catch (waitError) {
+    } catch {
       console.warn('⚠️ V2 Withdrawal transaction confirmation timeout, continuing...');
     }
     
@@ -426,7 +433,7 @@ export class VesuV2TransactionFlow {
   async getVTokenBalance(
     vTokenAddress: string,
     userAddress: string,
-    provider: any
+    provider: RpcProvider
   ): Promise<{ shares: string; assets: string }> {
     console.log('🔍 Getting V2 vToken balance for user:', userAddress);
     
@@ -443,15 +450,15 @@ export class VesuV2TransactionFlow {
         calldata: [userAddress]
       });
       
-      if (!balanceResult?.result || !balanceResult.result[0]) {
+      const shares = getContractResult(balanceResult, 'vToken balanceOf');
+      
+      if (!shares || shares === "0") {
         console.warn('⚠️ No balance result returned from V2 vToken');
         return {
           shares: "0",
           assets: "0"
         };
       }
-      
-      const shares = getContractResult(balanceResult, 'vToken balanceOf');
       console.log('📊 V2 vToken shares balance:', shares);
       
       return {
@@ -463,7 +470,7 @@ export class VesuV2TransactionFlow {
       console.error('❌ Error details:', {
         vTokenAddress,
         userAddress,
-        error: (error as any)?.message || error
+        error: error instanceof Error ? error.message : String(error)
       });
       return {
         shares: "0",
@@ -483,8 +490,8 @@ export class VesuTransactionFlow {
     amount: number,
     decimals: number,
     userAddress: string,
-    account: any,
-    provider: any,
+    account: AccountInterface,
+    provider: RpcProvider,
     vTokenAddress: string
   ): Promise<{ approvalTx: string; depositTx: string }> {
     console.log('🚀 VesuTransactionFlow.deposit - Starting real vToken deposit transaction');
@@ -511,7 +518,8 @@ export class VesuTransactionFlow {
       }
     } catch (balanceError) {
       console.error('❌ Balance check failed:', balanceError);
-      throw new Error(`Balance check failed: ${(balanceError as any)?.message || balanceError}`);
+      const errorMessage = balanceError instanceof Error ? balanceError.message : String(balanceError);
+      throw new Error(`Balance check failed: ${errorMessage}`);
     }
     
     // Step 1: Execute approval transaction to vToken (only if needed)
@@ -548,7 +556,7 @@ export class VesuTransactionFlow {
             retryInterval: 2000
           });
           console.log('✅ Approval transaction confirmed');
-        } catch (waitError) {
+        } catch {
           console.warn('⚠️ Approval transaction confirmation timeout, continuing...');
         }
       } else {
@@ -556,7 +564,8 @@ export class VesuTransactionFlow {
       }
     } catch (approvalError) {
       console.error('❌ Approval transaction failed:', approvalError);
-      throw new Error(`Token approval failed: ${(approvalError as any)?.message || approvalError}`);
+      const errorMessage = approvalError instanceof Error ? approvalError.message : String(approvalError);
+      throw new Error(`Token approval failed: ${errorMessage}`);
     }
     
     // Step 2: Execute vToken deposit transaction
@@ -573,7 +582,8 @@ export class VesuTransactionFlow {
       });
     } catch (depositError) {
       console.error('❌ Deposit transaction failed:', depositError);
-      throw new Error(`vToken deposit failed: ${(depositError as any)?.message || depositError}`);
+      const errorMessage = depositError instanceof Error ? depositError.message : String(depositError);
+      throw new Error(`vToken deposit failed: ${errorMessage}`);
     }
     
     console.log('✅ vToken deposit transaction submitted:', depositResult.transaction_hash);
@@ -584,7 +594,7 @@ export class VesuTransactionFlow {
         retryInterval: 2000
       });
       console.log('✅ vToken deposit transaction confirmed');
-    } catch (waitError) {
+    } catch {
       console.warn('⚠️ Deposit transaction confirmation timeout, continuing...');
     }
     
@@ -600,8 +610,8 @@ export class VesuTransactionFlow {
     amount: number,
     decimals: number,
     userAddress: string,
-    account: any,
-    provider: any,
+    account: AccountInterface,
+    provider: RpcProvider,
     vTokenAddress: string
   ): Promise<{ withdrawalTx: string }> {
     console.log('🚀 VesuTransactionFlow.withdraw - Starting real vToken withdrawal transaction');
@@ -626,7 +636,8 @@ export class VesuTransactionFlow {
       });
     } catch (withdrawalError) {
       console.error('❌ Withdrawal transaction failed:', withdrawalError);
-      throw new Error(`vToken withdrawal failed: ${(withdrawalError as any)?.message || withdrawalError}`);
+      const errorMessage = withdrawalError instanceof Error ? withdrawalError.message : String(withdrawalError);
+      throw new Error(`vToken withdrawal failed: ${errorMessage}`);
     }
     
     console.log('✅ vToken withdraw transaction submitted:', withdrawalResult.transaction_hash);
@@ -637,7 +648,7 @@ export class VesuTransactionFlow {
         retryInterval: 2000
       });
       console.log('✅ vToken withdraw transaction confirmed');
-    } catch (waitError) {
+    } catch {
       console.warn('⚠️ Withdrawal transaction confirmation timeout, continuing...');
     }
     
@@ -650,7 +661,7 @@ export class VesuTransactionFlow {
   async getVTokenBalance(
     vTokenAddress: string,
     userAddress: string,
-    provider: any
+    provider: RpcProvider
   ): Promise<{ shares: string; assets: string }> {
     console.log('🔍 Getting vToken balance for user:', userAddress);
     
@@ -667,15 +678,15 @@ export class VesuTransactionFlow {
         calldata: [userAddress]
       });
       
-      if (!balanceResult?.result || !balanceResult.result[0]) {
+      const shares = getContractResult(balanceResult, 'vToken balanceOf');
+      
+      if (!shares || shares === "0") {
         console.warn('⚠️ No balance result returned from vToken');
         return {
           shares: "0",
           assets: "0"
         };
       }
-      
-      const shares = getContractResult(balanceResult, 'vToken balanceOf');
       console.log('📊 vToken shares balance:', shares);
       
       // For now, we'll return the shares as assets (1:1 ratio)
@@ -689,7 +700,7 @@ export class VesuTransactionFlow {
       console.error('❌ Error details:', {
         vTokenAddress,
         userAddress,
-        error: (error as any)?.message || error
+        error: error instanceof Error ? error.message : String(error)
       });
       return {
         shares: "0",
@@ -830,7 +841,7 @@ export function getVesuProtocolData(isTestnet: boolean = true): { protocol: Vesu
 }
 
 // Helper function to safely get contract result
-function getContractResult(result: any, operation: string): string {
+function getContractResult(result: unknown, operation: string): string {
   console.log(`🔍 Raw ${operation} result:`, result);
   
   if (!result) {
@@ -838,13 +849,13 @@ function getContractResult(result: any, operation: string): string {
   }
   
   // Handle different response formats
-  let resultArray;
+  let resultArray: string[];
   if (Array.isArray(result)) {
     // Direct array response: ["0x34b150fc4ad2c3c","0x0"]
     resultArray = result;
-  } else if (result.result && Array.isArray(result.result)) {
+  } else if (result && typeof result === 'object' && 'result' in result && Array.isArray(result.result)) {
     // Wrapped response: { result: ["0x34b150fc4ad2c3c","0x0"] }
-    resultArray = result.result;
+    resultArray = result.result as string[];
   } else {
     throw new Error(`Invalid result format for ${operation}: ${JSON.stringify(result)}`);
   }
@@ -868,7 +879,7 @@ export async function validateBalanceAndAllowance(
   vTokenAddress: string,
   userAddress: string,
   amountInWei: string,
-  provider: any
+  provider: RpcProvider
 ): Promise<{ needsApproval: boolean; currentAllowance: string }> {
   console.log('🔍 Validating balance and allowance...');
   
@@ -889,7 +900,8 @@ export async function validateBalanceAndAllowance(
     }
   } catch (balanceError) {
     console.error('❌ Balance check failed:', balanceError);
-    throw new Error(`Balance check failed: ${(balanceError as any)?.message || balanceError}`);
+    const errorMessage = balanceError instanceof Error ? balanceError.message : String(balanceError);
+    throw new Error(`Balance check failed: ${errorMessage}`);
   }
   
   // Check current allowance

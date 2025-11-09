@@ -19,10 +19,10 @@ import { useWalletBalance } from '@/hooks/use-wallet-balance';
 import { useWallet } from '@/hooks/use-wallet';
 import { useVesuTransactions } from '@/hooks/use-vesu-transactions';
 import type { VesuPool } from '@/types/VesuPools';
-import { formatApy, calculateRiskLevel, getVesuConfig } from '@/lib/vesu-config';
+import { formatApy, getVesuConfig } from '@/lib/vesu-config';
 import { isTestnet } from '@/lib/utils';
 import { Contract, RpcProvider } from 'starknet';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 interface VesuAddToPoolFormProps {
   pool: VesuPool;
@@ -53,7 +53,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
   };
 
   // Function to get balance directly from contract
-  const getDirectBalance = async (tokenAddress: string, decimals: number) => {
+  const getDirectBalance = useCallback(async (tokenAddress: string, decimals: number) => {
     if (!address) {
       console.log('No address available for balance check');
       return 0;
@@ -104,7 +104,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
       console.error('Error getting direct balance:', error);
       return 0;
     }
-  };
+  }, [address]);
 
   // Get balance for selected asset
   const walletBalance = selectedAsset 
@@ -135,7 +135,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     } else {
       setDirectBalance(0);
     }
-  }, [selectedAsset, address]);
+  }, [selectedAsset, address, getDirectBalance]);
 
   const handleAmountChange = (value: string) => {
     setAmount(value);
@@ -201,7 +201,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
       console.log('🔍 DEBUG - Mainnet Addresses Available:', mainnetAddresses);
       console.log('🔍 DEBUG - Selected Asset Symbol:', selectedAsset.symbol);
       console.log('🔍 DEBUG - Is USDC Selected?', selectedAsset.symbol === 'USDC');
-      console.log('🔍 DEBUG - All Available Assets:', pool.assets.map((a: any) => ({ symbol: a.symbol, address: a.address })));
+      console.log('🔍 DEBUG - All Available Assets:', pool.assets.map((a) => ({ symbol: a.symbol, address: a.address })));
       
       // Use correct addresses based on network
       const isMainnet = vesuConfig.network === 'mainnet';
@@ -244,17 +244,17 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
           variant: "destructive",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Deposit failed:', error);
       
       // Extract meaningful error message
       let errorMessage = "An error occurred while processing your deposit";
-      if (error?.message) {
+      if (error instanceof Error) {
         errorMessage = error.message;
       } else if (typeof error === 'string') {
         errorMessage = error;
-      } else if (error?.reason) {
-        errorMessage = error.reason;
+      } else if (error && typeof error === 'object' && 'reason' in error) {
+        errorMessage = String(error.reason);
       }
       
       toast({
@@ -276,25 +276,26 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     ? (Number(amount) * selectedAsset.apy) / 100 
     : 0;
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'Low': return 'bg-green-500 text-white border-green-600';
-      case 'Medium': return 'bg-yellow-500 text-white border-yellow-600';
-      case 'High': return 'bg-red-500 text-white border-red-600';
-      case 'Critical': return 'bg-red-600 text-white border-red-700';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // Risk color and icon functions are available but not currently used
+  // const getRiskColor = (risk: string) => {
+  //   switch (risk) {
+  //     case 'Low': return 'bg-green-500 text-white border-green-600';
+  //     case 'Medium': return 'bg-yellow-500 text-white border-yellow-600';
+  //     case 'High': return 'bg-red-500 text-white border-red-600';
+  //     case 'Critical': return 'bg-red-600 text-white border-red-700';
+  //     default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  //   }
+  // };
 
-  const getRiskIcon = (risk: string) => {
-    switch (risk) {
-      case 'Low': return <Shield className="h-4 w-4" />;
-      case 'Medium': return <AlertTriangle className="h-4 w-4" />;
-      case 'High': return <AlertTriangle className="h-4 w-4" />;
-      case 'Critical': return <AlertTriangle className="h-4 w-4" />;
-      default: return <Shield className="h-4 w-4" />;
-    }
-  };
+  // const getRiskIcon = (risk: string) => {
+  //   switch (risk) {
+  //     case 'Low': return <Shield className="h-4 w-4" />;
+  //     case 'Medium': return <AlertTriangle className="h-4 w-4" />;
+  //     case 'High': return <AlertTriangle className="h-4 w-4" />;
+  //     case 'Critical': return <AlertTriangle className="h-4 w-4" />;
+  //     default: return <Shield className="h-4 w-4" />;
+  //   }
+  // };
 
   return (
     <Card className="bg-gradient-to-br from-white/90 via-blue-50/30 to-purple-50/30 dark:from-gray-900/90 dark:via-blue-950/20 dark:to-purple-950/20 backdrop-blur-xl border-2 border-blue-200/40 shadow-lg hover:shadow-xl transition-all duration-300">

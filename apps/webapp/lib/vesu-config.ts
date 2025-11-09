@@ -1,5 +1,5 @@
 // Vesu V2 Configuration
-import { getCurrentChainId, isTestnet } from './utils';
+import { isTestnet } from './utils';
 
 export interface VesuV2Config {
 	apiUrl: string;

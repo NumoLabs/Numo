@@ -1,18 +1,16 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendingUp, ArrowRight, Shield, Coins, Star, Target, Users } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { VesuPoolCard } from "@/components/pools-vault/vesu-pool-card"
 import { AddToPoolForm } from "@/components/pools-vault/add-to-pool-form"
 import { VesuPoolsTestnet, VesuPoolDetailCard, VesuAddToPoolForm } from "@/components/vesu"
-import { useVesuConfig } from "@/hooks/use-vesu"
+import type { VesuPool } from "@/types/VesuPools"
 import { useVesuTransactions } from "@/hooks/use-vesu-transactions"
+import { Users } from "lucide-react"
 
 interface PoolData {
   id: string
@@ -35,12 +33,12 @@ interface PoolData {
 
 export function PoolsVaultContent() {
   const [selectedPool, setSelectedPool] = useState<string | null>(null)
-  const [selectedVesuPool, setSelectedVesuPool] = useState<any>(null)
+  const [selectedVesuPool, setSelectedVesuPool] = useState<VesuPool | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
+  // const [searchTerm, setSearchTerm] = useState("") // Currently unused
   const [selectedTab, setSelectedTab] = useState("vesu-testnet")
   const { toast } = useToast()
-  const { isTestnetMode } = useVesuConfig()
+  // const { isTestnetMode } = useVesuConfig() // Currently unused
   const { depositToVesu, isLoading: isTransactionLoading, currentStep } = useVesuTransactions()
 
   // Function to check if selected pool is a Vesu pool
@@ -51,12 +49,12 @@ export function PoolsVaultContent() {
 
   const selectedPoolData = availablePools.find(pool => pool.id === selectedPool)
 
-  const filteredPools = availablePools.filter(pool => 
-    pool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pool.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pool.protocol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pool.tokens.some(token => token.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+  // const filteredPools = availablePools.filter(pool => // Currently unused
+  //   pool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   pool.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   pool.protocol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   pool.tokens.some(token => token.toLowerCase().includes(searchTerm.toLowerCase()))
+  // )
 
   const handleAddToPool = async (amount: number) => {
     setIsLoading(true)
@@ -110,7 +108,7 @@ export function PoolsVaultContent() {
     }
 
     // Find the selected asset to get its decimals
-    const selectedAsset = selectedVesuPool.assets.find((asset: any) => asset.address === assetAddress)
+    const selectedAsset = selectedVesuPool.assets.find((asset) => asset.address === assetAddress)
     if (!selectedAsset) {
       toast({
         title: "Asset Not Found",
@@ -159,17 +157,17 @@ export function PoolsVaultContent() {
           variant: "destructive",
         })
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('❌ Vesu deposit error in component:', error);
       
       // Extract meaningful error message
       let errorMessage = "Failed to deposit to Vesu pool";
-      if (error?.message) {
+      if (error instanceof Error) {
         errorMessage = error.message;
       } else if (typeof error === 'string') {
         errorMessage = error;
-      } else if (error?.reason) {
-        errorMessage = error.reason;
+      } else if (error && typeof error === 'object' && 'reason' in error) {
+        errorMessage = String(error.reason);
       }
       
       toast({
@@ -226,7 +224,7 @@ export function PoolsVaultContent() {
 
             <TabsContent value="vesu-testnet" className="space-y-6">
               <VesuPoolsTestnet 
-                onPoolSelect={(pool) => {
+                onPoolSelect={(pool: VesuPool) => {
                   setSelectedVesuPool(pool);
                   setSelectedPool(pool.id);
                   toast({

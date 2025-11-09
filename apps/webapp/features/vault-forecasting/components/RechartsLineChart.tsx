@@ -20,15 +20,15 @@ export default function RechartsLineChart({
   }));
 
   // Add forecast data if available
-  if (forecastResult) {
-    const lastPrice = historicalPrices[historicalPrices.length - 1];
-    const forecastTimestamp = lastPrice.timestamp + (forecastResult.horizonDays * 24 * 60 * 60 * 1000);
-    
-    chartData.push({
-      timestamp: forecastTimestamp,
-      price: forecastResult.expectedValue,
-      date: new Date(forecastTimestamp).toLocaleDateString(),
-      time: new Date(forecastTimestamp).toLocaleTimeString()
+  if (forecastResult && forecastResult.forecast.length > 0) {
+    // Add all forecast points to the chart
+    forecastResult.forecast.forEach((forecastPoint) => {
+      chartData.push({
+        timestamp: forecastPoint.timestamp,
+        price: forecastPoint.price,
+        date: new Date(forecastPoint.timestamp).toLocaleDateString(),
+        time: new Date(forecastPoint.timestamp).toLocaleTimeString()
+      });
     });
   }
 
@@ -80,18 +80,22 @@ export default function RechartsLineChart({
           {/* Forecast confidence bands */}
           {forecastResult && (
             <>
-              <ReferenceLine 
-                y={forecastResult.confidenceBand.upper}
-                stroke="#ef4444"
-                strokeDasharray="5 5"
-                strokeWidth={1}
-              />
-              <ReferenceLine 
-                y={forecastResult.confidenceBand.lower}
-                stroke="#ef4444"
-                strokeDasharray="5 5"
-                strokeWidth={1}
-              />
+              {forecastResult.confidenceBand.upper.length > 0 && (
+                <ReferenceLine 
+                  y={forecastResult.confidenceBand.upper[forecastResult.confidenceBand.upper.length - 1]}
+                  stroke="#ef4444"
+                  strokeDasharray="5 5"
+                  strokeWidth={1}
+                />
+              )}
+              {forecastResult.confidenceBand.lower.length > 0 && (
+                <ReferenceLine 
+                  y={forecastResult.confidenceBand.lower[forecastResult.confidenceBand.lower.length - 1]}
+                  stroke="#10b981"
+                  strokeDasharray="5 5"
+                  strokeWidth={1}
+                />
+              )}
             </>
           )}
         </LineChart>
