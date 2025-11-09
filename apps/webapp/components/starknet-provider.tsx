@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 
-import { sepolia } from "@starknet-react/chains";
+import { mainnet } from "@starknet-react/chains";
 import {
   StarknetConfig,
   argent,
@@ -15,7 +15,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const provider = useMemo(() => {
     function rpc() {
       return {
-        nodeUrl: `https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_8/yI1L61QqzPDE0eXH4nVDl`
+        nodeUrl: process.env.NEXT_PUBLIC_STARKNET_RPC_URL || `https://starknet-mainnet.public.blastapi.io/rpc/v0_7`
       }
     }
     return jsonRpcProvider({ rpc });
@@ -29,11 +29,11 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <StarknetConfig
-      chains={[sepolia]}
+      chains={[mainnet]}
       provider={provider}
       connectors={connectors}
       explorer={voyager}
-      autoConnect={true}
+      autoConnect={false}
     >
       {children}
     </StarknetConfig>

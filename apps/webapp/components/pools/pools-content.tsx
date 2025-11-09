@@ -8,18 +8,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PoolCard } from "@/components/pools/pool-card"
 import { VaultCard } from "@/components/pools/vault-card"
 import { poolsData } from "@/lib/pools-data"
+// getVesuPools and calculateRiskLevel are available but not currently used in this component
+// import { getVesuPools } from "@/app/api/vesuApi"
+// import { calculateRiskLevel } from "@/lib/vesu-config"
 
 export function PoolsContent() {
+  // Vesu pools are fetched but not currently displayed in this component
+  // const [vesuPools, setVesuPools] = useState<unknown[]>([])
+
+  // Vesu pools fetching is disabled until needed
+  // useEffect(() => {
+  //   let mounted = true
+  //   getVesuPools()
+  //     .then((data) => {
+  //       if (mounted) setVesuPools(data)
+  //     })
+  //     .catch(() => {
+  //       if (mounted) setVesuPools([])
+  //     })
+  //   return () => {
+  //     mounted = false
+  //   }
+  // }, [])
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-            Custom Pools
+            Pools
           </h1>
           <p className="text-muted-foreground mt-2">
-            Explore liquidity pools and create custom vaults tailored to your strategy
+            Explore available pools and add them to your vaults
           </p>
         </div>
         <Link href="/pools/create">
@@ -60,13 +81,13 @@ export function PoolsContent() {
             value="explore"
             className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
-            Explore Pools
+            Pools
           </TabsTrigger>
           <TabsTrigger 
             value="custom"
             className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
-            My Custom Vaults
+            My Vaults
           </TabsTrigger>
         </TabsList>
 
@@ -86,6 +107,82 @@ export function PoolsContent() {
           {/* Pools Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {poolsData.map((pool) => (
+              <PoolCard
+                key={pool.id}
+                name={pool.name}
+                description={pool.description}
+                apy={pool.apy}
+                tvl={pool.tvl}
+                protocol={pool.protocol}
+                risk={pool.risk}
+                tokens={pool.tokens}
+                poolId={pool.id}
+              />
+            ))}
+
+            {/* Vesu V2 Pools (hardcoded from docs) */}
+            {[
+              {
+                id: "0x451fe483d5921a2919ddd81d0de6696669bccdacd859f72a4fba7656b97c3b5",
+                name: "Prime",
+                description: "Vesu V2 Prime pool",
+                apy: "5.2%",
+                tvl: "—",
+                protocol: "Vesu V2",
+                risk: "Low",
+                tokens: ["USDC", "ETH", "WBTC"],
+              },
+              {
+                id: "0x3976cac265a12609934089004df458ea29c776d77da423c96dc761d09d24124",
+                name: "Re7 USDC Core",
+                description: "Vesu V2 Re7 USDC Core pool",
+                apy: "4.8%",
+                tvl: "—",
+                protocol: "Vesu V2",
+                risk: "Low",
+                tokens: ["USDC"],
+              },
+              {
+                id: "0x2eef0c13b10b487ea5916b54c0a7f98ec43fb3048f60fdeedaf5b08f6f88aaf",
+                name: "Re7 USDC Prime",
+                description: "Vesu V2 Re7 USDC Prime pool",
+                apy: "5.1%",
+                tvl: "—",
+                protocol: "Vesu V2",
+                risk: "Low",
+                tokens: ["USDC"],
+              },
+              {
+                id: "0x5c03e7e0ccfe79c634782388eb1e6ed4e8e2a013ab0fcc055140805e46261bd",
+                name: "Re7 USDC Frontier",
+                description: "Vesu V2 Re7 USDC Frontier pool",
+                apy: "5.5%",
+                tvl: "—",
+                protocol: "Vesu V2",
+                risk: "Medium",
+                tokens: ["USDC"],
+              },
+              {
+                id: "0x3a8416bf20d036df5b1cf3447630a2e1cb04685f6b0c3a70ed7fb1473548ecf",
+                name: "Re7 xBTC",
+                description: "Vesu V2 Re7 xBTC pool",
+                apy: "6.2%",
+                tvl: "—",
+                protocol: "Vesu V2",
+                risk: "Medium",
+                tokens: ["xBTC"],
+              },
+              {
+                id: "0x73702fce24aba36da1eac539bd4bae62d4d6a76747b7cdd3e016da754d7a135",
+                name: "Re7 USDC Stable Core",
+                description: "Vesu V2 Re7 USDC Stable Core pool",
+                apy: "4.5%",
+                tvl: "—",
+                protocol: "Vesu V2",
+                risk: "Low",
+                tokens: ["USDC"],
+              },
+            ].map((pool) => (
               <PoolCard
                 key={pool.id}
                 name={pool.name}

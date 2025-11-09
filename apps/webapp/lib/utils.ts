@@ -48,6 +48,34 @@ export async function fetchCryptoPrice(symbol: string): Promise<number> {
 	return price !== null ? price : 0;
 }
 
+// Vesu-specific utility functions
+export function getCurrentChainId(): string {
+	if (typeof window === 'undefined') return 'SN_MAIN'; // Back to mainnet
+	
+	const walletString = window?.localStorage.getItem('walletStarknetkitLatest');
+	if (!walletString || walletString === 'undefined') return 'SN_MAIN'; // Back to mainnet
+	
+	try {
+		const wallet = JSON.parse(walletString);
+		return wallet?.chainId || 'SN_MAIN'; // Back to mainnet
+	} catch {
+		return 'SN_MAIN'; // Back to mainnet
+	}
+}
+
+export function isTestnet(): boolean {
+	return getCurrentChainId() === 'SN_SEPOLIA';
+}
+
+export function formatVesuAmount(amount: string | number, decimals: number): number {
+	const numAmount = typeof amount === 'string' ? Number(amount) : amount;
+	return numAmount / Math.pow(10, decimals);
+}
+
+export function parseVesuAmount(amount: number, decimals: number): string {
+	return (amount * Math.pow(10, decimals)).toString();
+}
+
 export function findActiveTick(
 	price: number,
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
