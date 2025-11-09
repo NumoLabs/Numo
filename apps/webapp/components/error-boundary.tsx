@@ -27,6 +27,14 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('🚨 ErrorBoundary caught an error:', error, errorInfo)
+    
+    // Handle Starknet-specific errors gracefully
+    if (error.message.includes('starknet') || error.message.includes('Account') || error.message.includes('toLowerCase')) {
+      console.error('🚨 Starknet wallet error (handled gracefully):', error.message)
+      // Don't show error UI for wallet connection issues - let the app continue
+      this.setState({ hasError: false })
+      return
+    }
   }
 
   resetError = () => {
@@ -89,6 +97,14 @@ export function useErrorHandler() {
 
   const handleError = React.useCallback((error: Error) => {
     console.error('🚨 useErrorHandler caught an error:', error)
+    
+    // Handle Starknet-specific errors gracefully
+    if (error.message.includes('starknet') || error.message.includes('Account') || error.message.includes('toLowerCase')) {
+      console.error('🚨 Starknet wallet error (handled gracefully):', error.message)
+      // Don't set error state for wallet connection issues
+      return
+    }
+    
     setError(error)
   }, [])
 
@@ -98,17 +114,17 @@ export function useErrorHandler() {
       handleError(new Error(event.reason?.message || 'Unhandled promise rejection'))
     }
 
-    const handleError = (event: ErrorEvent) => {
+    const handleErrorEvent = (event: ErrorEvent) => {
       console.error('🚨 Unhandled error:', event.error)
       handleError(event.error || new Error(event.message || 'Unknown error'))
     }
 
     window.addEventListener('unhandledrejection', handleUnhandledRejection)
-    window.addEventListener('error', handleError)
+    window.addEventListener('error', handleErrorEvent)
 
     return () => {
       window.removeEventListener('unhandledrejection', handleUnhandledRejection)
-      window.removeEventListener('error', handleError)
+      window.removeEventListener('error', handleErrorEvent)
     }
   }, [handleError])
 

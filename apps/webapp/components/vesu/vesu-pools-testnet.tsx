@@ -15,7 +15,6 @@ import {
 	Users, 
 	Shield, 
 	AlertTriangle, 
-	RefreshCw,
 	ExternalLink 
 } from 'lucide-react';
 
@@ -25,7 +24,7 @@ interface VesuPoolsTestnetProps {
 }
 
 export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: VesuPoolsTestnetProps) {
-  const { pools, loading, error, refreshPools } = useVesuPools();
+  const { pools, loading, error } = useVesuPools();
   const { isTestnetMode } = useVesuConfig();
   const { isConnected } = useWalletStatus();
   const [selectedPool, setSelectedPool] = useState<any>(null);
@@ -89,22 +88,11 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 				{showTestnetBanner && <VesuTestnetBanner isTestnet={isTestnetMode} />}
 				<Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
 					<CardContent className="pt-6">
-						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<AlertTriangle className="h-4 w-4 text-red-600" />
-								<span className="text-red-800 dark:text-red-200">
-									Error loading Vesu pools: {error}
-								</span>
-							</div>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={refreshPools}
-								className="border-red-300 text-red-700 hover:bg-red-100"
-							>
-								<RefreshCw className="h-3 w-3 mr-1" />
-								Retry
-							</Button>
+						<div className="flex items-center gap-2">
+							<AlertTriangle className="h-4 w-4 text-red-600" />
+							<span className="text-red-800 dark:text-red-200">
+								Error loading Vesu pools: {error}
+							</span>
 						</div>
 					</CardContent>
 				</Card>
@@ -119,22 +107,16 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 			{/* Wallet Connection */}
 			<VesuWalletConnect />
 			
-			<div className="flex items-center justify-between">
-				<div>
-					<h2 className="text-2xl font-bold tracking-tight">
-						Vesu Pools {isTestnetMode && '(Testnet)'}
-					</h2>
-					<p className="text-muted-foreground">
-						{isTestnetMode 
-							? 'Explore and interact with Vesu testnet pools for development and testing'
-							: 'Discover and participate in Vesu lending pools'
-						}
-					</p>
-				</div>
-				<Button variant="outline" onClick={refreshPools}>
-					<RefreshCw className="h-4 w-4 mr-2" />
-					Refresh
-				</Button>
+			<div>
+				<h2 className="text-2xl font-bold tracking-tight">
+					Vesu Pools {isTestnetMode && '(Testnet)'}
+				</h2>
+				<p className="text-muted-foreground">
+					{isTestnetMode 
+						? 'Explore and interact with Vesu testnet pools for development and testing'
+						: 'Discover and participate in Vesu lending pools'
+					}
+				</p>
 			</div>
 
 			{displayPools.length === 0 ? (
@@ -143,16 +125,12 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 						<div className="text-center py-8">
 							<Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
 							<h3 className="text-lg font-semibold mb-2">No Real Pool Data Available</h3>
-							<p className="text-muted-foreground mb-4">
+							<p className="text-muted-foreground">
 								{isTestnetMode 
 									? 'Unable to fetch real Vesu testnet pool data from the API. Please check your connection and try again.'
 									: 'Unable to fetch real Vesu mainnet pool data from the API. Please check your connection and try again.'
 								}
 							</p>
-							<Button onClick={refreshPools} variant="outline">
-								<RefreshCw className="h-4 w-4 mr-2" />
-								Retry API Connection
-							</Button>
 						</div>
 					</CardContent>
 				</Card>
@@ -167,9 +145,13 @@ export function VesuPoolsTestnet({ onPoolSelect, showTestnetBanner = true }: Ves
 						return (
 							<Card 
 								key={poolId} 
-								className={`cursor-pointer transition-all hover:shadow-md ${
-									selectedPool?.id === poolId ? 'ring-2 ring-primary' : ''
+								className={`cursor-pointer transition-all hover:shadow-md border-2 border-yellow-400 dark:border-yellow-500 shadow-[0_0_10px_rgba(250,204,21,0.3)] hover:shadow-[0_0_20px_rgba(250,204,21,0.5)] bg-gradient-to-br from-black via-gray-900 to-black dark:from-black dark:via-gray-900 dark:to-black ${
+									selectedPool?.id === poolId ? 'ring-2 ring-yellow-400 dark:ring-yellow-500 shadow-[0_0_25px_rgba(250,204,21,0.6)]' : ''
 								}`}
+								style={{
+									background: 'linear-gradient(135deg, #000000 0%, #2d2800 20%, #3d3500 40%, #2d2800 60%, #1a1500 80%, #000000 100%)',
+									backgroundImage: 'radial-gradient(ellipse at center, rgba(250, 204, 21, 0.35) 0%, rgba(250, 204, 21, 0.2) 30%, rgba(250, 204, 21, 0.1) 60%, rgba(250, 204, 21, 0.05) 80%, transparent 100%)'
+								}}
 								onClick={() => handlePoolSelect(pool)}
 							>
 								<CardHeader>

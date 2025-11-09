@@ -11,10 +11,8 @@ import { useToast } from '@/hooks/use-toast'
 import { VesuPoolCard } from "@/components/pools-vault/vesu-pool-card"
 import { AddToPoolForm } from "@/components/pools-vault/add-to-pool-form"
 import { VesuPoolsTestnet, VesuPoolDetailCard, VesuAddToPoolForm } from "@/components/vesu"
-import { VesuV2Pools } from "@/components/vesu/vesu-v2-pools"
 import { useVesuConfig } from "@/hooks/use-vesu"
 import { useVesuTransactions } from "@/hooks/use-vesu-transactions"
-import { useVesuV2Transactions } from "@/hooks/use-vesu-v2-transactions"
 
 interface PoolData {
   id: string
@@ -44,7 +42,6 @@ export function PoolsVaultContent() {
   const { toast } = useToast()
   const { isTestnetMode } = useVesuConfig()
   const { depositToVesu, isLoading: isTransactionLoading, currentStep } = useVesuTransactions()
-  const { depositToVesuV2, withdrawFromVesuV2, getVTokenV2Balance, isLoading: isLoadingV2, currentStep: currentStepV2 } = useVesuV2Transactions()
 
   // Function to check if selected pool is a Vesu pool
   const isVesuPool = selectedVesuPool !== null
@@ -217,18 +214,12 @@ export function PoolsVaultContent() {
 
           {/* Tabs - Only Real Vesu Pools */}
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:w-[600px]">
+            <TabsList className="grid w-full grid-cols-1 lg:w-[300px]">
               <TabsTrigger 
                 value="vesu-testnet"
                 className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
               >
                 Vesu V1 Pools
-              </TabsTrigger>
-              <TabsTrigger 
-                value="vesu-v2"
-                className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
-              >
-                Vesu V2 Pools
               </TabsTrigger>
             </TabsList>
 
@@ -241,20 +232,6 @@ export function PoolsVaultContent() {
                   toast({
                     title: "Vesu V1 Pool Selected",
                     description: `You have selected ${pool.name} for testing.`,
-                  });
-                }}
-                showTestnetBanner={true}
-              />
-            </TabsContent>
-
-            <TabsContent value="vesu-v2" className="space-y-6">
-              <VesuV2Pools 
-                onPoolSelect={(pool) => {
-                  setSelectedVesuPool(pool);
-                  setSelectedPool(pool.id);
-                  toast({
-                    title: "Vesu V2 Pool Selected",
-                    description: `You have selected ${pool.name} V2 pool for testing.`,
                   });
                 }}
                 showTestnetBanner={true}
