@@ -3,6 +3,7 @@ import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 
 interface WalletContextType {
   address: string | undefined
+  isConnected: boolean
   connect: ReturnType<typeof useConnect>['connect']
   disconnect: ReturnType<typeof useDisconnect>['disconnect']
   connectors: ReturnType<typeof useConnect>['connectors']
@@ -31,10 +32,14 @@ export function useWallet(): WalletContextType {
  * This is optimized to prevent unnecessary re-renders
  */
 export function useWalletStatus() {
-  const { address } = useWallet()
+  const { address, isConnected } = useWallet()
+  
+  // Only consider connected if BOTH isConnected is true AND address exists
+  // This prevents false positives when address exists but wallet isn't actually connected
+  const trulyConnected = isConnected === true && !!address && typeof address === 'string' && address.length > 0
   
   return {
-    isConnected: !!address,
+    isConnected: trulyConnected,
     address,
   }
 } 

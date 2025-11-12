@@ -16,7 +16,6 @@ export function HarvestForm() {
     harvest, 
     isPending, 
     isConnected, 
-    account,
     contractAddress,
     error 
   } = useVesuVault();
@@ -139,11 +138,12 @@ export function HarvestForm() {
         integrator_fee_recipient: contractAddress || '',
         routes: [],
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Harvest failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Harvest failed';
       toast({
         title: 'Error',
-        description: err?.message || 'Harvest failed',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

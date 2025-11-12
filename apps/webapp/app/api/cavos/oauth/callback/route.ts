@@ -1,6 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createCavosAuth, getCavosConfig } from '@/lib/cavos-config'
+import { getCavosConfig } from '@/lib/cavos-config'
 import type { CavosNormalizedResponse } from '@/types/cavos'
+
+interface AegisAccount {
+  handleOAuthCallback?: (callbackResult: string) => Promise<CavosNormalizedResponse>
+  [key: string]: unknown
+}
+
+interface ErrorWithCode extends Error {
+  code?: string
+}
+
+interface UserDataParams {
+  user_id?: string
+  userId?: string
+  id?: string
+  sub?: string
+  email?: string
+  email_address?: string
+  organization?: {
+    org_id: number | string
+    org_name?: string
+  } | string
+  org_id?: number | string
+  wallet?: {
+    address?: string
+    network?: string
+    [key: string]: unknown
+  } | string
+  access_token?: string
+  accessToken?: string
+  token?: string
+  auth_token?: string
+  refresh_token?: string
+  refreshToken?: string
+  expires_in?: number | string
+  expiresIn?: number | string
+  timestamp?: number
+  authData?: {
+    accessToken?: string
+    refreshToken?: string
+    [key: string]: unknown
+  }
+  auth?: {
+    accessToken?: string
+    refreshToken?: string
+    [key: string]: unknown
+  }
+  user?: {
+    [key: string]: unknown
+  }
+  data?: {
+    [key: string]: unknown
+  }
+  [key: string]: unknown
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +71,7 @@ export async function POST(request: NextRequest) {
     try {
       const config = getCavosConfig()
       
-      let result: any
+      let result: CavosNormalizedResponse | undefined
       
       try {
         const { createCavosAuth } = await import('@/lib/cavos-config')
@@ -26,18 +80,19 @@ export async function POST(request: NextRequest) {
         // Log available methods for debugging
         if (process.env.NODE_ENV === 'development') {
           const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(aegisAccount))
-          console.log('Available methods on aegisAccount:', methods.filter(m => typeof (aegisAccount as any)[m] === 'function'))
+          console.log('Available methods on aegisAccount:', methods.filter(m => typeof (aegisAccount as unknown as AegisAccount)[m] === 'function'))
           console.log('Callback result URL:', callbackResult)
         }
         
-        if (typeof (aegisAccount as any).handleOAuthCallback === 'function') {
+        const typedAccount = aegisAccount as unknown as AegisAccount
+        if (typeof typedAccount.handleOAuthCallback === 'function') {
           try {
-            result = await (aegisAccount as any).handleOAuthCallback(callbackResult)
+            result = await typedAccount.handleOAuthCallback(callbackResult)
             
             if (process.env.NODE_ENV === 'development') {
               console.log('Successfully processed OAuth callback with SDK:', result)
             }
-          } catch (sdkMethodError: any) {
+          } catch (sdkMethodError: unknown) {
             if (process.env.NODE_ENV === 'development') {
               console.error('SDK method execution error:', sdkMethodError)
             }
@@ -116,7 +171,7 @@ export async function POST(request: NextRequest) {
             const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
             
             try {
-              const response = await fetch(cavosCallbackUrl, {
+              await fetch(cavosCallbackUrl, {
                 method: 'GET',
                 headers: {
                   'Accept': 'application/json',
@@ -133,7 +188,7 @@ export async function POST(request: NextRequest) {
                 `the client to call Cavos callback endpoint directly. Please configure the OAuth flow ` +
                 `so that Cavos callback endpoint is called before redirecting to final_redirect_uri.`
               )
-            } catch (fetchError: any) {
+            } catch (fetchError: unknown) {
               clearTimeout(timeoutId)
               
               if (process.env.NODE_ENV === 'development') {
@@ -141,17 +196,18 @@ export async function POST(request: NextRequest) {
               }
               
               // If fetch fails, throw a more helpful error
+              const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError)
               throw new Error(
                 `Failed to process OAuth callback with Cavos. ` +
                 `Received code and state but could not exchange them for user data. ` +
                 `This may indicate a configuration issue with the OAuth flow. ` +
-                `Error: ${fetchError.message}`
+                `Error: ${errorMessage}`
               )
             }
           }
           
           // Try to extract user data directly from query parameters
-          let userDataFromParams: any = {}
+          let userDataFromParams: UserDataParams = {}
           
           const userDataParam = callbackUrl.searchParams.get('user_data')
           if (userDataParam) {
@@ -296,31 +352,64 @@ export async function POST(request: NextRequest) {
                               callbackUrl.searchParams.get('refresh_token') || 
                               callbackUrl.searchParams.get('refreshToken')
           
-          let wallet = (userDataFromParams && userDataFromParams.wallet) || undefined
+          let wallet: CavosNormalizedResponse['wallet'] = undefined
+          const walletFromParams = userDataFromParams?.wallet
+          if (walletFromParams) {
+            if (typeof walletFromParams === 'object' && walletFromParams !== null) {
+              wallet = walletFromParams as CavosNormalizedResponse['wallet']
+            }
+          }
           if (!wallet) {
             const walletParam = callbackUrl.searchParams.get('wallet') || 
                                callbackUrl.searchParams.get('wallet_address')
             if (walletParam) {
               try {
                 // Try to parse as JSON if it's a string
-                wallet = JSON.parse(walletParam)
+                const parsed = JSON.parse(walletParam)
+                if (typeof parsed === 'object' && parsed !== null) {
+                  wallet = parsed as CavosNormalizedResponse['wallet']
+                }
               } catch {
-                wallet = walletParam
+                // If parsing fails, ignore - wallet stays undefined
               }
             }
           }
           
           // Organization - can be object or just org_id
-          let organization = (userDataFromParams && userDataFromParams.organization) || undefined
-          if (!organization && userDataFromParams && userDataFromParams.org_id) {
-            organization = { org_id: userDataFromParams.org_id, org_name: '' }
+          let organization: { org_id: number; org_name: string } | undefined = undefined
+          const orgFromParams = userDataFromParams?.organization
+          if (orgFromParams) {
+            if (typeof orgFromParams === 'object' && orgFromParams !== null && 'org_id' in orgFromParams) {
+              const orgId = typeof orgFromParams.org_id === 'number' ? orgFromParams.org_id : parseInt(String(orgFromParams.org_id))
+              if (!isNaN(orgId)) {
+                organization = { 
+                  org_id: orgId, 
+                  org_name: typeof orgFromParams.org_name === 'string' ? orgFromParams.org_name : '' 
+                }
+              }
+            }
+          }
+          if (!organization && userDataFromParams?.org_id) {
+            const orgId = typeof userDataFromParams.org_id === 'number' ? userDataFromParams.org_id : parseInt(String(userDataFromParams.org_id))
+            if (!isNaN(orgId)) {
+              organization = { org_id: orgId, org_name: '' }
+            }
           }
           if (!organization) {
             const orgParam = callbackUrl.searchParams.get('organization') || 
                             callbackUrl.searchParams.get('org_id')
             if (orgParam) {
               try {
-                organization = JSON.parse(orgParam)
+                const parsed = JSON.parse(orgParam)
+                if (typeof parsed === 'object' && parsed !== null && 'org_id' in parsed) {
+                  const orgId = typeof parsed.org_id === 'number' ? parsed.org_id : parseInt(String(parsed.org_id))
+                  if (!isNaN(orgId)) {
+                    organization = { 
+                      org_id: orgId, 
+                      org_name: typeof parsed.org_name === 'string' ? parsed.org_name : '' 
+                    }
+                  }
+                }
               } catch {
                 const orgIdNum = parseInt(orgParam)
                 if (!isNaN(orgIdNum)) {
@@ -331,28 +420,31 @@ export async function POST(request: NextRequest) {
           }
           
           // Final values
-          const finalUserId = userId
-          const finalEmail = email
-          const finalAccessToken = accessToken
-          const finalRefreshToken = refreshToken
+          const finalUserId = userId || ''
+          const finalEmail = email || ''
+          const finalAccessToken = accessToken || ''
+          const finalRefreshToken = refreshToken || ''
           const finalWallet = wallet
           const finalOrganization = organization
           
+          const expiresInStr = callbackUrl.searchParams.get('expires_in') || 
+                             (userDataFromParams?.expires_in ? String(userDataFromParams.expires_in) : null) || 
+                             (userDataFromParams?.expiresIn ? String(userDataFromParams.expiresIn) : null) || 
+                             (finalAccessToken ? '3600' : null)
+          const finalExpiresIn = expiresInStr ? parseInt(expiresInStr) : 3600
+          
           if (finalUserId || finalEmail) {
             result = {
-              data: {
-                user_id: finalUserId || finalEmail,
-                email: finalEmail || '',
-                access_token: finalAccessToken || undefined,
-                refresh_token: finalRefreshToken || undefined,
-                wallet: finalWallet || undefined,
-                organization: finalOrganization || undefined,
-                org_id: userDataFromParams.org_id || organization?.org_id || undefined,
-                expires_in: callbackUrl.searchParams.get('expires_in') || 
-                           userDataFromParams.expires_in || 
-                           userDataFromParams.expiresIn || 
-                           (finalAccessToken ? '3600' : undefined)
-              }
+              user: {
+                id: finalUserId || finalEmail,
+                email: finalEmail,
+                organization: finalOrganization || { org_id: 0, org_name: '' }
+              },
+              wallet: finalWallet,
+              access_token: finalAccessToken,
+              refresh_token: finalRefreshToken,
+              expires_in: finalExpiresIn,
+              timestamp: userDataFromParams?.timestamp ? Number(userDataFromParams.timestamp) : Date.now()
             }
             
             if (!finalAccessToken) {
@@ -364,12 +456,12 @@ export async function POST(request: NextRequest) {
             if (process.env.NODE_ENV === 'development') {
               console.log('Extracted user data from callback URL:', {
                 source: userDataParam ? 'user_data parameter' : 'individual parameters',
-                userId: result.data.user_id,
-                email: result.data.email,
-                hasAccessToken: !!result.data.access_token,
-                hasRefreshToken: !!result.data.refresh_token,
-                hasWallet: !!result.data.wallet,
-                walletData: userDataFromParams.wallet
+                userId: result.user.id,
+                email: result.user.email,
+                hasAccessToken: !!result.access_token,
+                hasRefreshToken: !!result.refresh_token,
+                hasWallet: !!result.wallet,
+                walletData: userDataFromParams?.wallet
               })
             }
           } else {
@@ -425,35 +517,24 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Extract data from the response
-      const data = result.data || result
+      // result is already a CavosNormalizedResponse
+      if (!result) {
+        throw new Error('OAuth callback processing failed: No result data available')
+      }
       
-      // Extract user info
-      const userId = data.user_id || data.user?.id || data.id || data.userId
-      const email = data.email || data.user?.email
-      const wallet = data.wallet || data.user?.wallet
-      const organization = data.organization || data.user?.organization || (data.org_id ? { org_id: data.org_id } : undefined)
-      
-      // Extract tokens (may be undefined for OAuth flows)
-      const accessToken = data.authData?.accessToken || data.access_token || data.accessToken || data.token
-      const refreshToken = data.authData?.refreshToken || data.refresh_token || data.refreshToken
-      
-      if ((userId || email) && !accessToken) {
+      // Check if user is authenticated but no access token (may need password)
+      if ((result.user.id || result.user.email) && !result.access_token) {
         if (process.env.NODE_ENV === 'development') {
           console.log('OAuth callback: User authenticated but no access_token provided. This may require additional authentication step.')
         }
         
-        const userData: any = {
-          user: {
-            id: userId || email || '',
-            email: email || '',
-            organization: organization || undefined
-          },
-          wallet: wallet || undefined,
+        const userData: CavosNormalizedResponse & { requires_password?: boolean; oauth_authenticated?: boolean } = {
+          user: result.user,
+          wallet: result.wallet,
           access_token: '',
           refresh_token: '',
           expires_in: 0,
-          timestamp: Date.now(),
+          timestamp: result.timestamp || Date.now(),
           requires_password: true,
           oauth_authenticated: true
         }
@@ -462,23 +543,11 @@ export async function POST(request: NextRequest) {
       }
       
       // Standard response with tokens
-      const userData: CavosNormalizedResponse = {
-        user: {
-          id: userId || email || '',
-          email: email || '',
-          organization: organization
-        },
-        wallet: wallet,
-        access_token: accessToken || '',
-        refresh_token: refreshToken || '',
-        expires_in: data.authData?.expiresIn || data.expires_in || data.expiresIn || 3600,
-        timestamp: data.authData?.timestamp || data.timestamp || Date.now()
-      }
-
-      return NextResponse.json(userData)
+      return NextResponse.json(result)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'OAuth callback failed'
-      const errorCode = (error as any)?.code
+      const errorWithCode = error as ErrorWithCode
+      const errorCode = errorWithCode?.code
       
       let statusCode = 400
       if (errorMessage.toLowerCase().includes('invalid') || errorMessage.toLowerCase().includes('invalid token')) {
@@ -497,7 +566,7 @@ export async function POST(request: NextRequest) {
         { status: statusCode }
       )
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

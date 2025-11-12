@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useVesuVault } from '@/hooks/use-vesu-vault';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Loader2, RefreshCw, Wallet, TrendingUp } from 'lucide-react';
 
 export function VesuVaultPosition() {
@@ -15,9 +14,9 @@ export function VesuVaultPosition() {
     usdValue?: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { getUserPosition, checkVaultShares, isConnected, account } = useVesuVault();
+  const { getUserPosition, isConnected, account } = useVesuVault();
 
-  const loadUserPosition = async () => {
+  const loadUserPosition = useCallback(async () => {
     if (!isConnected || !account) return;
     
     setIsLoading(true);
@@ -29,13 +28,13 @@ export function VesuVaultPosition() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isConnected, account, getUserPosition]);
 
   useEffect(() => {
     if (isConnected && account) {
       loadUserPosition();
     }
-  }, [isConnected, account]);
+  }, [isConnected, account, loadUserPosition]);
 
   if (!isConnected) {
     return (

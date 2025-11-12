@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 
 export function SimpleClaimRewards() {
   const { 
-    harvest, 
     isPending, 
     isConnected, 
     contractAddress,
@@ -41,11 +40,12 @@ export function SimpleClaimRewards() {
         variant: 'default',
       });
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Claim failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to claim rewards. Please try again later.';
       toast({
         title: 'Error',
-        description: err?.message || 'Failed to claim rewards. Please try again later.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -90,7 +90,7 @@ export function SimpleClaimRewards() {
             <div className="text-center">
               <p className="text-2xl font-bold text-bitcoin-gold">Rewards Available</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Claim rewards and they'll be swapped to wBTC
+                Claim rewards and they&apos;ll be swapped to wBTC
               </p>
             </div>
           </div>

@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCavosConfig } from '@/lib/cavos-config'
 
+interface AegisAccount {
+  getAppleOAuthUrl?: (redirectUri: string) => Promise<string>
+  [key: string]: unknown
+}
+
+interface ErrorWithCode extends Error {
+  code?: string
+}
+
+interface ApiErrorResponse {
+  error?: string
+  message?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -24,12 +38,13 @@ export async function POST(request: NextRequest) {
         
         if (process.env.NODE_ENV === 'development') {
           const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(aegisAccount))
-          console.log('Available methods on aegisAccount:', methods.filter(m => typeof (aegisAccount as any)[m] === 'function'))
+          console.log('Available methods on aegisAccount:', methods.filter(m => typeof (aegisAccount as unknown as AegisAccount)[m] === 'function'))
         }
         
-        if (typeof (aegisAccount as any).getAppleOAuthUrl === 'function') {
+        const typedAccount = aegisAccount as unknown as AegisAccount
+        if (typeof typedAccount.getAppleOAuthUrl === 'function') {
           try {
-            url = await (aegisAccount as any).getAppleOAuthUrl(redirectUri)
+            url = await typedAccount.getAppleOAuthUrl(redirectUri)
             
             if (!url) {
               throw new Error('SDK method returned no URL')
@@ -40,7 +55,7 @@ export async function POST(request: NextRequest) {
             }
             
             return NextResponse.json({ url })
-          } catch (sdkMethodError: any) {
+          } catch (sdkMethodError: unknown) {
             if (process.env.NODE_ENV === 'development') {
               console.error('SDK method execution error:', sdkMethodError)
             }
@@ -83,10 +98,7 @@ export async function POST(request: NextRequest) {
           })
         }
         
-        // Call GET endpoint with query parameters
-        // According to Swagger: GET /api/v1/external/auth/apple
-        // Parameters: network, final_redirect_uri, app_id (all in query string)
-        // Note: This endpoint does not require authentication headers according to Swagger docs
+        // Endpoint: GET /api/v1/external/auth/apple
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
         
@@ -98,7 +110,6 @@ export async function POST(request: NextRequest) {
               'User-Agent': 'PayStark/1.0'
             },
             signal: controller.signal,
-            // Add redirect handling
             redirect: 'follow'
           })
           
@@ -106,9 +117,9 @@ export async function POST(request: NextRequest) {
           
           if (!response.ok) {
             const errorText = await response.text()
-            let errorData: any = {}
+            let errorData: ApiErrorResponse = {}
             try {
-              errorData = JSON.parse(errorText)
+              errorData = JSON.parse(errorText) as ApiErrorResponse
             } catch {
               errorData = { error: errorText || `HTTP ${response.status}: Failed to get Apple OAuth URL` }
             }
@@ -185,7 +196,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url })
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to get Apple OAuth URL'
-      const errorCode = (error as any)?.code
+      const errorWithCode = error as ErrorWithCode
+      const errorCode = errorWithCode?.code
       
       // Log the error for debugging
       if (process.env.NODE_ENV === 'development') {
@@ -200,7 +212,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

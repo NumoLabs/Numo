@@ -125,7 +125,7 @@ export function VesuVaultDepositForm() {
           <p>• Make sure you have wBTC in your wallet</p>
           <p>• Approval and deposit will be executed in a single transaction</p>
           <p>• The vault will automatically manage your position in Vesu V2</p>
-          <p>• You'll receive vault tokens representing your share</p>
+          <p>• You&apos;ll receive vault tokens representing your share</p>
         </div>
       </CardContent>
     </Card>

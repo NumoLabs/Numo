@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useVesuVault, type PoolProps } from '@/hooks/use-vesu-vault';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,6 @@ export function PoolsManagement() {
     isPending, 
     isConnected, 
     error,
-    account,
     getPoolYield,
     getPoolBalance,
     vaultData
@@ -42,16 +41,8 @@ export function PoolsManagement() {
   const [vTokenAddress, setVTokenAddress] = useState<string>('');
   const [maxWeight, setMaxWeight] = useState<string>('');
 
-  // Load pools on mount and when connected
-  useEffect(() => {
-    if (isConnected) {
-      loadCurrentPools();
-      loadVesuPoolsData();
-    }
-  }, [isConnected]);
-
   // Load Vesu pools data from API to get vToken addresses
-  const loadVesuPoolsData = async (poolsToCheck?: PoolProps[]) => {
+  const loadVesuPoolsData = useCallback(async (poolsToCheck?: PoolProps[]) => {
     try {
       const pools = await getVesuPools();
       setVesuPoolsData(pools);
@@ -95,7 +86,149 @@ export function PoolsManagement() {
     } catch (err) {
       console.error('[pools-management] Failed to load Vesu pools data:', err);
     }
-  };
+  }, [currentPools]);
+
+  // Load balances for all pools
+  const loadPoolBalances = useCallback(async (pools: PoolProps[]) => {
+    if (!pools || pools.length === 0) {
+      console.log('No pools to load balances for');
+      return;
+    }
+    
+    console.log('[pools-management] ===== loadPoolBalances called =====');
+    setIsLoadingBalances(true);
+    const balances: Record<string, bigint> = {};
+    
+    try {
+      await Promise.all(
+        pools.map(async (pool) => {
+          try {
+            const balance = await getPoolBalance(pool.pool_id);
+            if (balance !== null && balance !== undefined) {
+              balances[pool.pool_id] = balance;
+            }
+          } catch (err) {
+            console.error(`Failed to load balance for pool ${pool.pool_id}:`, err);
+          }
+        })
+      );
+      
+      setPoolBalances(balances);
+      console.log('[pools-management] Pool balances loaded:', balances);
+    } catch (err) {
+      console.error('Failed to load pool balances:', err);
+    } finally {
+      setIsLoadingBalances(false);
+    }
+  }, [getPoolBalance]);
+
+  // Load yields for all pools
+  const loadPoolYields = useCallback(async (pools: PoolProps[]) => {
+    if (!pools || pools.length === 0) {
+      console.log('No pools to load yields for');
+      return;
+    }
+    
+    // Normalize pool addresses to lowercase for consistent key matching
+    const normalizeAddress = (addr: string) => addr.toLowerCase();
+    
+    console.log('[pools-management] ===== loadPoolYields called =====');
+    console.log('[pools-management] getPoolYield type:', typeof getPoolYield);
+    console.log('[pools-management] getPoolYield value:', getPoolYield);
+    
+    if (!getPoolYield) {
+      console.error('[pools-management] getPoolYield is undefined or null!');
+      return;
+    }
+    
+    console.log('Loading yields for pools:', pools.map((p, i) => `Pool ${i + 1}: ${p.pool_id}`));
+    setIsLoadingYields(true);
+    const yields: Record<string, number | null> = {};
+    
+    try {
+      // Load yields in parallel for all pools
+      const yieldPromises = pools.map(async (pool, index) => {
+        try {
+          const normalizedPoolId = normalizeAddress(pool.pool_id);
+          console.log(`[pools-management] Loading yield for pool ${index + 1} (${normalizedPoolId})...`);
+          console.log(`[pools-management] Calling getPoolYield with:`, {
+            pool_id: pool.pool_id,
+            normalizedPoolId,
+            getPoolYield: typeof getPoolYield,
+            isFunction: typeof getPoolYield === 'function'
+          });
+          
+          if (typeof getPoolYield !== 'function') {
+            console.error(`[pools-management] getPoolYield is not a function! Type: ${typeof getPoolYield}`);
+            yields[normalizedPoolId] = null;
+            return;
+          }
+          
+          console.log(`[pools-management] About to call getPoolYield(${pool.pool_id})...`);
+          const yieldValue = await getPoolYield(pool.pool_id);
+          console.log(`[pools-management] Yield for pool ${index + 1} (${normalizedPoolId}):`, yieldValue);
+          yields[normalizedPoolId] = yieldValue;
+        } catch (err) {
+          const normalizedPoolId = normalizeAddress(pool.pool_id);
+          console.error(`[pools-management] Failed to load yield for pool ${index + 1} (${normalizedPoolId}):`, err);
+          yields[normalizedPoolId] = null;
+        }
+      });
+      
+      await Promise.all(yieldPromises);
+      console.log('All yields loaded:', yields);
+      setPoolYields(yields);
+    } catch (err) {
+      console.error('Failed to load pool yields:', err);
+    } finally {
+      setIsLoadingYields(false);
+    }
+  }, [getPoolYield]);
+
+  // Load current pools from contract
+  const loadCurrentPools = useCallback(async () => {
+    if (!isConnected) return;
+    
+    setIsLoadingPools(true);
+    try {
+      const pools = await getAllowedPools();
+      if (pools) {
+        setCurrentPools(pools);
+        console.log('[pools-management] Current pools loaded:', pools);
+        
+        // Load Vesu pools data to check vToken mismatches
+        await loadVesuPoolsData(pools);
+        
+        // Load yields and balances for all pools
+        if (pools && pools.length > 0) {
+          console.log('[pools-management] About to call loadPoolYields with', pools.length, 'pools');
+          await Promise.all([
+            loadPoolYields(pools),
+            loadPoolBalances(pools)
+          ]);
+        } else {
+          console.log('[pools-management] No pools to load yields for');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load pools:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to load current pools',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingPools(false);
+    }
+  }, [isConnected, getAllowedPools, loadVesuPoolsData, loadPoolYields, loadPoolBalances, toast]);
+
+  // Load pools on mount and when connected
+  useEffect(() => {
+    if (isConnected) {
+      loadCurrentPools();
+      loadVesuPoolsData();
+    }
+  }, [isConnected, loadCurrentPools, loadVesuPoolsData]);
 
   useEffect(() => {
     if (isConnected && currentPools && currentPools.length > 0 && vaultData) {
@@ -103,7 +236,7 @@ export function PoolsManagement() {
       console.log('[pools-management] Vault data changed, reloading pool balances...');
       loadPoolBalances(currentPools);
     }
-  }, [vaultData?.totalAssets?.toString(), isConnected]); // Reload when total assets change
+  }, [isConnected, currentPools, vaultData, loadPoolBalances]); // Reload when total assets change
 
   // Handle add pool
   const handleAddPool = async () => {
@@ -252,9 +385,9 @@ export function PoolsManagement() {
 
       // Reload pools
       await loadCurrentPools();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to add pool:', err);
-      const errorMessage = err?.message || 'Failed to add pool';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add pool';
       toast({
         title: 'Error',
         description: errorMessage,
@@ -262,151 +395,6 @@ export function PoolsManagement() {
       });
     } finally {
       setIsAdding(false);
-    }
-  };
-
-  // Load current pools function (used by refresh button and after operations)
-  const loadCurrentPools = async () => {
-    console.log('[pools-management] ===== loadCurrentPools called =====');
-    console.log('[pools-management] isConnected:', isConnected);
-    
-    if (!isConnected) {
-      console.log('[pools-management] Not connected, returning early');
-      return;
-    }
-    
-    setIsLoadingPools(true);
-    try {
-      console.log('[pools-management] Fetching allowed pools...');
-      const pools = await getAllowedPools();
-      console.log('[pools-management] Pools fetched:', pools);
-      setCurrentPools(pools);
-      
-      // Load Vesu pools data to check vToken addresses
-      if (pools) {
-        await loadVesuPoolsData(pools);
-      }
-      
-      // Load yields and balances for all pools
-      if (pools && pools.length > 0) {
-        console.log('[pools-management] About to call loadPoolYields with', pools.length, 'pools');
-        await Promise.all([
-          loadPoolYields(pools),
-          loadPoolBalances(pools)
-        ]);
-      } else {
-        console.log('[pools-management] No pools to load yields for');
-      }
-    } catch (err) {
-      console.error('Failed to load pools:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to load current pools',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoadingPools(false);
-    }
-  };
-
-  // Load balances for all pools
-  const loadPoolBalances = async (pools: PoolProps[]) => {
-    if (!pools || pools.length === 0) {
-      console.log('No pools to load balances for');
-      return;
-    }
-    
-    console.log('[pools-management] ===== loadPoolBalances called =====');
-    setIsLoadingBalances(true);
-    const balances: Record<string, bigint> = {};
-    
-    try {
-      // Load balances in parallel for all pools
-      const balancePromises = pools.map(async (pool) => {
-        try {
-          const normalizedPoolId = pool.pool_id.toLowerCase();
-          console.log(`[pools-management] Loading balance for pool ${normalizedPoolId}...`);
-          
-          const balance = await getPoolBalance(pool.v_token);
-          balances[normalizedPoolId] = balance;
-          
-          console.log(`[pools-management] Balance loaded for pool ${normalizedPoolId}:`, balance.toString());
-        } catch (err) {
-          console.error(`[pools-management] Failed to load balance for pool ${pool.pool_id}:`, err);
-          balances[pool.pool_id.toLowerCase()] = BigInt(0);
-        }
-      });
-      
-      await Promise.all(balancePromises);
-      setPoolBalances(balances);
-      console.log('[pools-management] All balances loaded:', balances);
-    } catch (err) {
-      console.error('[pools-management] Error loading pool balances:', err);
-    } finally {
-      setIsLoadingBalances(false);
-    }
-  };
-
-  // Load yields for all pools
-  const loadPoolYields = async (pools: PoolProps[]) => {
-    if (!pools || pools.length === 0) {
-      console.log('No pools to load yields for');
-      return;
-    }
-    
-    // Normalize pool addresses to lowercase for consistent key matching
-    const normalizeAddress = (addr: string) => addr.toLowerCase();
-    
-    console.log('[pools-management] ===== loadPoolYields called =====');
-    console.log('[pools-management] getPoolYield type:', typeof getPoolYield);
-    console.log('[pools-management] getPoolYield value:', getPoolYield);
-    
-    if (!getPoolYield) {
-      console.error('[pools-management] getPoolYield is undefined or null!');
-      return;
-    }
-    
-    console.log('Loading yields for pools:', pools.map((p, i) => `Pool ${i + 1}: ${p.pool_id}`));
-    setIsLoadingYields(true);
-    const yields: Record<string, number | null> = {};
-    
-    try {
-      // Load yields in parallel for all pools
-      const yieldPromises = pools.map(async (pool, index) => {
-        try {
-          const normalizedPoolId = normalizeAddress(pool.pool_id);
-          console.log(`[pools-management] Loading yield for pool ${index + 1} (${normalizedPoolId})...`);
-          console.log(`[pools-management] Calling getPoolYield with:`, {
-            pool_id: pool.pool_id,
-            normalizedPoolId,
-            getPoolYield: typeof getPoolYield,
-            isFunction: typeof getPoolYield === 'function'
-          });
-          
-          if (typeof getPoolYield !== 'function') {
-            console.error(`[pools-management] getPoolYield is not a function! Type: ${typeof getPoolYield}`);
-            yields[normalizedPoolId] = null;
-            return;
-          }
-          
-          console.log(`[pools-management] About to call getPoolYield(${pool.pool_id})...`);
-          const yieldValue = await getPoolYield(pool.pool_id);
-          console.log(`[pools-management] Yield for pool ${index + 1} (${normalizedPoolId}):`, yieldValue);
-          yields[normalizedPoolId] = yieldValue;
-        } catch (err) {
-          const normalizedPoolId = normalizeAddress(pool.pool_id);
-          console.error(`[pools-management] Failed to load yield for pool ${index + 1} (${normalizedPoolId}):`, err);
-          yields[normalizedPoolId] = null;
-        }
-      });
-      
-      await Promise.all(yieldPromises);
-      console.log('All yields loaded:', yields);
-      setPoolYields(yields);
-    } catch (err) {
-      console.error('Failed to load pool yields:', err);
-    } finally {
-      setIsLoadingYields(false);
     }
   };
 
@@ -428,9 +416,9 @@ export function PoolsManagement() {
         description: 'Pool vToken updated successfully',
       });
       await loadCurrentPools();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to update pool vToken:', err);
-      const errorMessage = err?.message || 'Failed to update pool vToken';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update pool vToken';
       toast({
         title: 'Error',
         description: errorMessage,
@@ -478,9 +466,9 @@ export function PoolsManagement() {
         description: 'Pool removed successfully',
       });
       await loadCurrentPools();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to remove pool:', err);
-      const errorMessage = err?.message || 'Failed to remove pool';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to remove pool';
       toast({
         title: 'Error',
         description: errorMessage,
@@ -661,7 +649,7 @@ export function PoolsManagement() {
                                   </div>
                                 </div>
                                 <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                                  To fix: Click "Update vToken" below to update this pool with the correct vToken address.
+                                  To fix: Click &quot;Update vToken&quot; below to update this pool with the correct vToken address.
                                 </p>
                                 <Button
                                   variant="outline"
@@ -836,7 +824,7 @@ export function PoolsManagement() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Note:</strong> Adding pools requires the GOVERNOR role. If you don't have this role, the transaction will fail.
+                <strong>Note:</strong> Adding pools requires the GOVERNOR role. If you don&apos;t have this role, the transaction will fail.
               </AlertDescription>
             </Alert>
           </div>

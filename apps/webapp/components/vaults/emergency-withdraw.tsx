@@ -26,7 +26,6 @@ export function EmergencyWithdraw() {
     getAllowedPools, 
     isPending, 
     isConnected, 
-    account,
     error 
   } = useVesuVault();
   const { toast } = useToast();
@@ -34,7 +33,6 @@ export function EmergencyWithdraw() {
   const [pools, setPools] = useState<PoolProps[]>([]);
   const [isLoadingPools, setIsLoadingPools] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [selectedPoolIndex, setSelectedPoolIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const loadPools = async () => {
@@ -71,11 +69,12 @@ export function EmergencyWithdraw() {
         title: 'Success',
         description: `Emergency withdraw transaction submitted: ${txHash.slice(0, 10)}...`,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Emergency withdraw failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Emergency withdraw failed';
       toast({
         title: 'Error',
-        description: err?.message || 'Emergency withdraw failed',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -91,12 +90,12 @@ export function EmergencyWithdraw() {
         title: 'Success',
         description: `Emergency withdraw pool transaction submitted: ${txHash.slice(0, 10)}...`,
       });
-      setSelectedPoolIndex(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Emergency withdraw pool failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Emergency withdraw pool failed';
       toast({
         title: 'Error',
-        description: err?.message || 'Emergency withdraw pool failed',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -222,7 +221,6 @@ export function EmergencyWithdraw() {
                           variant="destructive"
                           size="sm"
                           disabled={isWithdrawing || isPending}
-                          onClick={() => setSelectedPoolIndex(index)}
                         >
                           Withdraw
                         </Button>

@@ -96,8 +96,8 @@ export function StarknetWalletConnect() {
         {/* Instructions */}
         <div className="text-xs text-muted-foreground space-y-1">
           <p>• Supported wallets: Argent, Braavos</p>
-          <p>• Make sure you're on StarkNet Mainnet</p>
-          <p>• You'll need wBTC to make deposits</p>
+          <p>• Make sure you&apos;re on StarkNet Mainnet</p>
+          <p>• You&apos;ll need wBTC to make deposits</p>
         </div>
       </CardContent>
     </Card>

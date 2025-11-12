@@ -66,8 +66,8 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       })
       setLocalError(null)
       setResetEmailSent(false)
-      clearError() // Clear context error when opening modal
-      setView('signin') // Always start with Sign In when opening
+      clearError()
+      setView('signin')
       setIsSignUp(false)
     }
   }, [isOpen, clearError])
@@ -115,22 +115,16 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
   // Clear error when switching views
   useEffect(() => {
     setLocalError(null)
-    clearError() // Also clear context error when switching modes
+    clearError()
   }, [view, clearError])
   
   // Track previous error to avoid showing duplicate toasts
   const prevErrorRef = useRef<string | null>(null)
   
-  // Sync context error to local error for display and show toast
-  // This ensures auth errors from the context are always displayed
   useEffect(() => {
     if (error) {
-      // Always sync context error to local error for auth errors
-      // This ensures errors from signIn are displayed in the form
       setLocalError(error)
       
-      // Show toast notification only if this is a new error (not a duplicate)
-      // This helps users see the error even if they're not looking at the form
       if (prevErrorRef.current !== error) {
         prevErrorRef.current = error
         toast({
@@ -141,7 +135,6 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         })
       }
     } else {
-      // Clear previous error reference when error is cleared
       prevErrorRef.current = null
     }
   }, [error, isSignUp, toast])
@@ -149,10 +142,6 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Clear previous errors only for validation errors, not for auth errors
-    // We'll clear auth errors after showing them
-    
-    // Validate form fields
     if (!formData.email || !formData.password) {
       setLocalError('Please fill in all required fields.')
       clearError()
@@ -187,16 +176,12 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       const result = await signIn(formData.email, formData.password, action)
       
       if (!result) {
-        // Error is set in the context by signIn
-        // The useEffect will automatically sync it to localError and show a toast
-        // The error will be displayed via both the Alert component and toast notification
         return
       }
-    } catch (authError: any) {
-      // Fallback error handling if signIn throws instead of returning null
-      const errorMessage = authError?.message || 'Authentication failed. Please try again.'
+    } catch (authError: unknown) {
+      const errorMessage = authError instanceof Error ? authError.message : 'Authentication failed. Please try again.'
       setLocalError(errorMessage)
-      clearError() // Clear context error to avoid duplication
+      clearError()
       
       toast({
         title: isSignUp ? "Registration Failed" : "Sign In Failed",
@@ -242,8 +227,6 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       ...prev,
       [field]: value
     }))
-    // Clear errors when user starts typing (both local and context)
-    // This provides immediate feedback that user is fixing the issue
     if (localError) {
       setLocalError(null)
     }
@@ -270,8 +253,8 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         description: "If an account exists for this email, a password reset link has been sent.",
         duration: 5000,
       })
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to send password reset email'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send password reset email'
       setLocalError(errorMessage)
     }
   }
@@ -305,8 +288,8 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         password: '',
         resetToken: ''
       }))
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to reset password'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to reset password'
       setLocalError(errorMessage)
     }
   }
@@ -321,18 +304,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
 
       if (event.data.type === 'OAUTH_CALLBACK') {
         try {
-          // If userData is already provided in the message, use it directly
-          // Otherwise, process the callbackResult via API
-          if (event.data.userData && event.data.userData.access_token) {
-            // We have user data directly, process it
-            const userData = event.data.userData
-            
-            // Call handleOAuthCallback to process and store the data
-            await handleOAuthCallback(event.data.callbackResult)
-          } else {
-            // Process callbackResult via API
-            await handleOAuthCallback(event.data.callbackResult)
-          }
+          await handleOAuthCallback(event.data.callbackResult)
           
           // Show success toast
           toast({
@@ -342,8 +314,8 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
           })
           
           // Modal will close automatically via useEffect when user is authenticated
-        } catch (err: any) {
-          const errorMessage = err?.message || 'OAuth authentication failed'
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'OAuth authentication failed'
           setLocalError(errorMessage)
           
           // Also show error toast
@@ -405,8 +377,8 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
           `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
         )
       }
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Google authentication failed'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Google authentication failed'
       setLocalError(errorMessage)
     }
   }
@@ -437,8 +409,8 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
           `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
         )
       }
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Apple authentication failed'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Apple authentication failed'
       setLocalError(errorMessage)
     }
   }

@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 export function Footer() {
   return (
     <footer className="border-t border-gray-600 py-4 md:py-0" style={{ backgroundColor: '#000000' }}>

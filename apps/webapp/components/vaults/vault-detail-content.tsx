@@ -11,14 +11,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   ArrowLeft, 
   Briefcase, 
-  TrendingUp, 
   Coins, 
-  Wallet, 
   Loader2, 
   AlertCircle, 
-  RefreshCw,
-  Info,
-  Zap
+  Info
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getVesuPools } from '@/app/api/vesuApi';
@@ -61,12 +57,12 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   
   // Tab configuration
-  const tabs = [
+  const tabs = useMemo(() => [
     { id: 'overview', label: 'Overview' },
     { id: 'deposit-withdraw', label: 'Deposit/Withdraw' },
     { id: 'rebalance', label: 'Rebalance' },
     { id: 'pools', label: 'Pools' },
-  ] as const;
+  ] as const, []);
 
   // Update indicator position when active tab changes
   useEffect(() => {
@@ -185,14 +181,6 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
   };
   
   // Calculate total from pool balances as backup/verification
-  const calculatedTotalFromPools = useMemo(() => {
-    if (pools.length === 0 || Object.keys(poolBalances).length === 0) return null;
-    const total = pools.reduce((sum, pool) => {
-      const balance = poolBalances[pool.pool_id] || BigInt(0);
-      return sum + balance;
-    }, BigInt(0));
-    return total;
-  }, [pools, poolBalances]);
 
   // Safe APY formatter
   const formatApy = (apy: number | null | undefined): string => {

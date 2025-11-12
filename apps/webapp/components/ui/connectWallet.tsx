@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import { Button } from "./button"
 import { useCavosAuthContext } from '@/components/cavos-auth-provider'
 import { CavosAuthModal } from './cavos-auth-modal'
-import { User, LogOut, LayoutDashboard, Loader2 } from 'lucide-react'
+import { User, LogOut, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUserDirect } from '@/lib/cavos-config'
 import type { CavosNormalizedResponse } from '@/types/cavos'
 
+interface ErrorWithStatus extends Error {
+  status?: number
+  code?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -47,10 +52,11 @@ export async function POST(request: NextRequest) {
       
       if (error instanceof Error) {
         errorMessage = error.message
+        const errorWithStatus = error as ErrorWithStatus
         
         // Use status from error if available
-        if ((error as any).status) {
-          statusCode = (error as any).status
+        if (errorWithStatus.status) {
+          statusCode = errorWithStatus.status
         } else if (error.message?.toLowerCase().includes('invalid credentials') || 
                    error.message?.toLowerCase().includes('wrong password') ||
                    error.message?.toLowerCase().includes('authentication failed') ||
@@ -63,22 +69,20 @@ export async function POST(request: NextRequest) {
           statusCode = 503
         }
         
-        // Clean up error message - remove nested JSON formatting if present
-        // Handle cases like "signUp failed: signUp failed: 400 {...}"
         errorMessage = errorMessage.replace(/^(signUp|signIn)\s+failed:\s*/gi, '')
         errorMessage = errorMessage.replace(/\s*\d{3}\s*\{[\s\S]*\}/g, '')
       }
       
+      const errorWithStatus = error as ErrorWithStatus
       return NextResponse.json(
         { 
           error: errorMessage,
-          code: (error as any)?.code || undefined
+          code: errorWithStatus?.code || undefined
         },
         { status: statusCode }
       )
     }
   } catch (error) {
-    // Log server-side errors for debugging, but don't expose details to client
     if (process.env.NODE_ENV === 'development') {
     console.error('Cavos API error:', error)
     }

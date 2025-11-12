@@ -690,6 +690,15 @@ export function useVesuVault() {
           ],
           "outputs": [{"type": "core::integer::u256"}],
           "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "balanceOf",
+          "inputs": [
+            {"name": "account", "type": "core::starknet::contract_address::ContractAddress"}
+          ],
+          "outputs": [{"type": "core::integer::u256"}],
+          "state_mutability": "view"
         }
       ], WBTC_ADDRESS, provider);
 
@@ -698,19 +707,28 @@ export function useVesuVault() {
       console.log('Current allowance:', currentAllowance.toString());
       console.log('Required amount:', amountInWei.toString());
 
+      // Check user's wBTC balance to ensure they have enough
+      const balanceResult = await wbtcContract.call('balanceOf', [account.address], { blockIdentifier: 'latest' });
+      const userBalance = BigInt(balanceResult.toString());
+      console.log('User wBTC balance:', userBalance.toString());
+      
+      if (userBalance < amountInWei) {
+        throw new Error(`Insufficient balance. You have ${formatWeiToDecimal(userBalance, 8)} wBTC but need ${formatWeiToDecimal(amountInWei, 8)} wBTC.`);
+      }
+
       // Prepare calls array for multicall
       const calls: any[] = [];
 
       // Only add approve call if current allowance is less than required amount
-      // Approve slightly more to account for any rounding or calculation differences
-      const approveAmount = amountInWei + (amountInWei / BigInt(1000)); // Add 0.1% buffer
-      if (BigInt(currentAllowance.toString()) < approveAmount) {
+      // Approve exactly the amount needed (no buffer) to avoid overflow issues
+      // The buffer was causing issues with balance validation in the contract
+      if (BigInt(currentAllowance.toString()) < amountInWei) {
         console.log('Approval needed, will be included in multicall...');
-        console.log('Approving amount:', approveAmount.toString());
+        console.log('Approving amount:', amountInWei.toString());
         calls.push({
           contractAddress: WBTC_ADDRESS,
           entrypoint: 'approve',
-          calldata: [VESU_VAULT_ADDRESS, approveAmount.toString(), '0'] // u256: [low, high] - approve with buffer
+          calldata: [VESU_VAULT_ADDRESS, amountInWei.toString(), '0'] // u256: [low, high] - approve exact amount
         });
       } else {
         console.log('Sufficient allowance already exists, skipping approval');

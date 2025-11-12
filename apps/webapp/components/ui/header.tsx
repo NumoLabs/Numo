@@ -2,13 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Menu } from "lucide-react"
+import { Menu } from "lucide-react"
 import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import WalletConnector from "@/components/ui/connectWallet"
-import { useWalletStatus } from "@/hooks/use-wallet"
+import { useCavosAuth } from "@/hooks/use-cavos-auth"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 
@@ -18,9 +18,30 @@ interface HeaderProps {
 
 export function Header({ variant = "auto" }: HeaderProps) {
   const pathname = usePathname()
-  const { address } = useWalletStatus()
+  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized, user: cavosUser } = useCavosAuth()
+  
+  const hasValidCavosAuth = (() => {
+    if (typeof window === 'undefined') return false
+    if (isCavosInitialized !== true) return false
+    if (isCavosAuthenticated !== true) return false
+    if (!cavosUser || typeof cavosUser !== 'object') return false
+    
+    const email = cavosUser.email || (typeof cavosUser === 'object' && 'user' in cavosUser && typeof cavosUser.user === 'object' && cavosUser.user !== null && 'email' in cavosUser.user ? (cavosUser.user as { email?: string }).email : undefined)
+    if (!email || typeof email !== 'string' || email.length === 0) return false
+    
+    const accessToken = localStorage.getItem('cavos_access_token')
+    const refreshToken = localStorage.getItem('cavos_refresh_token')
+    const storedUser = localStorage.getItem('cavos_user')
+    
+    if (!accessToken || accessToken === 'undefined' || accessToken === 'null' || accessToken.trim().length === 0) return false
+    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null' || refreshToken.trim().length === 0) return false
+    if (!storedUser || storedUser === 'undefined' || storedUser === 'null' || storedUser.trim().length === 0) return false
+    
+    return true
+  })()
+  
+  const shouldShowDashboard = hasValidCavosAuth
 
-  // Auto-detect variant based on pathname
   const getVariant = () => {
     if (variant !== "auto") return variant
     return pathname === "/" ? "landing" : "dashboard"
@@ -48,7 +69,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Link href="/" className="flex items-center group cursor-pointer">
+            <Link href="/" className="flex items-center group cursor-pointer mr-2">
               <motion.div
                 initial={{ scale: 0.8, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -92,17 +113,25 @@ export function Header({ variant = "auto" }: HeaderProps) {
             >
               Waitlist
             </Link>
+            {shouldShowDashboard ? (
+              <Button
+                asChild
+                variant="default"
+                className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
+              >
+                <Link href="/dashboard">
+                  Dashboard
+                </Link>
+              </Button>
+            ) : null}
             <Button
               asChild
               variant="default"
               className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
             >
-              <Link href="/dashboard">
-                Dashboard
-              </Link>
             </Button>
           </nav>
-          <div className="flex items-center gap-6 ml-auto pl-6">
+          <div className="flex items-center gap-6 ml-auto pl-14">
             <WalletConnector />
           </div>
         </div>
@@ -127,7 +156,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                   <Image src="/numo-logo.png" alt="Numo Logo" width={40} height={40} className="h-14 w-14" />
                   <span>Numo</span>
                 </Link>
-                {address && (
+                {isCavosAuthenticated && (
                   <>
                     <Link
                       href="/dashboard"

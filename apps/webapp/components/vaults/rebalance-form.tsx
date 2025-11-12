@@ -17,14 +17,12 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { AlertCircle, Loader2, ArrowRight, TrendingUp, ArrowDownUp, Coins, Sparkles, Zap, ArrowRightCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Loader2, ArrowRight, ArrowDownUp, Coins, Sparkles, ArrowRightCircle, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getVesuPools } from '@/app/api/vesuApi';
 import type { VesuPool } from '@/types/VesuPools';
-import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
 // Schema for rebalance form
@@ -65,7 +63,6 @@ export function RebalanceForm() {
     getAllowedPools, 
     isPending, 
     isConnected, 
-    error,
     getPoolBalance,
     vaultData
   } = useVesuVault();
@@ -180,12 +177,13 @@ export function RebalanceForm() {
     loadPools();
   }, [isConnected, getAllowedPools, getPoolBalance, form, toast, loadPoolBalances]);
 
+  const totalAssetsString = vaultData?.totalAssets?.toString();
   useEffect(() => {
     if (isConnected && pools && pools.length > 0 && vaultData) {
       console.log('[Rebalance] Vault data changed, reloading pool balances...');
       loadPoolBalances(pools);
     }
-  }, [vaultData?.totalAssets?.toString(), isConnected, pools, getPoolBalance, loadPoolBalances]);
+  }, [totalAssetsString, isConnected, pools, vaultData, loadPoolBalances]);
 
   // Get pool name from Vesu API
   const getPoolName = (poolId: string): string => {
@@ -314,9 +312,9 @@ export function RebalanceForm() {
         form.setValue('fromPool', pools[0].pool_id);
         form.setValue('toPool', pools[1].pool_id);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Rebalance failed:', err);
-      const errorMessage = err?.message || 'Rebalance failed. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'Rebalance failed. Please try again.';
       form.setError('root', {
         message: errorMessage,
       });

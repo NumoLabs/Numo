@@ -37,13 +37,11 @@ export function DepositWithdrawForm() {
   const { 
     deposit, 
     withdraw,
-    totalAssets, 
     wbtcBalance, 
     getUserPosition,
     isPending, 
     isSuccess, 
     error, 
-    contractAddress, 
     isConnected 
   } = useVesuVault();
 
@@ -214,10 +212,6 @@ export function DepositWithdrawForm() {
     }
   };
 
-  const formatTotalAssets = (assets: bigint | null | undefined) => {
-    if (!assets) return '0.00';
-    return (Number(assets) / 1e8).toFixed(4);
-  };
 
   const formatWbtcBalance = (balance: bigint | null | undefined) => {
     if (!balance) return '0.00';
@@ -388,7 +382,7 @@ export function DepositWithdrawForm() {
               <Alert className="bg-white/5 backdrop-blur-xl border-white/10">
                 <Info className="h-4 w-4 text-bitcoin-orange" />
                 <AlertDescription className="text-gray-300">
-                  You don't have any position in this vault. Make a deposit first to start earning yield.
+                  You don&apos;t have any position in this vault. Make a deposit first to start earning yield.
                 </AlertDescription>
               </Alert>
             ) : (

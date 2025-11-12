@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Briefcase, Search, Loader2, AlertCircle, Info, Wallet, CheckCircle, TrendingUp, Zap, Sparkles } from 'lucide-react';
+import { Briefcase, Search, Loader2, AlertCircle, Wallet, TrendingUp, Zap, Sparkles } from 'lucide-react';
 import {
   useVaultPools,
   useVesuPoolsData,
@@ -17,15 +17,6 @@ import {
   usePoolBalances,
   useVaultTotalAssets,
 } from '@/hooks/use-vault-queries';
-import type { PoolProps } from '@/hooks/use-vesu-vault';
-
-interface VaultData {
-  id: string;
-  name: string;
-  totalAssets: bigint | null;
-  pools: VaultPool[];
-  isLoading: boolean;
-}
 
 export function VaultsContent() {
   const { address, isConnected } = useAccount();

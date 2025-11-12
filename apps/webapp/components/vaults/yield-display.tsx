@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useVesuVault } from '@/hooks/use-vesu-vault';
 import { type YieldInfo } from '@/types/VesuVault';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +15,7 @@ export function YieldDisplay() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadYield = async () => {
+  const loadYield = useCallback(async () => {
     if (!isConnected) return;
 
     setIsLoading(true);
@@ -23,10 +23,7 @@ export function YieldDisplay() {
     try {
       const result = await computeYield();
       if (result === null) {
-        // Yield computation returned null - could be network error, pool configuration, or no pools
-        // Don't show error for network issues (they're handled gracefully in computeYield)
-        // Only show error if it's a configuration issue
-        setError(null); // Clear error - network issues are handled gracefully
+        setError(null);
         setYieldInfo(null);
       } else {
         setYieldInfo(result);
@@ -49,13 +46,13 @@ export function YieldDisplay() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isConnected, computeYield]);
 
   useEffect(() => {
     if (isConnected) {
       loadYield();
     }
-  }, [isConnected]);
+  }, [isConnected, loadYield]);
 
   // Format large numbers
   const formatNumber = (value: string | null): string => {

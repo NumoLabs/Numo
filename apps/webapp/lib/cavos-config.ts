@@ -1,5 +1,15 @@
 import { CavosAuth, getBalanceOf } from 'cavos-service-sdk'
 
+interface ErrorWithStatus extends Error {
+  status?: number
+  code?: string
+}
+
+interface ApiErrorResponse {
+  error?: string
+  code?: string
+}
+
 // Environment variables setup
 const config = {
   appId: process.env.NEXT_PUBLIC_CAVOS_APP_ID!,
@@ -92,24 +102,24 @@ export const authenticateUser = async (email: string, password: string, action: 
           const signInError = await signInResponse.json().catch(() => ({ error: 'Sign in failed' }))
           // Create error with proper message
           const signInErrorMessage = signInError.error || 'Sign in failed'
-          const authError = new Error(signInErrorMessage)
+          const authError = new Error(signInErrorMessage) as ErrorWithStatus
           // Preserve status code and error code if available
           if (signInResponse.status) {
-            (authError as any).status = signInResponse.status
+            authError.status = signInResponse.status
           }
           if (signInError.code) {
-            (authError as any).code = signInError.code
+            authError.code = signInError.code
           }
           throw authError
         }
       } else {
         // Create error with proper message and status
-        const authError = new Error(errorMessage)
+        const authError = new Error(errorMessage) as ErrorWithStatus
         if (response.status) {
-          (authError as any).status = response.status
+          authError.status = response.status
         }
         if (errorCode) {
-          (authError as any).code = errorCode
+          authError.code = errorCode
         }
         throw authError
       }
@@ -148,16 +158,17 @@ const parseCavosError = (error: unknown): { message: string; code?: string; stat
     if (statusMatch) {
       statusCode = parseInt(statusMatch[1], 10)
     }
-  } catch (parseError) {
+  } catch {
+    // Ignore parse errors
   }
 
   // Create a new error with the parsed message
-  const parsedError = new Error(errorMessage)
+  const parsedError = new Error(errorMessage) as ErrorWithStatus
   if (errorCode) {
-    (parsedError as any).code = errorCode
+    parsedError.code = errorCode
   }
   if (statusCode) {
-    (parsedError as any).status = statusCode
+    parsedError.status = statusCode
   }
 
   return {
@@ -196,24 +207,24 @@ export const authenticateUserDirect = async (email: string, password: string) =>
         return signInResult
       } catch (signInError: unknown) {
         const parsedSignInError = parseCavosError(signInError)
-        const signInErr = new Error(parsedSignInError.message)
+        const signInErr = new Error(parsedSignInError.message) as ErrorWithStatus
         if (parsedSignInError.code) {
-          (signInErr as any).code = parsedSignInError.code
+          signInErr.code = parsedSignInError.code
         }
         if (parsedSignInError.status) {
-          (signInErr as any).status = parsedSignInError.status
+          signInErr.status = parsedSignInError.status
         }
         throw signInErr
       }
     }
     
     // Throw the parsed error
-    const err = new Error(parsedError.message)
+    const err = new Error(parsedError.message) as ErrorWithStatus
     if (parsedError.code) {
-      (err as any).code = parsedError.code
+      err.code = parsedError.code
     }
     if (parsedError.status) {
-      (err as any).status = parsedError.status
+      err.status = parsedError.status
     }
     throw err
   }
@@ -309,13 +320,13 @@ export const requestPasswordReset = async (email: string) => {
       const result = await response.json()
       return result
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'Password reset request failed' }))
-      const error = new Error(errorData.error || 'Password reset request failed')
+      const errorData = await response.json().catch(() => ({ error: 'Password reset request failed' })) as ApiErrorResponse
+      const error = new Error(errorData.error || 'Password reset request failed') as ErrorWithStatus
       if (response.status) {
-        (error as any).status = response.status
+        error.status = response.status
       }
       if (errorData.code) {
-        (error as any).code = errorData.code
+        error.code = errorData.code
       }
       throw error
     }
@@ -342,13 +353,13 @@ export const confirmPasswordReset = async (token: string, newPassword: string) =
       const result = await response.json()
       return result
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'Password reset confirmation failed' }))
-      const error = new Error(errorData.error || 'Password reset confirmation failed')
+      const errorData = await response.json().catch(() => ({ error: 'Password reset confirmation failed' })) as ApiErrorResponse
+      const error = new Error(errorData.error || 'Password reset confirmation failed') as ErrorWithStatus
       if (response.status) {
-        (error as any).status = response.status
+        error.status = response.status
       }
       if (errorData.code) {
-        (error as any).code = errorData.code
+        error.code = errorData.code
       }
       throw error
     }
@@ -374,13 +385,13 @@ export const getGoogleOAuthUrl = async (redirectUri: string) => {
       const result = await response.json()
       return result.url
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to get Google OAuth URL' }))
-      const error = new Error(errorData.error || 'Failed to get Google OAuth URL')
+      const errorData = await response.json().catch(() => ({ error: 'Failed to get Google OAuth URL' })) as ApiErrorResponse
+      const error = new Error(errorData.error || 'Failed to get Google OAuth URL') as ErrorWithStatus
       if (response.status) {
-        (error as any).status = response.status
+        error.status = response.status
       }
       if (errorData.code) {
-        (error as any).code = errorData.code
+        error.code = errorData.code
       }
       throw error
     }
@@ -406,13 +417,13 @@ export const getAppleOAuthUrl = async (redirectUri: string) => {
       const result = await response.json()
       return result.url
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to get Apple OAuth URL' }))
-      const error = new Error(errorData.error || 'Failed to get Apple OAuth URL')
+      const errorData = await response.json().catch(() => ({ error: 'Failed to get Apple OAuth URL' })) as ApiErrorResponse
+      const error = new Error(errorData.error || 'Failed to get Apple OAuth URL') as ErrorWithStatus
       if (response.status) {
-        (error as any).status = response.status
+        error.status = response.status
       }
       if (errorData.code) {
-        (error as any).code = errorData.code
+        error.code = errorData.code
       }
       throw error
     }
@@ -438,13 +449,13 @@ export const handleOAuthCallback = async (callbackResult: string) => {
       const result = await response.json()
       return result
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'OAuth callback failed' }))
-      const error = new Error(errorData.error || 'OAuth callback failed')
+      const errorData = await response.json().catch(() => ({ error: 'OAuth callback failed' })) as ApiErrorResponse
+      const error = new Error(errorData.error || 'OAuth callback failed') as ErrorWithStatus
       if (response.status) {
-        (error as any).status = response.status
+        error.status = response.status
       }
       if (errorData.code) {
-        (error as any).code = errorData.code
+        error.code = errorData.code
       }
       throw error
     }
