@@ -16,7 +16,7 @@ export function PoolsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-            Custom Pools
+            Pools
           </h1>
           <p className="text-muted-foreground mt-2">
             Explore liquidity pools and create custom vaults tailored to your strategy
@@ -25,7 +25,7 @@ export function PoolsContent() {
         <Link href="/pools/create">
           <Button className="gap-2 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105">
             <Plus className="h-4 w-4" />
-            New Custom Vault
+            New Pool
           </Button>
         </Link>
       </div>
@@ -55,18 +55,12 @@ export function PoolsContent() {
 
       {/* Tabs */}
       <Tabs defaultValue="explore" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-1 lg:w-[200px]">
           <TabsTrigger 
             value="explore"
             className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
             Explore Pools
-          </TabsTrigger>
-          <TabsTrigger 
-            value="custom"
-            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
-          >
-            My Custom Vaults
           </TabsTrigger>
         </TabsList>
 

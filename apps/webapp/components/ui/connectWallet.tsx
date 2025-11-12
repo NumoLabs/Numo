@@ -72,22 +72,14 @@ export default function WalletConnector() {
     <div className="flex items-center gap-4">
       <Link href="/dashboard">
         <Button
-          variant="default"
-          className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
+          onClick={handleCavosSignOut}
+          variant="ghost"
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-sm focus-visible:shadow-sm"
         >
-          <LayoutDashboard className="mr-2 h-4 w-4" />
-          Dashboard
+          <LogOut className="mr-2 h-4 w-4" />
+          Sign Out
         </Button>
       </Link>
-      
-      <Button
-        onClick={handleCavosSignOut}
-        variant="ghost"
-        className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-sm focus-visible:shadow-sm"
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign Out
-      </Button>
     </div>
   )
 }

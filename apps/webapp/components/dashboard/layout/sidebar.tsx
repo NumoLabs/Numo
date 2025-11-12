@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Wallet, Users } from "lucide-react"
+import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Users, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -17,9 +17,9 @@ const navigation = [
   {
     section: "Trading",
     items: [
-      { name: "Custom Pools", href: "/pools", icon: Target, current: false },
+      { name: "Vaults", href: "/vaults", icon: Briefcase, current: false },
+      { name: "Pools", href: "/pools", icon: Target, current: false },
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
-      { name: "Deposit", href: "/deposit-test", icon: Wallet, current: false },
       { name: "Pools", href: "/pools-vault", icon: Users, current: false },
     ],
   },
@@ -49,8 +49,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       {/* Mobile sidebar */}
       <div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
         <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-xl">
-          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-800">
+        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-xl flex flex-col">
+          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-800 shrink-0">
             <Link href="/" className="flex items-center group">
               <Image
                 src="/numo-logo.png"
@@ -67,8 +67,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
               <X className="h-5 w-5" />
             </Button>
           </div>
-          <nav className="mt-6 px-3">
-            <div className="space-y-6">
+          <nav className="flex-1 flex flex-col overflow-y-auto mt-6 px-3">
+            <div className="space-y-6 flex-1">
               {navigation.map((section) => (
                 <div key={section.section}>
                   <h3 className="px-3 text-xs font-semibold text-bitcoin-gold uppercase tracking-wider mb-2">
@@ -77,11 +77,12 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                   <div className="space-y-1">
                     {section.items.map((item) => (
                       <Link
-                        key={item.name}
+                        key={item.href}
                         href={item.href}
                         className={cn(
                           "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                           pathname === item.href || 
+                          (item.href === "/vaults" && pathname.startsWith("/vaults")) ||
                           (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
                           (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
                             ? "bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange border-r-2 border-bitcoin-orange"
@@ -105,6 +106,38 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 </div>
               ))}
             </div>
+            {/* Social Links - Mobile */}
+            <div className="pb-6 px-3 border-t border-gray-800 pt-6 mt-8 shrink-0">
+              <div className="flex items-center justify-center gap-4">
+                <a
+                  href="https://github.com/NumoLabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-bitcoin-orange transition-colors duration-200 hover:scale-110"
+                  aria-label="GitHub"
+                >
+                  <Github className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://x.com/NumoLabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-bitcoin-orange transition-colors duration-200 hover:scale-110"
+                  aria-label="Twitter"
+                >
+                  <Twitter className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://linkedin.com/company/numolabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-bitcoin-orange transition-colors duration-200 hover:scale-110"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
           </nav>
         </div>
       </div>
@@ -126,14 +159,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           </div>
           <nav className="flex flex-1 flex-col px-4">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
-              {navigation.map((section) => (
-                <li key={section.section}>
+              {navigation.map((section, sectionIndex) => (
+                <li key={section.section} className={sectionIndex === navigation.length - 1 ? "mb-4" : ""}>
                   <div className="text-xs font-semibold leading-6 text-bitcoin-gold uppercase tracking-wider mb-2">
                     {section.section}
                   </div>
                   <ul role="list" className="-mx-2 space-y-1">
                     {section.items.map((item) => (
-                      <li key={item.name}>
+                      <li key={item.href}>
                         <Link
                           href={item.href}
                           className={cn(
@@ -164,6 +197,38 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 </li>
               ))}
             </ul>
+            {/* Social Links - Desktop */}
+            <div className="mt-auto pb-6 pt-4 border-t border-gray-800/50">
+              <div className="flex items-center justify-center gap-4">
+                <a
+                  href="https://github.com/NumoLabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-bitcoin-orange transition-all duration-200 hover:scale-110"
+                  aria-label="GitHub"
+                >
+                  <Github className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://x.com/NumoLabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-bitcoin-orange transition-all duration-200 hover:scale-110"
+                  aria-label="Twitter"
+                >
+                  <Twitter className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://linkedin.com/company/numolabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-bitcoin-orange transition-all duration-200 hover:scale-110"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
           </nav>
         </div>
       </div>

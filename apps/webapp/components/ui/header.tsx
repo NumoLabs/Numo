@@ -95,22 +95,14 @@ export function Header({ variant = "auto" }: HeaderProps) {
             <Button
               asChild
               variant="default"
-              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-cyan-500/50 hover:shadow-xl hover:shadow-cyan-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
+              className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
             >
-              {/* <Link href="#waitlist">
-                Waitlist
-              </Link> */}
+              <Link href="/dashboard">
+                Dashboard
+              </Link>
             </Button>
           </nav>
-          <div className="flex items-center gap-6 ml-auto pl-12">
-            {address && (
-              <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </Button>
-              </Link>
-            )}
+          <div className="flex items-center gap-6 ml-auto pl-6">
             <WalletConnector />
           </div>
         </div>
@@ -180,7 +172,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                         pathname === "/pools" ? "text-foreground" : "text-muted-foreground",
                       )}
                     >
-                      Custom Pools
+                      Pools
                     </Link>
                     <Link
                       href="/bonds"

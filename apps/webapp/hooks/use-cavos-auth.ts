@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useCallback, useEffect } from 'react'
-import { authenticateUser, refreshUserToken, executeTransaction } from '@/lib/cavos-config'
+import { authenticateUser, refreshUserToken, executeTransaction, requestPasswordReset, confirmPasswordReset, getGoogleOAuthUrl, getAppleOAuthUrl, handleOAuthCallback } from '@/lib/cavos-config'
+import type { PasswordResetResponse, PasswordResetConfirmResponse } from '@/types/cavos'
 
 interface CavosUser {
   id: string
@@ -168,11 +169,11 @@ export function useCavosAuth() {
   }, [clearAuthData])
 
   // Sign up or sign in user
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string, action: 'signup' | 'signin' = 'signup') => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
-      const result = await authenticateUser(email, password)
+      const result = await authenticateUser(email, password, action)
       
       // Handle the normalized response structure from our API
       const user = result.user
@@ -200,15 +201,45 @@ export function useCavosAuth() {
       // Improve error messages for better user experience
       let errorMessage = 'Authentication failed'
       
-      if (error.message) {
-        if (error.message.includes('already registered') || error.message.includes('already has an account')) {
+      if (error?.message) {
+        const message = error.message.toLowerCase()
+        
+        if (message.includes('password must contain') || 
+            message.includes('invalid_password') ||
+            message.includes('password requirements') ||
+            error?.code === 'INVALID_PASSWORD') {
+
+          errorMessage = error.message.charAt(0).toUpperCase() + error.message.slice(1)
+          // Ensure it ends with a period
+          if (!errorMessage.endsWith('.') && !errorMessage.endsWith('!')) {
+            errorMessage += '.'
+          }
+        } else if (message.includes('invalid email') || message.includes('invalid password') || 
+                   message.includes('invalid credentials') || message.includes('wrong password') ||
+                   error?.status === 401) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+        } else if (message.includes('already registered') || message.includes('already has an account') ||
+                   message.includes('already exists')) {
           errorMessage = 'This email is already registered. Please sign in instead.'
-        } else if (error.message.includes('Invalid credentials') || error.message.includes('wrong password')) {
-          errorMessage = 'Invalid email or password. Please try again.'
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        } else if (message.includes('network') || message.includes('fetch') || 
+                   message.includes('timeout') || error?.status === 503) {
           errorMessage = 'Network error. Please check your connection and try again.'
         } else {
           errorMessage = error.message
+            .replace(/^(signUp|signIn)\s+failed:\s*/gi, '')
+            .replace(/\s*\d{3}\s*\{[\s\S]*\}/g, '')
+            .trim()
+          
+          // Capitalize first letter
+          if (errorMessage) {
+            errorMessage = errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)
+            // Ensure it ends with punctuation
+            if (!errorMessage.endsWith('.') && !errorMessage.endsWith('!') && !errorMessage.endsWith('?')) {
+              errorMessage += '.'
+            }
+          } else {
+            errorMessage = 'Authentication failed. Please try again.'
+          }
         }
       }
       
@@ -218,7 +249,8 @@ export function useCavosAuth() {
         error: errorMessage,
         isInitialized: true
       }))
-      throw error
+      
+      return null
     }
   }, [storeAuthData])
 
@@ -247,7 +279,6 @@ export function useCavosAuth() {
 
       return result
     } catch (error: any) {
-      // If refresh fails, sign out the user
       signOut()
       throw error
     }
@@ -300,6 +331,144 @@ export function useCavosAuth() {
     }
   }, [authState, storeAuthData, refreshToken])
 
+  // Clear error manually
+  const clearError = useCallback(() => {
+    setAuthState(prev => ({
+      ...prev,
+      error: null
+    }))
+  }, [])
+
+  // Password reset - request reset email
+  const passwordReset = useCallback(async (email: string) => {
+    setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
+
+    try {
+      const result = await requestPasswordReset(email)
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: null
+      }))
+      return result as PasswordResetResponse
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to request password reset'
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage
+      }))
+      throw error
+    }
+  }, [])
+
+  // Password reset - confirm with token and new password
+  const passwordResetConfirm = useCallback(async (token: string, newPassword: string) => {
+    setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
+
+    try {
+      const result = await confirmPasswordReset(token, newPassword)
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: null
+      }))
+      return result as PasswordResetConfirmResponse
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to confirm password reset'
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage
+      }))
+      throw error
+    }
+  }, [])
+
+  // Get Google OAuth URL
+  const getGoogleOAuthUrlHandler = useCallback(async (redirectUri: string) => {
+    try {
+      const url = await getGoogleOAuthUrl(redirectUri)
+      return url
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to get Google OAuth URL'
+      setAuthState(prev => ({
+        ...prev,
+        error: errorMessage
+      }))
+      throw error
+    }
+  }, [])
+
+  // Get Apple OAuth URL
+  const getAppleOAuthUrlHandler = useCallback(async (redirectUri: string) => {
+    try {
+      const url = await getAppleOAuthUrl(redirectUri)
+      return url
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to get Apple OAuth URL'
+      setAuthState(prev => ({
+        ...prev,
+        error: errorMessage
+      }))
+      throw error
+    }
+  }, [])
+
+  // Handle OAuth callback
+  const handleOAuthCallbackHandler = useCallback(async (callbackResult: string) => {
+    setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
+
+    try {
+      const result = await handleOAuthCallback(callbackResult)
+      
+      // Handle the normalized response structure
+      const user = result.user
+      const accessToken = result.access_token
+      const refreshToken = result.refresh_token
+      
+      // Check if OAuth returned user but requires password (partial authentication)
+      if ((result as any).requires_password && (result as any).oauth_authenticated) {
+        // OAuth user authenticated but needs to complete with password
+        setAuthState(prev => ({
+          ...prev,
+          user: user,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: 'OAuth authentication successful. Please enter your password to complete login.',
+          isInitialized: true
+        }))
+        
+        return { ...result, requires_password: true }
+      }
+      
+      const newAuthState = {
+        user: user,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+        isInitialized: true
+      }
+      
+      setAuthState(newAuthState)
+      storeAuthData(user, accessToken, refreshToken)
+
+      return result
+    } catch (error: any) {
+      const errorMessage = error?.message || 'OAuth callback failed'
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage
+      }))
+      throw error
+    }
+  }, [storeAuthData])
+
   return {
     // State
     user: authState.user,
@@ -314,6 +483,12 @@ export function useCavosAuth() {
     signOut,
     refreshToken,
     executeTransaction: executeCavosTransaction,
-    resetAuth
+    resetAuth,
+    clearError,
+    passwordReset,
+    passwordResetConfirm,
+    getGoogleOAuthUrl: getGoogleOAuthUrlHandler,
+    getAppleOAuthUrl: getAppleOAuthUrlHandler,
+    handleOAuthCallback: handleOAuthCallbackHandler
   }
 }

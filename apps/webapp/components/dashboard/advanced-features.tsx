@@ -59,7 +59,7 @@ export function AdvancedFeatures() {
                   </div>
                 )}
                 <p className="text-sm text-white">
-                  {feature.title === "Custom Pools"
+                  {feature.title === "Pools"
                     ? "Manually select liquidity pools and assign specific percentages according to your investment strategy."
                     : "Step-by-step guides, concept explanations, and strategies to maximize your returns while minimizing risks."}
                 </p>

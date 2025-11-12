@@ -5,12 +5,17 @@ import { VaultCTA } from "@/components/home/vault-cta"
 import { Header } from "@/components/ui/header"
 import { Footer } from "@/components/ui/footer"
 import { SectionDivider } from "@/components/ui/section-divider"
+import { getVesuPools } from '@/app/api/vesuApi';
 
-export default function Home() {
+export default async function Home() {
+  const pools = await getVesuPools();
+  console.log(pools);
+  
   return (
     <div className="relative flex min-h-screen flex-col" style={{ backgroundColor: '#000000' }}>
       <div className="absolute top-0 left-0 w-full h-[600px] bg-bitcoin-gradient -z-10" />
       <Header />
+
       <VaultHero />
       
       {/* Divider between Hero and Stats */}
