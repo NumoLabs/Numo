@@ -109,6 +109,18 @@
   }
 }
 
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .animate-gradient-x {
   background-size: 300% 100%;
   animation: gradient-x 3s ease-in-out infinite;
@@ -272,6 +284,7 @@ html {
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -285,6 +298,20 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 163, 175, 0.8);
+}
+
+/* Horizontal scrollbar styling */
+.horizontal-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(247, 147, 26, 0.3);
+  border-radius: 4px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(247, 147, 26, 0.5);
 }
 
 /* Performance optimization for scroll */

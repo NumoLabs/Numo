@@ -1,12 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { StarknetProvider } from '@/components/starknet-provider'
-import { WalletProvider } from '@/components/wallet-provider'
-import { CavosAuthProvider } from '@/components/cavos-auth-provider'
-import { ReactQueryProvider } from '@/components/react-query-provider'
+import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/toaster'
-import { ErrorBoundary } from '@/components/error-boundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,17 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} text-white`} style={{ backgroundColor: '#000000' }}>
-        <ErrorBoundary>
-          <ReactQueryProvider>
-            <StarknetProvider>
-              <CavosAuthProvider>
-                <WalletProvider>
-                  {children}
-                </WalletProvider>
-              </CavosAuthProvider>
-            </StarknetProvider>
-          </ReactQueryProvider>
-        </ErrorBoundary>
+        <Providers>
+          {children}
+        </Providers>
         <Toaster />
       </body>
     </html>

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUserDirect } from '@/lib/cavos-config'
 import type { CavosNormalizedResponse } from '@/types/cavos'
 
+interface ErrorWithStatus extends Error {
+  status?: number
+  code?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -43,29 +48,46 @@ export async function POST(request: NextRequest) {
     } catch (error: unknown) {
       // Determine appropriate status code based on error type
       let statusCode = 400
-      const errorMessage = error instanceof Error ? error.message : `${action} failed`
+      let errorMessage = `${action} failed`
       
       if (error instanceof Error) {
-        if (error.message?.includes('Invalid credentials') || 
-            error.message?.includes('wrong password') ||
-            error.message?.includes('authentication failed')) {
+        errorMessage = error.message
+        const errorWithStatus = error as ErrorWithStatus
+        
+        // Use status from error if available
+        if (errorWithStatus.status) {
+          statusCode = errorWithStatus.status
+        } else if (error.message?.toLowerCase().includes('invalid credentials') || 
+                   error.message?.toLowerCase().includes('wrong password') ||
+                   error.message?.toLowerCase().includes('authentication failed') ||
+                   error.message?.toLowerCase().includes('invalid email') ||
+                   error.message?.toLowerCase().includes('invalid password')) {
           statusCode = 401
-        } else if (error.message?.includes('network') || 
-                   error.message?.includes('fetch') ||
-                   error.message?.includes('timeout')) {
+        } else if (error.message?.toLowerCase().includes('network') || 
+                   error.message?.toLowerCase().includes('fetch') ||
+                   error.message?.toLowerCase().includes('timeout')) {
           statusCode = 503
         }
+        
+        errorMessage = errorMessage.replace(/^(signUp|signIn)\s+failed:\s*/gi, '')
+        errorMessage = errorMessage.replace(/\s*\d{3}\s*\{[\s\S]*\}/g, '')
       }
       
+      const errorWithStatus = error as ErrorWithStatus
       return NextResponse.json(
-        { error: errorMessage },
+        { 
+          error: errorMessage,
+          code: errorWithStatus?.code || undefined
+        },
         { status: statusCode }
       )
     }
   } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
     console.error('Cavos API error:', error)
+    }
     return NextResponse.json(
-      { error: `Internal server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      { error: 'Internal server error. Please try again later.' },
       { status: 500 }
     )
   }

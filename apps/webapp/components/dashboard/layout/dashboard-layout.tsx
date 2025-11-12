@@ -12,14 +12,14 @@ import { PoolsContent } from "@/components/pools/pools-content"
 import { CreateVaultContent } from "@/components/pools/create-vault-content"
 import { PoolDetailContent } from "@/components/pools/pool-detail-content"
 import AddPoolToVaultContent from "@/components/pools/add-pool-to-vault-content"
-import { VaultDetailContent } from "@/components/pools/vault-detail-content"
 import { VaultDepositContent } from "@/components/pools/vault-deposit-content"
 import { BondsContent } from "@/components/bonds/bonds-content"
 import { ForecastContent } from "@/components/forecast/forecast-content"
 import { MarketplaceContent } from "@/components/marketplace/marketplace-content"
 import { LearnContent } from "@/components/learn/learn-content"
 import { PoolsVaultContent } from "@/components/pools-vault/pools-vault-content"
-import { DepositTestContent } from "@/components/deposit-test/deposit-test-content"
+import { VaultsContent } from "@/components/vaults/vaults-content"
+import { VaultDetailContent } from "@/components/vaults/vault-detail-content"
 
 export function DashboardLayout() {
   const pathname = usePathname()
@@ -44,20 +44,32 @@ export function DashboardLayout() {
     if (pathname === "/learn") {
       return <LearnContent />
     }
+    if (pathname === "/vaults") {
+      return <VaultsContent />
+    }
+    if (pathname.startsWith("/vaults/") && pathname !== "/vaults") {
+      // Extract vaultId from pathname
+      const extractedVaultId = pathname.split("/vaults/")[1]?.split("?")[0];
+      if (extractedVaultId) {
+        return <VaultDetailContent vaultId={extractedVaultId} />;
+      }
+      return null;
+    }
     if (pathname === "/pools") {
       return <PoolsContent />
     }
     if (pathname === "/pools-vault") {
       return <PoolsVaultContent />
     }
-    if (pathname === "/deposit-test") {
-      return <DepositTestContent />
-    }
     if (pathname === "/pools/create") {
       return <CreateVaultContent />
     }
     if (pathname.startsWith("/pools/vault/")) {
-      return <VaultDetailContent />
+      const vaultId = pathname.split("/pools/vault/")[1]?.split("?")[0];
+      if (vaultId) {
+        return <VaultDetailContent vaultId={vaultId} />;
+      }
+      return null;
     }
     if (pathname.startsWith("/pools/deposit/")) {
       return <VaultDepositContent />

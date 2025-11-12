@@ -94,3 +94,13 @@ export interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
 }
+
+export interface PasswordResetResponse {
+  message: string
+  timestamp: number
+}
+
+export interface PasswordResetConfirmResponse {
+  message: string
+  timestamp: number
+}

@@ -364,10 +364,10 @@ export function getRebalanceHistory(): RebalanceEvent[] {
 export function getAdvancedFeatures(): AdvancedFeature[] {
   return [
     {
-      title: "Custom Pools",
+      title: "Pools",
       description: "Create and manage your own vaults with custom distributions between different pools.",
       icon: "Target",
-      color: "indigo", // Puedes dejar el color de la card como quieras
+      color: "indigo",
       stats: [
         { label: "Active Vaults", value: "2 active" },
         { label: "Average Return", value: "5.4%" },
