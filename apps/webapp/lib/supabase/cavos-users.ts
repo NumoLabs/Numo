@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createHash } from 'crypto'
 import type { CavosUser } from '@/types/cavos'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -374,17 +375,10 @@ export async function revokeAllUserSessions(userId: string): Promise<number> {
 }
 
 /**
- * Simple hash function for tokens (for audit logging)
- * In production, use a proper cryptographic hash like SHA-256
+ * Hash function for tokens (for audit logging)
+ * Uses SHA-256 cryptographic hash for production security
  */
 export function hashToken(token: string): string {
-  // Simple hash for demonstration - use crypto.createHash('sha256') in production
-  let hash = 0
-  for (let i = 0; i < token.length; i++) {
-    const char = token.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(36)
+  return createHash('sha256').update(token).digest('hex')
 }
 
