@@ -15,7 +15,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const provider = useMemo(() => {
     function rpc() {
       return {
-        nodeUrl: process.env.NEXT_PUBLIC_STARKNET_RPC_URL || `https://starknet-mainnet.public.blastapi.io/rpc/v0_7`
+        nodeUrl: `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm`
       }
     }
     return jsonRpcProvider({ rpc });
@@ -33,7 +33,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       provider={provider}
       connectors={connectors}
       explorer={voyager}
-      autoConnect={false}
+      autoConnect={true}
     >
       {children}
     </StarknetConfig>

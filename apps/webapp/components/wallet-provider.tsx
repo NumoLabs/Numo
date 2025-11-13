@@ -10,14 +10,13 @@ interface WalletProviderProps {
 
 export function WalletProvider({ children }: WalletProviderProps) {
   // Centralized wallet hooks - only executed once here
-  const { address, account } = useAccount()
+  const { address, isConnected } = useAccount()
   const { connect, connectors, status: connectStatus } = useConnect()
   const { disconnect, status: disconnectStatus } = useDisconnect()
 
-  // Memoize the context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({
     address,
-    account,
+    isConnected: isConnected ?? false,
     connect,
     disconnect,
     connectors,
@@ -25,7 +24,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
     isDisconnecting: disconnectStatus === 'pending',
   }), [
     address,
-    account,
+    isConnected,
     connect,
     disconnect,
     connectors,
