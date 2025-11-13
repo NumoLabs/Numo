@@ -17,9 +17,9 @@ const navigation = [
   {
     section: "Trading",
     items: [
-      { name: "Custom Pools", href: "/pools", icon: Target, current: false },
+      { name: "Custom Pools", href: "/pools", icon: Target, current: false, hidden: true }, // Hidden: custom vaults feature not yet available
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
-      { name: "Deposit", href: "/deposit-test", icon: Wallet, current: false },
+      { name: "Deposit", href: "/deposit-test", icon: Wallet, current: false, hidden: true }, // Hidden: custom vaults feature not yet available
       { name: "Pools", href: "/pools-vault", icon: Users, current: false },
     ],
   },
@@ -75,7 +75,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                     {section.section}
                   </h3>
                   <div className="space-y-1">
-                    {section.items.map((item) => (
+                    {section.items.filter((item) => !item.hidden).map((item) => (
                       <Link
                         key={item.name}
                         href={item.href}
@@ -132,7 +132,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                     {section.section}
                   </div>
                   <ul role="list" className="-mx-2 space-y-1">
-                    {section.items.map((item) => (
+                    {section.items.filter((item) => !item.hidden).map((item) => (
                       <li key={item.name}>
                         <Link
                           href={item.href}

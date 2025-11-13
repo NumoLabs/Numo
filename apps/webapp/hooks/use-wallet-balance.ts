@@ -1,9 +1,9 @@
 // Hook to get real wallet balance for Vesu assets
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useWallet } from './use-wallet';
+import { useProvider } from '@starknet-react/core';
 import { Contract, RpcProvider } from 'starknet';
 import { getVesuAssets } from '@/lib/vesu-real-data';
-import { isTestnet } from '@/lib/utils';
 
 interface WalletBalance {
   symbol: string;
@@ -25,11 +25,28 @@ export function useWalletBalance(): UseWalletBalanceReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const provider = new RpcProvider({
-    nodeUrl: isTestnet() 
-      ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-      : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
-  });
+  // Try to use provider from Starknet context first, fallback to creating new one
+  const contextProvider = useProvider();
+  
+  // MAINNET ONLY: Always use mainnet RPC
+  // Use provider from context if available, otherwise create new one
+  const provider = useMemo(() => {
+    // If context provider is available and has a valid nodeUrl, use it
+    if (contextProvider && (contextProvider as any).baseUrl) {
+      console.log('🔧 Using provider from Starknet context');
+      return contextProvider as RpcProvider;
+    }
+    
+    // Otherwise, create a new provider
+    const rpcUrl = process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
+      'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
+    
+    console.log('🔧 Creating new RPC Provider with URL:', rpcUrl);
+    
+    return new RpcProvider({
+      nodeUrl: rpcUrl
+    });
+  }, [contextProvider]);
 
   const getBalance = async (tokenAddress: string, decimals: number, symbol: string): Promise<number> => {
     if (!address) {
@@ -61,14 +78,40 @@ export function useWalletBalance(): UseWalletBalanceReturn {
         }
       ], tokenAddress, provider);
 
-      const result = await contract.balanceOf(address);
+      // Add a timeout to prevent hanging
+      const timeout = 15000; // 15 seconds
+      const balancePromise = contract.balanceOf(address);
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error(`Balance fetch timeout after ${timeout}ms`)), timeout)
+      );
+      
+      const result = await Promise.race([balancePromise, timeoutPromise]);
       const balanceWei = result.balance.low;
       const balance = Number(balanceWei) / Math.pow(10, decimals);
       
       console.log(`${symbol} balance: ${balance} (${balanceWei} wei, ${decimals} decimals)`);
       return balance;
-    } catch (err) {
-      console.error(`Error fetching balance for ${symbol} (${tokenAddress}):`, err);
+    } catch (err: any) {
+      // Silently handle errors - don't log to console.error to avoid Next.js error overlay
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        const errorMessage = err?.message || String(err) || 'Unknown error';
+        console.warn(`⚠️ Failed to fetch balance for ${symbol}:`, errorMessage);
+        
+        // Only log detailed error in development if it's not a timeout
+        if (!errorMessage.includes('timeout')) {
+          console.debug('Error details:', {
+            errorMessage: err?.message,
+            errorType: err?.constructor?.name,
+            errorCode: err?.code,
+            providerUrl: (provider as any)?.channel?.nodeUrl || (provider as any)?.baseUrl,
+            tokenAddress,
+            userAddress: address
+          });
+        }
+      }
+      
+      // Return 0 instead of throwing to prevent breaking the entire balance fetch
       return 0;
     }
   };
@@ -87,23 +130,8 @@ export function useWalletBalance(): UseWalletBalanceReturn {
       console.log('Address:', address);
       console.log('Provider URL:', provider.channel.nodeUrl);
       
-      // Use correct addresses based on network
-      const testAssets = isTestnet() ? [
-        {
-          token: {
-            address: '0x7809bb63f557736e49ff0ae4a64bd8aa6ea60e3f77f26c520cb92c24e3700d3', // Sepolia ETH
-            symbol: 'ETH',
-            decimals: 18
-          }
-        },
-        {
-          token: {
-            address: '0x772131070c7d56f78f3e46b27b70271d8ca81c7c52e3f62aa868fab4b679e43', // Sepolia STRK
-            symbol: 'STRK',
-            decimals: 18
-          }
-        }
-      ] : [
+      // MAINNET ONLY: Always use mainnet addresses
+      const testAssets = [
         {
           token: {
             address: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // Mainnet ETH
@@ -120,9 +148,10 @@ export function useWalletBalance(): UseWalletBalanceReturn {
         }
       ];
       
-      console.log('Using test assets for', isTestnet() ? 'SEPOLIA' : 'MAINNET', ':', testAssets);
+      console.log('Using test assets for MAINNET:', testAssets);
       
-      const vesuAssets = getVesuAssets(isTestnet());
+      // MAINNET ONLY: Always get mainnet assets
+      const vesuAssets = getVesuAssets(false);
       console.log('Vesu assets count:', vesuAssets.length);
       console.log('Vesu assets to check:', vesuAssets.map(a => `${a.token.symbol} (${a.token.address})`));
       
@@ -161,14 +190,42 @@ export function useWalletBalance(): UseWalletBalanceReturn {
       });
 
       console.log('Waiting for all balance promises...');
-      const walletBalances = await Promise.all(balancePromises);
+      // Use Promise.allSettled to handle individual failures gracefully
+      const balanceResults = await Promise.allSettled(balancePromises);
+      const walletBalances = balanceResults
+        .map((result, index) => {
+          if (result.status === 'fulfilled') {
+            return result.value;
+          } else {
+            // Silently handle failures - don't log to console.error
+            // Only log in development mode
+            if (process.env.NODE_ENV === 'development') {
+              console.debug(`Balance fetch failed for asset ${index}:`, result.reason);
+            }
+            // Return a zero balance for failed fetches
+            const asset = vesuAssets[index];
+            return {
+              symbol: asset?.token?.symbol || 'UNKNOWN',
+              balance: 0,
+              decimals: asset?.token?.decimals || 18,
+              address: asset?.token?.address || '',
+            };
+          }
+        })
+        .filter(b => b !== null);
+      
       console.log('=== FINAL BALANCES ===');
       console.log('Final balances:', walletBalances);
       setBalances(walletBalances);
     } catch (err) {
-      console.error('=== ERROR FETCHING BALANCES ===');
-      console.error('Error details:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch balances');
+      // Only log errors in development to avoid Next.js error overlay
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('=== ERROR FETCHING BALANCES ===');
+        console.warn('Error details:', err);
+      }
+      // Set a user-friendly error message
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch balances';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

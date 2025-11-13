@@ -84,13 +84,14 @@ export function PoolCard({ name, description, apy, tvl, protocol, risk, tokens, 
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-center">
         <Link href={`/pools/${slug}`}>
           <Button variant="outline" size="sm">
             View Details
           </Button>
         </Link>
-        <Link href={`/pools/add/${slug}`}>
+        {/* Hidden: Custom vaults feature not yet available */}
+        <Link href={`/pools/add/${slug}`} className="hidden">
           <Button size="sm">Add to Vault</Button>
         </Link>
       </CardFooter>

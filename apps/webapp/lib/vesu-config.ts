@@ -65,23 +65,27 @@ export const VESU_MAINNET_CONFIG: VesuConfig = {
 };
 
 // Get current Vesu V2 configuration based on network
+// MAINNET ONLY: Always returns mainnet configuration
 export function getVesuV2Config(): VesuV2Config {
-	return isTestnet() ? VESU_V2_TESTNET_CONFIG : VESU_V2_MAINNET_CONFIG;
+	return VESU_V2_MAINNET_CONFIG;
 }
 
 // Get Vesu V2 configuration by chain ID
+// MAINNET ONLY: Always returns mainnet configuration
 export function getVesuV2ConfigByChainId(chainId: string): VesuV2Config {
-	return chainId === 'SN_SEPOLIA' ? VESU_V2_TESTNET_CONFIG : VESU_V2_MAINNET_CONFIG;
+	return VESU_V2_MAINNET_CONFIG;
 }
 
 // Get current Vesu configuration based on network (V1 - Legacy)
+// MAINNET ONLY: Always returns mainnet configuration
 export function getVesuConfig(): VesuConfig {
-	return isTestnet() ? VESU_TESTNET_CONFIG : VESU_MAINNET_CONFIG;
+	return VESU_MAINNET_CONFIG;
 }
 
 // Get Vesu configuration by chain ID (V1 - Legacy)
+// MAINNET ONLY: Always returns mainnet configuration
 export function getVesuConfigByChainId(chainId: string): VesuConfig {
-	return chainId === 'SN_SEPOLIA' ? VESU_TESTNET_CONFIG : VESU_MAINNET_CONFIG;
+	return VESU_MAINNET_CONFIG;
 }
 
 // Vesu V2 API endpoints

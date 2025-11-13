@@ -4,7 +4,7 @@ import { Account, Contract, RpcProvider, CallData, CairoCustomEnum } from 'stark
 import { useWalletStatus, useWallet } from './use-wallet';
 import { useToast } from './use-toast';
 import { getVesuConfig } from '@/lib/vesu-config';
-import { isTestnet } from '@/lib/utils';
+// MAINNET ONLY: Removed isTestnet import
 import { 
   createVesuDepositParams, 
   createVesuAmount, 
@@ -284,7 +284,8 @@ export function useVesuDeposit() {
 
     try {
       const vesuConfig = getVesuConfig();
-      const { protocol } = getVesuProtocolData(isTestnet());
+      // MAINNET ONLY: Always use mainnet protocol data
+      const { protocol } = getVesuProtocolData(false);
       
       console.log('🚀 STARTING DEPOSIT PROCESS...');
       console.log('📋 Deposit Parameters:', {
@@ -296,17 +297,14 @@ export function useVesuDeposit() {
         user: address
       });
       console.log('🌐 Network Info:', {
-        isTestnet: isTestnet(),
-        network: vesuConfig.network,
+        network: 'mainnet',
         singletonAddress: vesuConfig.singletonAddress,
         poolId: vesuConfig.genesisPoolId
       });
       
-      // Create provider and account
+      // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
       
       // Use the account from wallet context
@@ -345,7 +343,7 @@ export function useVesuDeposit() {
         amountBigInt: BigInt(amountInWei),
         asset: normalizedAssetAddress,
         assetAddressLength: params.assetAddress?.length,
-        isTestnet: isTestnet(),
+        network: 'mainnet',
         vesuConfig: vesuConfig,
         starknetAccount: starknetAccount?.address,
         accountConnected: !!starknetAccount,
@@ -577,9 +575,7 @@ export function useVesuDeposit() {
     try {
       const vesuConfig = getVesuConfig();
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
       const tokenContract = new Contract(ERC20_ABI, assetAddress, provider);
@@ -605,9 +601,7 @@ export function useVesuDeposit() {
 
     try {
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
       const tokenContract = new Contract(ERC20_ABI, assetAddress, provider);
@@ -635,9 +629,7 @@ export function useVesuDeposit() {
     try {
       const vesuConfig = getVesuConfig();
       const provider = new RpcProvider({
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
       
       const singletonContract = new Contract(VESU_SINGLETON_ABI, vesuConfig.singletonAddress, provider);

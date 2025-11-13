@@ -11,7 +11,7 @@ import {
   Activity,
   AlertTriangle,
   Info
-} from 'lucide-react';
+} from 'lucide-react'; 
 import { useToast } from '@/hooks/use-toast';
 import { getVesuV2Pools, getVesuV2Vaults, getVesuV2Strategies } from '@/app/api/vesuApi';
 import type { VesuV2Pool } from '@/types/VesuPools';

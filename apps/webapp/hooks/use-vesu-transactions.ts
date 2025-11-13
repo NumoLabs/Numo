@@ -3,7 +3,7 @@ import { useAccount } from '@starknet-react/core';
 import { RpcProvider } from 'starknet';
 import { useToast } from '@/hooks/use-toast';
 import { getVesuConfig } from '@/lib/vesu-config';
-import { parseVesuAmount, isTestnet } from '@/lib/utils';
+import { parseVesuAmount } from '@/lib/utils';
 import { vesuTransactionFlow } from '@/lib/vesu-real-implementation';
 
 export function useVesuTransactions() {
@@ -34,11 +34,9 @@ export function useVesuTransactions() {
     setCurrentStep('Preparing transaction...');
 
     try {
-      // Create provider for transaction execution
+      // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
       // Step 1: Approve token spending
@@ -129,11 +127,9 @@ export function useVesuTransactions() {
     setCurrentStep('Preparing withdrawal...');
 
     try {
-      // Create provider for transaction execution
+      // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
       // For withdrawal, we use negative collateral_delta
@@ -219,10 +215,10 @@ export function useVesuTransactions() {
     }
 
     try {
+      // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
+          'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
       return await vesuTransactionFlow.getVTokenBalance(vTokenAddress, address, provider);

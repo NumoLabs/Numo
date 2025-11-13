@@ -8,15 +8,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     
-    // Get RPC URL from environment or use default based on network
-    // Check if we're in testnet by looking at the request or environment
-    const isTestnetEnv = process.env.NEXT_PUBLIC_NETWORK === 'sepolia' || 
-                         process.env.NEXT_PUBLIC_STARKNET_RPC_URL?.includes('sepolia');
-    
+    // MAINNET ONLY: Always use mainnet RPC URL
     const rpcUrl = process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
-      (isTestnetEnv
-        ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-        : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7');
+      'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
     
     // Forward the request to the Starknet RPC endpoint
     const response = await fetch(rpcUrl, {

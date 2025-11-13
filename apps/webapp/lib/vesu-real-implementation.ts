@@ -299,29 +299,94 @@ export class VesuV2TransactionFlow {
     let approvalResult = null;
     let approvalTxHash = '';
     
+    // Validate account before proceeding
+    if (!account) {
+      throw new Error('Account is not available. Please ensure your wallet is connected.');
+    }
+    
+    console.log('🔍 Account validation:', {
+      hasAccount: !!account,
+      accountType: account?.constructor?.name,
+      hasExecute: typeof account?.execute === 'function',
+      address: userAddress
+    });
+    
     try {
       // Check if we need approval
-      const allowanceResult = await provider.callContract({
+      console.log('🔍 Checking allowance before approval...');
+      console.log('🔍 Allowance check params:', {
         contractAddress: assetAddress,
         entrypoint: 'allowance',
-        calldata: [userAddress, vTokenAddress]
+        owner: userAddress,
+        spender: vTokenAddress
       });
       
-      const currentAllowance = getContractResult(allowanceResult, 'allowance');
-      
-      if (BigInt(currentAllowance) < BigInt(amountInWei)) {
-        console.log('🔧 Executing approval transaction...');
-        approvalResult = await account.execute({
+      let currentAllowance = BigInt(0);
+      try {
+        const allowanceResult = await provider.callContract({
           contractAddress: assetAddress,
-          entrypoint: 'approve',
-          calldata: CallData.compile([
-            vTokenAddress,
-            { low: BigInt(amountInWei), high: BigInt(0) }
-          ])
+          entrypoint: 'allowance',
+          calldata: [userAddress, vTokenAddress]
         });
         
-        approvalTxHash = approvalResult.transaction_hash;
-        console.log('✅ V2 Approval transaction submitted:', approvalTxHash);
+        currentAllowance = BigInt(getContractResult(allowanceResult, 'allowance'));
+        console.log('✅ Allowance check successful:', currentAllowance.toString());
+      } catch (allowanceError: any) {
+        console.warn('⚠️ Allowance check failed, proceeding with approval anyway:', allowanceError?.message || allowanceError);
+        // If allowance check fails, we'll proceed with approval to be safe
+        currentAllowance = BigInt(0);
+      }
+      
+      if (currentAllowance < BigInt(amountInWei)) {
+        console.log('🔧 Executing approval transaction...');
+        console.log('🔧 Approval params:', {
+          contractAddress: assetAddress,
+          entrypoint: 'approve',
+          spender: vTokenAddress,
+          amount: { low: BigInt(amountInWei), high: BigInt(0) }
+        });
+        
+        try {
+          console.log('🔧 About to call account.execute for approval...');
+          console.log('🔧 Account details:', {
+            hasAccount: !!account,
+            accountAddress: account?.address,
+            accountType: account?.constructor?.name,
+            hasExecute: typeof account?.execute === 'function',
+            hasProvider: !!account?.provider
+          });
+          
+          approvalResult = await account.execute({
+            contractAddress: assetAddress,
+            entrypoint: 'approve',
+            calldata: CallData.compile([
+              vTokenAddress,
+              { low: BigInt(amountInWei), high: BigInt(0) }
+            ])
+          });
+          
+          approvalTxHash = approvalResult.transaction_hash;
+          console.log('✅ V2 Approval transaction submitted:', approvalTxHash);
+        } catch (executeError: any) {
+          console.error('❌ Account.execute error details:', {
+            error: executeError,
+            errorType: executeError?.constructor?.name,
+            errorMessage: executeError instanceof Error ? executeError.message : String(executeError),
+            errorStack: executeError instanceof Error ? executeError.stack : undefined,
+            errorCode: executeError?.code,
+            errorName: executeError?.name,
+            accountAvailable: !!account,
+            accountAddress: account?.address,
+            accountMethods: account ? Object.keys(account).slice(0, 20) : [],
+            accountProvider: account?.provider ? 'has provider' : 'no provider'
+          });
+          
+          // Re-throw with more context
+          const errorMsg = executeError instanceof Error 
+            ? executeError.message 
+            : String(executeError);
+          throw new Error(`Failed to execute approval transaction: ${errorMsg}`);
+        }
         
         // Wait for approval confirmation
         try {
@@ -342,15 +407,29 @@ export class VesuV2TransactionFlow {
     }
     
     // Step 2: Execute vToken deposit transaction
+    // According to Vesu V2 documentation:
+    // deposit(assets: u256, receiver: ContractAddress) -> u256
+    // Mints Vault shares to `receiver` by depositing exactly `assets` of underlying tokens.
     console.log('🔧 Executing V2 vToken deposit...');
+    console.log('🔧 Deposit params:', {
+      contractAddress: vTokenAddress,
+      entrypoint: 'deposit',
+      assets: { low: BigInt(amountInWei), high: BigInt(0) },
+      receiver: userAddress
+    });
+    
     let depositResult;
     try {
+      if (!account) {
+        throw new Error('Account is not available for deposit transaction');
+      }
+      
       depositResult = await account.execute({
         contractAddress: vTokenAddress,
         entrypoint: 'deposit',
         calldata: CallData.compile([
-          { low: BigInt(amountInWei), high: BigInt(0) }, // assets
-          userAddress // receiver
+          { low: BigInt(amountInWei), high: BigInt(0) }, // assets: u256 - amount to deposit
+          userAddress // receiver: ContractAddress - address to receive the minted shares
         ])
       });
     } catch (depositError) {
@@ -395,15 +474,18 @@ export class VesuV2TransactionFlow {
     console.log('🔧 V2 Withdrawal amount in wei:', amountInWei);
     
     // Execute vToken withdraw transaction
+    // According to Vesu V2 documentation:
+    // withdraw(assets: u256, receiver: ContractAddress, owner: ContractAddress) -> u256
+    // Burns shares from `owner` and sends exactly `assets` of underlying tokens to `receiver`.
     let withdrawalResult;
     try {
       withdrawalResult = await account.execute({
         contractAddress: vTokenAddress,
         entrypoint: 'withdraw',
         calldata: CallData.compile([
-          { low: BigInt(amountInWei), high: BigInt(0) }, // assets to withdraw
-          userAddress, // receiver
-          userAddress  // owner
+          { low: BigInt(amountInWei), high: BigInt(0) }, // assets: u256 - amount to withdraw
+          userAddress, // receiver: ContractAddress - address to receive the underlying tokens
+          userAddress  // owner: ContractAddress - address that owns the shares to burn
         ])
       });
     } catch (withdrawalError) {

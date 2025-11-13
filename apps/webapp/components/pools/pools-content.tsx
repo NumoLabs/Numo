@@ -1,3 +1,6 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Filter, Info, Plus, Search } from "lucide-react"
 
@@ -7,29 +10,74 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PoolCard } from "@/components/pools/pool-card"
 import { VaultCard } from "@/components/pools/vault-card"
-import { poolsData } from "@/lib/pools-data"
-// getVesuPools and calculateRiskLevel are available but not currently used in this component
-// import { getVesuPools } from "@/app/api/vesuApi"
-// import { calculateRiskLevel } from "@/lib/vesu-config"
+import { getVesuV2Pools, getVesuPools } from "@/app/api/vesuApi"
+import { calculateRiskLevel, formatApy } from "@/lib/vesu-config"
+
+interface VesuPool {
+  id: string
+  name: string
+  version?: string
+  assets: Array<{
+    symbol: string
+    apy: number
+    currentUtilization: number
+    defiSpringApy?: number
+  }>
+}
 
 export function PoolsContent() {
-  // Vesu pools are fetched but not currently displayed in this component
-  // const [vesuPools, setVesuPools] = useState<unknown[]>([])
+  const [vesuPools, setVesuPools] = useState<VesuPool[]>([])
+  const [isLoadingPools, setIsLoadingPools] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Vesu pools fetching is disabled until needed
-  // useEffect(() => {
-  //   let mounted = true
-  //   getVesuPools()
-  //     .then((data) => {
-  //       if (mounted) setVesuPools(data)
-  //     })
-  //     .catch(() => {
-  //       if (mounted) setVesuPools([])
-  //     })
-  //   return () => {
-  //     mounted = false
-  //   }
-  // }, [])
+  useEffect(() => {
+    let mounted = true
+    setIsLoadingPools(true)
+    setError(null)
+
+    // Fetch both V1 and V2 pools from Vesu API
+    Promise.allSettled([getVesuV2Pools(), getVesuPools()])
+      .then(([v2Result, v1Result]) => {
+        if (!mounted) return
+
+        const v2Pools = v2Result.status === "fulfilled" ? v2Result.value : []
+        const v1Pools = v1Result.status === "fulfilled" ? v1Result.value : []
+
+        // Combine V1 and V2 pools
+        const allPools = [
+          ...(v2Pools as VesuPool[]).map((pool) => ({ ...pool, version: "v2" })),
+          ...(v1Pools as VesuPool[]).map((pool) => ({ ...pool, version: "v1" })),
+        ]
+
+        setVesuPools(allPools)
+        setIsLoadingPools(false)
+
+        // Log errors but don't block UI
+        if (v2Result.status === "rejected") {
+          console.warn("Error fetching Vesu V2 pools:", v2Result.reason)
+        }
+        if (v1Result.status === "rejected") {
+          console.warn("Error fetching Vesu V1 pools:", v1Result.reason)
+        }
+
+        // Show error only if all requests failed
+        if (v2Result.status === "rejected" && v1Result.status === "rejected") {
+          setError("Unable to fetch pools from Vesu API. Please try again later.")
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching Vesu pools:", error)
+        if (mounted) {
+          setVesuPools([])
+          setIsLoadingPools(false)
+          setError("Failed to fetch pools. Please try again later.")
+        }
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -43,7 +91,8 @@ export function PoolsContent() {
             Explore available pools and add them to your vaults
           </p>
         </div>
-        <Link href="/pools/create">
+        {/* Hidden: Custom vaults feature not yet available */}
+        <Link href="/pools/create" className="hidden">
           <Button className="gap-2 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105">
             <Plus className="h-4 w-4" />
             New Custom Vault
@@ -76,16 +125,17 @@ export function PoolsContent() {
 
       {/* Tabs */}
       <Tabs defaultValue="explore" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-1 lg:w-[200px]">
           <TabsTrigger 
             value="explore"
             className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
             Pools
           </TabsTrigger>
+          {/* Hidden: Custom vaults feature not yet available */}
           <TabsTrigger 
             value="custom"
-            className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
+            className="hidden gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:via-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-gray-100 transition-all duration-300 ease-in-out"
           >
             My Vaults
           </TabsTrigger>
@@ -106,124 +156,88 @@ export function PoolsContent() {
 
           {/* Pools Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {poolsData.map((pool) => (
-              <PoolCard
-                key={pool.id}
-                name={pool.name}
-                description={pool.description}
-                apy={pool.apy}
-                tvl={pool.tvl}
-                protocol={pool.protocol}
-                risk={pool.risk}
-                tokens={pool.tokens}
-                poolId={pool.id}
-              />
-            ))}
+            {isLoadingPools ? (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                Loading pools from Vesu API...
+              </div>
+            ) : error ? (
+              <div className="col-span-full text-center py-8">
+                <p className="text-destructive mb-4">{error}</p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsLoadingPools(true)
+                    setError(null)
+                    // Trigger re-fetch
+                    window.location.reload()
+                  }}
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : vesuPools.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                No pools available at the moment. Please try again later.
+              </div>
+            ) : (
+              vesuPools.map((pool) => {
+                // Calculate total APY (supply APY + DeFi Spring APY) for each asset
+                const assetApys = pool.assets.map((asset) => {
+                  const supplyApy = asset.apy || 0
+                  const defiSpringApy = asset.defiSpringApy || 0
+                  return supplyApy + defiSpringApy
+                })
 
-            {/* Vesu V2 Pools (hardcoded from docs) */}
-            {[
-              {
-                id: "0x451fe483d5921a2919ddd81d0de6696669bccdacd859f72a4fba7656b97c3b5",
-                name: "Prime",
-                description: "Vesu V2 Prime pool",
-                apy: "5.2%",
-                tvl: "—",
-                protocol: "Vesu V2",
-                risk: "Low",
-                tokens: ["USDC", "ETH", "WBTC"],
-              },
-              {
-                id: "0x3976cac265a12609934089004df458ea29c776d77da423c96dc761d09d24124",
-                name: "Re7 USDC Core",
-                description: "Vesu V2 Re7 USDC Core pool",
-                apy: "4.8%",
-                tvl: "—",
-                protocol: "Vesu V2",
-                risk: "Low",
-                tokens: ["USDC"],
-              },
-              {
-                id: "0x2eef0c13b10b487ea5916b54c0a7f98ec43fb3048f60fdeedaf5b08f6f88aaf",
-                name: "Re7 USDC Prime",
-                description: "Vesu V2 Re7 USDC Prime pool",
-                apy: "5.1%",
-                tvl: "—",
-                protocol: "Vesu V2",
-                risk: "Low",
-                tokens: ["USDC"],
-              },
-              {
-                id: "0x5c03e7e0ccfe79c634782388eb1e6ed4e8e2a013ab0fcc055140805e46261bd",
-                name: "Re7 USDC Frontier",
-                description: "Vesu V2 Re7 USDC Frontier pool",
-                apy: "5.5%",
-                tvl: "—",
-                protocol: "Vesu V2",
-                risk: "Medium",
-                tokens: ["USDC"],
-              },
-              {
-                id: "0x3a8416bf20d036df5b1cf3447630a2e1cb04685f6b0c3a70ed7fb1473548ecf",
-                name: "Re7 xBTC",
-                description: "Vesu V2 Re7 xBTC pool",
-                apy: "6.2%",
-                tvl: "—",
-                protocol: "Vesu V2",
-                risk: "Medium",
-                tokens: ["xBTC"],
-              },
-              {
-                id: "0x73702fce24aba36da1eac539bd4bae62d4d6a76747b7cdd3e016da754d7a135",
-                name: "Re7 USDC Stable Core",
-                description: "Vesu V2 Re7 USDC Stable Core pool",
-                apy: "4.5%",
-                tvl: "—",
-                protocol: "Vesu V2",
-                risk: "Low",
-                tokens: ["USDC"],
-              },
-            ].map((pool) => (
+                // Get the highest total APY from all assets in the pool
+                const maxApy = assetApys.length > 0 ? Math.max(...assetApys) : 0
+
+                // Get the highest risk level from all assets
+                const maxRisk =
+                  pool.assets.length > 0
+                    ? pool.assets.reduce(
+                        (max, asset) => {
+                          const assetRisk = calculateRiskLevel(asset.currentUtilization)
+                          const riskOrder = { Low: 1, Medium: 2, High: 3, Critical: 4 }
+                          return (
+                            (riskOrder[assetRisk as keyof typeof riskOrder] || 0) >
+                            (riskOrder[max as keyof typeof riskOrder] || 0)
+                              ? assetRisk
+                              : max
+                          )
+                        },
+                        "Low" as string,
+                      )
+                    : "Low"
+
+                // Get all unique token symbols from assets
+                const tokens = pool.assets.map((asset) => asset.symbol)
+
+                // Determine protocol name based on version
+                const protocol = pool.version === "v2" ? "Vesu V2" : "Vesu"
+
+                return (
               <PoolCard
                 key={pool.id}
                 name={pool.name}
-                description={pool.description}
-                apy={pool.apy}
-                tvl={pool.tvl}
-                protocol={pool.protocol}
-                risk={pool.risk}
-                tokens={pool.tokens}
+                    description={`${protocol} ${pool.name} pool`}
+                    apy={formatApy(maxApy)}
+                    tvl="—"
+                    protocol={protocol}
+                    risk={maxRisk}
+                    tokens={tokens}
                 poolId={pool.id}
               />
-            ))}
+                )
+              })
+            )}
           </div>
         </TabsContent>
 
-        <TabsContent value="custom" className="space-y-6">
+        {/* Hidden: Custom vaults feature not yet available */}
+        <TabsContent value="custom" className="hidden space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {/* Existing Custom Vaults */}
-            <VaultCard
-              name="My Conservative Vault"
-              description="Conservative strategy focused on lending protocols"
-              apy="5.1%"
-              totalValue="0.45 BTC"
-              pools={[
-                { name: "Vesu BTC Lending", allocation: 70 },
-                { name: "Vesu BTC Vault", allocation: 30 },
-              ]}
-              vaultId="btc-conservative"
-            />
-            <VaultCard
-              name="My Balanced Vault"
-              description="Balanced strategy between lending and liquidity pools"
-              apy="5.4%"
-              totalValue="0.32 BTC"
-              pools={[
-                { name: "Vesu BTC Lending", allocation: 50 },
-                { name: "Ekubo BTC/USDC", allocation: 30 },
-                { name: "Ekubo BTC/ETH", allocation: 20 },
-              ]}
-              vaultId="btc-balanced"
-            />
+            {/* Custom Vaults - TODO: Fetch from user's vaults API */}
+            {/* Currently empty - vaults should be fetched from user's account */}
 
             {/* Create New Vault Card */}
             <Link href="/pools/create">

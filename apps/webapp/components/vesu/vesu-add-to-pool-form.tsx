@@ -18,10 +18,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useWalletBalance } from '@/hooks/use-wallet-balance';
 import { useWallet } from '@/hooks/use-wallet';
 import { useVesuTransactions } from '@/hooks/use-vesu-transactions';
+import { useVesuV2Transactions } from '@/hooks/use-vesu-v2-transactions';
 import type { VesuPool } from '@/types/VesuPools';
-import { formatApy, getVesuConfig } from '@/lib/vesu-config';
-import { isTestnet } from '@/lib/utils';
+import { formatApy, getVesuConfig, getVesuV2Config } from '@/lib/vesu-config';
 import { Contract, RpcProvider } from 'starknet';
+import { useProvider } from '@starknet-react/core';
 import { useEffect, useCallback } from 'react';
 
 interface VesuAddToPoolFormProps {
@@ -39,7 +40,23 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
   const { address } = useWallet();
   const isConnected = !!address;
   const { toast } = useToast();
-  const { depositToVesu, isLoading: isDepositing, currentStep } = useVesuTransactions();
+  
+  // Try to use provider from Starknet context first
+  const contextProvider = useProvider();
+  
+  // Determine if this is a V2 pool
+  const isV2Pool = pool.version === 'v2' || (pool as any).poolFactoryAddress !== undefined;
+  
+  // Use the appropriate hook based on pool version
+  const v1Hook = useVesuTransactions();
+  const v2Hook = useVesuV2Transactions();
+  
+  const depositToVesu = isV2Pool ? v2Hook.depositToVesuV2 : v1Hook.depositToVesu;
+  const isDepositing = isV2Pool ? v2Hook.isLoading : v1Hook.isLoading;
+  const currentStep = isV2Pool ? v2Hook.currentStep : v1Hook.currentStep;
+  
+  // Get the correct config based on version
+  const vesuConfig = isV2Pool ? getVesuV2Config() : getVesuConfig();
 
   // Official Mainnet addresses from vesu-v1 repository
   const mainnetAddresses = {
@@ -60,11 +77,17 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     }
     
     try {
-      const provider = new RpcProvider({
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
-      });
+      // Use provider from context if available, otherwise create new one
+      let provider: RpcProvider;
+      if (contextProvider && (contextProvider as any).baseUrl) {
+        provider = contextProvider as RpcProvider;
+      } else {
+        const rpcUrl = process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
+          'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
+        provider = new RpcProvider({
+          nodeUrl: rpcUrl
+        });
+      }
 
       const contract = new Contract([
         {
@@ -76,7 +99,14 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         }
       ], tokenAddress, provider);
 
-      const result = await contract.balanceOf(address);
+      // Add timeout to prevent hanging
+      const timeout = 15000; // 15 seconds
+      const balancePromise = contract.balanceOf(address);
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error(`Balance fetch timeout after ${timeout}ms`)), timeout)
+      );
+      
+      const result = await Promise.race([balancePromise, timeoutPromise]);
       console.log('Raw balance result:', result);
       
       // Handle different response formats
@@ -100,11 +130,17 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
       
       console.log(`🔍 Direct balance for ${tokenAddress}: ${balance} (${balanceWei} wei, ${decimals} decimals)`);
       return balance;
-    } catch (error) {
-      console.error('Error getting direct balance:', error);
+    } catch (error: any) {
+      // Silently handle errors - don't log to console.error to avoid Next.js error overlay
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        const errorMessage = error?.message || String(error) || 'Unknown error';
+        console.warn(`⚠️ Failed to fetch direct balance for ${tokenAddress}:`, errorMessage);
+      }
+      // Return 0 instead of throwing to prevent breaking the UI
       return 0;
     }
-  }, [address]);
+  }, [address, contextProvider]);
 
   // Get balance for selected asset
   const walletBalance = selectedAsset 
@@ -194,20 +230,16 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     // }
 
     try {
-      const vesuConfig = getVesuConfig();
-      
-      console.log('🔍 DEBUG - Current Network:', vesuConfig.network);
-      console.log('🔍 DEBUG - Is Testnet:', isTestnet());
+      // MAINNET ONLY: Always use mainnet addresses
+      console.log('🔍 DEBUG - Using Mainnet Configuration');
+      console.log('🔍 DEBUG - Pool Version:', pool.version || 'v1');
+      console.log('🔍 DEBUG - Is V2 Pool:', isV2Pool);
       console.log('🔍 DEBUG - Mainnet Addresses Available:', mainnetAddresses);
       console.log('🔍 DEBUG - Selected Asset Symbol:', selectedAsset.symbol);
-      console.log('🔍 DEBUG - Is USDC Selected?', selectedAsset.symbol === 'USDC');
       console.log('🔍 DEBUG - All Available Assets:', pool.assets.map((a) => ({ symbol: a.symbol, address: a.address })));
       
-      // Use correct addresses based on network
-      const isMainnet = vesuConfig.network === 'mainnet';
-      const assetAddress = isMainnet 
-        ? mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] || selectedAsset.address
-        : selectedAsset.address;
+      // Always use mainnet addresses
+      const assetAddress = mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] || selectedAsset.address;
       
       console.log('🔍 DEBUG - Asset Selection:', {
         symbol: selectedAsset.symbol,
@@ -215,8 +247,18 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         mainnetAddress: assetAddress,
         isUsingMainnet: mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] !== undefined,
         selectedAssetFull: selectedAsset,
-        mainnetAddressesKeys: Object.keys(mainnetAddresses),
-        vesuConfig: vesuConfig
+        poolVersion: pool.version,
+        isV2Pool
+      });
+      
+      console.log('🚀 About to call depositToVesu with:', {
+        poolId: pool.id,
+        assetAddress,
+        amount: numAmount,
+        decimals: selectedAsset.decimals || 18,
+        vTokenAddress: selectedAsset.vTokenAddress,
+        isV2Pool,
+        hasDepositFunction: !!depositToVesu
       });
       
       const result = await depositToVesu(
@@ -226,6 +268,8 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         selectedAsset.decimals || 18,
         selectedAsset.vTokenAddress
       );
+
+      console.log('📊 Deposit result:', result);
 
       if (result?.success) {
         // Refresh balances after successful deposit
@@ -244,8 +288,19 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
           variant: "destructive",
         });
       }
-    } catch (error) {
-      console.error('Deposit failed:', error);
+    } catch (error: any) {
+      console.error('❌ Deposit failed:', error);
+      console.error('❌ Error details:', {
+        errorMessage: error?.message,
+        errorType: error?.constructor?.name,
+        errorStack: error?.stack,
+        errorCode: error?.code,
+        errorName: error?.name,
+        isV2Pool,
+        poolId: pool.id,
+        assetAddress,
+        amount: numAmount
+      });
       
       // Extract meaningful error message
       let errorMessage = "An error occurred while processing your deposit";
@@ -255,6 +310,8 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         errorMessage = error;
       } else if (error && typeof error === 'object' && 'reason' in error) {
         errorMessage = String(error.reason);
+      } else if (error?.message) {
+        errorMessage = error.message;
       }
       
       toast({

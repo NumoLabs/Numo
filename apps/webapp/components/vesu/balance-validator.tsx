@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useAccount } from '@starknet-react/core';
 import { RpcProvider } from 'starknet';
-import { isTestnet } from '@/lib/utils';
+// MAINNET ONLY: Removed isTestnet import
 
 interface BalanceValidatorProps {
   assetAddress: string;
@@ -54,10 +54,9 @@ export function BalanceValidator({
     setError(null);
 
     try {
+      // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: isTestnet() 
-          ? 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7'
-          : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
       });
 
       // Convert amount to wei

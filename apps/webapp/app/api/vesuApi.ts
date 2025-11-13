@@ -142,15 +142,18 @@ export async function getVesuV2Pools() {
 			// Filter out pools that have no assets after filtering
 			.filter((pool: { assets: any[] }) => pool.assets.length > 0);
 	} catch (error) {
-		console.warn('⚠️ V2 API not available, using mock V2 data:', error);
-		// Return mock V2 data when API is not available
-		return getMockVesuV2Pools();
+		console.error('⚠️ V2 API not available:', error);
+		// Return empty array - no mock data, only real data from API
+		return [];
 	}
 }
 
 // Mock V2 pools data for development/testing
+// DISABLED: Only real data from API is used, no mock data
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getMockVesuV2Pools() {
 	// Only return pools with WBTC, USDT, USDC
+	// This function is no longer used - only real API data is returned
 	return [
 		{
 			id: 'vesu-v2-prime-pool',
