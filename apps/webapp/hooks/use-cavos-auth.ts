@@ -69,6 +69,14 @@ export function useCavosAuth() {
                 error: null,
                 isInitialized: true
               })
+              
+              // Dispatch custom event to notify other components
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('cavos-auth-update', { 
+                  detail: { isAuthenticated: true, user: parsedUser } 
+                }))
+              }
+              
               return
             } else {
               throw new Error('Invalid user data structure')
@@ -195,6 +203,13 @@ export function useCavosAuth() {
       
       // Store in localStorage
       storeAuthData(user, accessToken, refreshToken)
+      
+      // Dispatch custom event to notify other components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cavos-auth-update', { 
+          detail: { isAuthenticated: true, user } 
+        }))
+      }
 
       return result
     } catch (error: any) {
@@ -456,6 +471,13 @@ export function useCavosAuth() {
       
       setAuthState(newAuthState)
       storeAuthData(user, accessToken, refreshToken)
+      
+      // Dispatch custom event to notify other components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cavos-auth-update', { 
+          detail: { isAuthenticated: true, user } 
+        }))
+      }
 
       return result
     } catch (error: any) {
