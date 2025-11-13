@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 import Image from "next/image"
+import { useEffect, useState, useCallback } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -18,29 +19,67 @@ interface HeaderProps {
 
 export function Header({ variant = "auto" }: HeaderProps) {
   const pathname = usePathname()
-  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized, user: cavosUser } = useCavosAuth()
+  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized, user } = useCavosAuth()
   
-  const hasValidCavosAuth = (() => {
+  // Check localStorage directly for immediate feedback
+  const checkLocalStorage = useCallback(() => {
     if (typeof window === 'undefined') return false
-    if (isCavosInitialized !== true) return false
-    if (isCavosAuthenticated !== true) return false
-    if (!cavosUser || typeof cavosUser !== 'object') return false
-    
-    const email = cavosUser.email || (typeof cavosUser === 'object' && 'user' in cavosUser && typeof cavosUser.user === 'object' && cavosUser.user !== null && 'email' in cavosUser.user ? (cavosUser.user as { email?: string }).email : undefined)
-    if (!email || typeof email !== 'string' || email.length === 0) return false
     
     const accessToken = localStorage.getItem('cavos_access_token')
     const refreshToken = localStorage.getItem('cavos_refresh_token')
     const storedUser = localStorage.getItem('cavos_user')
     
-    if (!accessToken || accessToken === 'undefined' || accessToken === 'null' || accessToken.trim().length === 0) return false
-    if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null' || refreshToken.trim().length === 0) return false
-    if (!storedUser || storedUser === 'undefined' || storedUser === 'null' || storedUser.trim().length === 0) return false
-    
-    return true
-  })()
+    return !!(
+      accessToken && 
+      accessToken !== 'undefined' && 
+      accessToken !== 'null' &&
+      accessToken.trim().length > 0 &&
+      refreshToken && 
+      refreshToken !== 'undefined' && 
+      refreshToken !== 'null' &&
+      refreshToken.trim().length > 0 &&
+      storedUser && 
+      storedUser !== 'undefined' && 
+      storedUser !== 'null' &&
+      storedUser.trim().length > 0
+    )
+  }, [])
   
-  const shouldShowDashboard = hasValidCavosAuth
+  const [hasLocalStorageAuth, setHasLocalStorageAuth] = useState(() => checkLocalStorage())
+  
+  // Force re-render when localStorage changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const handleStorageChange = () => {
+      setHasLocalStorageAuth(checkLocalStorage())
+    }
+    
+    // Listen for custom storage event
+    window.addEventListener('cavos-auth-update', handleStorageChange)
+    
+    // Also check periodically for the first few seconds after mount
+    const interval = setInterval(() => {
+      const hasAuth = checkLocalStorage()
+      if (hasAuth !== hasLocalStorageAuth) {
+        setHasLocalStorageAuth(hasAuth)
+        clearInterval(interval)
+      }
+    }, 100)
+    
+    const timeout = setTimeout(() => {
+      clearInterval(interval)
+    }, 5000) // Stop checking after 5 seconds
+    
+    return () => {
+      window.removeEventListener('cavos-auth-update', handleStorageChange)
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [checkLocalStorage, hasLocalStorageAuth])
+  
+  // Calculate if dashboard should be shown
+  const shouldShowDashboard = isCavosInitialized && (isCavosAuthenticated || hasLocalStorageAuth)
 
   const getVariant = () => {
     if (variant !== "auto") return variant
@@ -117,21 +156,33 @@ export function Header({ variant = "auto" }: HeaderProps) {
               <Button
                 asChild
                 variant="default"
-                className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
+                className={cn(
+                  "bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500",
+                  "hover:from-orange-400 hover:via-orange-500 hover:to-orange-400",
+                  "text-white",
+                  "px-6 py-1.5",
+                  "font-medium",
+                  "rounded-lg",
+                  "transition-all duration-200",
+                  "shadow-lg shadow-orange-500/50",
+                  "hover:shadow-xl hover:shadow-orange-400/60",
+                  "focus-visible:shadow-xl",
+                  "transform",
+                  "hover:-translate-y-1 hover:scale-105",
+                  "focus-visible:-translate-y-1 focus-visible:scale-105",
+                  "ml-4"
+                )}
               >
                 <Link href="/dashboard">
                   Dashboard
                 </Link>
               </Button>
             ) : null}
-            <Button
-              asChild
-              variant="default"
-              className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-6 py-1.5 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105"
-            >
-            </Button>
           </nav>
-          <div className="flex items-center gap-6 ml-auto pl-14">
+          <div className={cn(
+            "flex items-center gap-6 ml-auto",
+            shouldShowDashboard ? "pl-8" : "pl-16"
+          )}>
             <WalletConnector />
           </div>
         </div>
