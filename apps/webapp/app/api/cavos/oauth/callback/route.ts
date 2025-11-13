@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCavosConfig } from '@/lib/cavos-config'
+import { saveCavosUser } from '@/lib/supabase/cavos-users'
 import type { CavosNormalizedResponse } from '@/types/cavos'
 
 interface AegisAccount {
@@ -522,6 +523,15 @@ export async function POST(request: NextRequest) {
         throw new Error('OAuth callback processing failed: No result data available')
       }
       
+      // Save user to Supabase database (non-blocking)
+      // Save even if no access token yet (user authenticated via OAuth)
+      if (result.user && (result.user.id || result.user.email)) {
+        saveCavosUser(result.user).catch((error) => {
+          // Log error but don't throw - authentication should still succeed
+          console.error('Failed to save OAuth user to Supabase:', error)
+        })
+      }
+
       // Check if user is authenticated but no access token (may need password)
       if ((result.user.id || result.user.email) && !result.access_token) {
         if (process.env.NODE_ENV === 'development') {

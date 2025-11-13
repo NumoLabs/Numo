@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUserDirect } from '@/lib/cavos-config'
+import { saveCavosUser } from '@/lib/supabase/cavos-users'
 import type { CavosNormalizedResponse } from '@/types/cavos'
 
 interface ErrorWithStatus extends Error {
@@ -43,6 +44,17 @@ export async function POST(request: NextRequest) {
         expires_in: result.data.authData.expiresIn,
         timestamp: result.data.authData.timestamp
       }
+
+      // Save user to Supabase database (non-blocking)
+      // Don't fail authentication if database save fails
+      const cavosUser = {
+        ...userData.user,
+        wallet: userData.wallet
+      }
+      saveCavosUser(cavosUser).catch((error) => {
+        // Log error but don't throw - authentication should still succeed
+        console.error('Failed to save user to Supabase:', error)
+      })
 
       return NextResponse.json(userData)
     } catch (error: unknown) {
