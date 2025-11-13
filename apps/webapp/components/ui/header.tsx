@@ -19,7 +19,7 @@ interface HeaderProps {
 
 export function Header({ variant = "auto" }: HeaderProps) {
   const pathname = usePathname()
-  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized, user } = useCavosAuth()
+  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized } = useCavosAuth()
   
   // Check localStorage directly for immediate feedback
   const checkLocalStorage = useCallback(() => {
