@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Users, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
+import { LayoutDashboard, History, Coins, TrendingUp, BookOpen, X, BarChart3, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -18,9 +18,10 @@ const navigation = [
     section: "Trading",
     items: [
       { name: "Vaults", href: "/vaults", icon: Briefcase, current: false },
-      { name: "Pools", href: "/pools", icon: Target, current: false },
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
-      { name: "Pools", href: "/pools-vault", icon: Users, current: false },
+      // Pools pages hidden from frontend but logic preserved
+      // { name: "Pools", href: "/pools", icon: Target, current: false },
+      // { name: "Pools", href: "/pools-vault", icon: Users, current: false },
     ],
   },
   {
@@ -82,9 +83,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         className={cn(
                           "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                           pathname === item.href || 
-                          (item.href === "/vaults" && pathname.startsWith("/vaults")) ||
-                          (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                          (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                          (item.href === "/vaults" && pathname.startsWith("/vaults"))
                             ? "bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange border-r-2 border-bitcoin-orange"
                             : "text-gray-300 hover:bg-gray-800 hover:text-white",
                         )}
@@ -92,9 +91,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         <item.icon
                           className={cn(
                             "mr-3 h-5 w-5 transition-colors",
-                            pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                            pathname === item.href
                               ? "text-bitcoin-orange"
                               : "text-gray-400 group-hover:text-gray-300",
                           )}
@@ -171,9 +168,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           href={item.href}
                           className={cn(
                             "group flex gap-x-3 rounded-xl px-3 py-3 text-sm font-semibold leading-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-md",
-                            pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                            pathname === item.href
                               ? "bg-gradient-to-r from-bitcoin-orange/10 via-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange shadow-lg border border-bitcoin-orange/50"
                               : "text-gray-300 hover:bg-gradient-to-r hover:from-gray-800/80 hover:to-gray-700/80 hover:text-white",
                           )}
@@ -181,11 +176,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           <item.icon
                             className={cn(
                               "h-5 w-5 shrink-0 transition-all duration-200",
-                                                          pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-bitcoin-orange scale-110"
-                              : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
+                              pathname === item.href
+                                ? "text-bitcoin-orange scale-110"
+                                : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
                             )}
                           />
                           {item.name}
