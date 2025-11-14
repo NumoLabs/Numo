@@ -78,61 +78,27 @@ export async function POST(request: NextRequest) {
         const { createCavosAuth } = await import('@/lib/cavos-config')
         const aegisAccount = createCavosAuth()
         
-        // Log available methods for debugging
-        if (process.env.NODE_ENV === 'development') {
-          const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(aegisAccount))
-          console.log('Available methods on aegisAccount:', methods.filter(m => typeof (aegisAccount as unknown as AegisAccount)[m] === 'function'))
-          console.log('Callback result URL:', callbackResult)
-        }
-        
         const typedAccount = aegisAccount as unknown as AegisAccount
         if (typeof typedAccount.handleOAuthCallback === 'function') {
           try {
             result = await typedAccount.handleOAuthCallback(callbackResult)
-            
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Successfully processed OAuth callback with SDK:', result)
-            }
           } catch (sdkMethodError: unknown) {
-            if (process.env.NODE_ENV === 'development') {
-              console.error('SDK method execution error:', sdkMethodError)
-            }
             // Re-throw to fall back to URL parsing
             throw sdkMethodError
           }
         } else {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('handleOAuthCallback method not found on SDK, trying to extract data from URL...')
-          }
           throw new Error('SDK method not available')
         }
       } catch (sdkError) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('SDK OAuth callback method error:', sdkError)
-          console.log('Attempting to extract user data from callback URL...')
-        }
         
         // Fallback: Try to extract user data from the callback URL
         // We need to check if we have code/state (OAuth flow) or if data is already in the URL
         try {
           const callbackUrl = new URL(callbackResult)
-          
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Callback URL:', callbackResult)
-            console.log('Callback URL query params:', Object.fromEntries(callbackUrl.searchParams.entries()))
-          }
-          
           const code = callbackUrl.searchParams.get('code')
           const state = callbackUrl.searchParams.get('state')
           
           if (code && state) {
-
-            // Endpoint: GET /api/v1/external/auth/google/callback
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Found OAuth code and state, calling Cavos callback endpoint...')
-              console.log('Code:', code.substring(0, 20) + '...')
-              console.log('State:', state)
-            }
             
             // Determine if this is Google or Apple based on the callback URL or state
             const isGoogle = callbackUrl.pathname.includes('google') || callbackUrl.searchParams.get('provider') === 'google'
@@ -162,10 +128,6 @@ export async function POST(request: NextRequest) {
             
             const cavosCallbackUrl = `${callbackEndpoint}?${callbackParams.toString()}`
             
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Calling Cavos callback endpoint:', cavosCallbackUrl.replace(code, 'CODE_HIDDEN'))
-            }
-            
             // Call Cavos callback endpoint with redirect following
             // This should redirect to our final_redirect_uri with user data
             const controller = new AbortController()
@@ -192,10 +154,6 @@ export async function POST(request: NextRequest) {
             } catch (fetchError: unknown) {
               clearTimeout(timeoutId)
               
-              if (process.env.NODE_ENV === 'development') {
-                console.error('Error calling Cavos callback endpoint:', fetchError)
-              }
-              
               // If fetch fails, throw a more helpful error
               const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError)
               throw new Error(
@@ -212,100 +170,42 @@ export async function POST(request: NextRequest) {
           
           const userDataParam = callbackUrl.searchParams.get('user_data')
           if (userDataParam) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('=== Found user_data parameter ===')
-              console.log('Raw user_data length:', userDataParam.length)
-              console.log('Raw user_data (first 500 chars):', userDataParam.substring(0, 500))
-            }
-            
             try {
               try {
                 userDataFromParams = JSON.parse(userDataParam)
-                if (process.env.NODE_ENV === 'development') {
-                  console.log('✅ Parsed user_data as direct JSON')
-                }
-              } catch (directParseError) {
+              } catch {
                 // Try URL decoded
                 try {
                   const decoded = decodeURIComponent(userDataParam)
                   userDataFromParams = JSON.parse(decoded)
-                  if (process.env.NODE_ENV === 'development') {
-                    console.log('✅ Parsed user_data as URL-decoded JSON')
-                  }
-                } catch (urlDecodeError) {
+                } catch {
                   // Try double URL decoded (sometimes it's encoded twice)
                   try {
                     const doubleDecoded = decodeURIComponent(decodeURIComponent(userDataParam))
                     userDataFromParams = JSON.parse(doubleDecoded)
-                    if (process.env.NODE_ENV === 'development') {
-                      console.log('✅ Parsed user_data as double URL-decoded JSON')
-                    }
-                  } catch (doubleDecodeError) {
+                  } catch {
                     // Try base64 encoded JSON
                     try {
                       const decoded = Buffer.from(userDataParam, 'base64').toString('utf-8')
                       userDataFromParams = JSON.parse(decoded)
-                      if (process.env.NODE_ENV === 'development') {
-                        console.log('✅ Parsed user_data as base64-encoded JSON')
-                      }
                     } catch (base64Error) {
-                      if (process.env.NODE_ENV === 'development') {
-                        console.error('❌ Failed to parse user_data with all methods:', {
-                          directParse: directParseError instanceof Error ? directParseError.message : String(directParseError),
-                          urlDecode: urlDecodeError instanceof Error ? urlDecodeError.message : String(urlDecodeError),
-                          doubleDecode: doubleDecodeError instanceof Error ? doubleDecodeError.message : String(doubleDecodeError),
-                          base64: base64Error instanceof Error ? base64Error.message : String(base64Error)
-                        })
-                      }
                       throw base64Error
                     }
                   }
                 }
               }
-              
-              if (process.env.NODE_ENV === 'development') {
-                console.log('✅ Successfully parsed user_data:', JSON.stringify(userDataFromParams, null, 2))
-                console.log('Parsed user_data type:', typeof userDataFromParams)
-                console.log('Parsed user_data keys:', Object.keys(userDataFromParams))
-              }
-            } catch (parseError) {
-              if (process.env.NODE_ENV === 'development') {
-                console.error('❌ All parsing methods failed for user_data:', parseError)
-                console.log('Raw user_data value:', userDataParam)
-              }
+            } catch {
               userDataFromParams = {}
             }
           }
           
           if (userDataFromParams && typeof userDataFromParams === 'object') {
             if (userDataFromParams.user && typeof userDataFromParams.user === 'object') {
-              if (process.env.NODE_ENV === 'development') {
-                console.log('Merging user_data.user into main object')
-              }
               Object.assign(userDataFromParams, userDataFromParams.user)
             }
             if (userDataFromParams.data && typeof userDataFromParams.data === 'object') {
-              if (process.env.NODE_ENV === 'development') {
-                console.log('Merging user_data.data into main object')
-              }
               Object.assign(userDataFromParams, userDataFromParams.data)
             }
-          }
-          
-          if (process.env.NODE_ENV === 'development') {
-            console.log('=== OAuth Callback Debug ===')
-            if (userDataParam) {
-              console.log('Raw user_data parameter (first 500 chars):', userDataParam.substring(0, 500))
-              console.log('Parsed user_data structure:', JSON.stringify(userDataFromParams, null, 2))
-              console.log('All keys in user_data:', Object.keys(userDataFromParams))
-              console.log('user_id value:', userDataFromParams.user_id)
-              console.log('email value:', userDataFromParams.email)
-              console.log('wallet value:', userDataFromParams.wallet)
-              console.log('org_id value:', userDataFromParams.org_id)
-            } else {
-              console.log('No user_data parameter found in URL')
-            }
-            console.log('All URL params:', Array.from(callbackUrl.searchParams.keys()))
           }
           
           const userId = (userDataFromParams && typeof userDataFromParams === 'object' && userDataFromParams.user_id) || 
@@ -320,16 +220,6 @@ export async function POST(request: NextRequest) {
           const email = (userDataFromParams && userDataFromParams.email) ||
                        (userDataFromParams && userDataFromParams.email_address) ||
                        callbackUrl.searchParams.get('email')
-                       
-          if (process.env.NODE_ENV === 'development') {
-            console.log('=== Field Extraction ===')
-            console.log('userId extracted:', userId || 'NOT FOUND')
-            console.log('email extracted:', email || 'NOT FOUND')
-            if (userDataFromParams && typeof userDataFromParams === 'object') {
-              console.log('userDataFromParams.user_id:', userDataFromParams.user_id)
-              console.log('userDataFromParams.email:', userDataFromParams.email)
-            }
-          }
           
           const accessToken = (userDataFromParams && userDataFromParams.access_token) ||
                              (userDataFromParams && userDataFromParams.accessToken) ||
@@ -341,10 +231,6 @@ export async function POST(request: NextRequest) {
                              callbackUrl.searchParams.get('accessToken') || 
                              callbackUrl.searchParams.get('token') ||
                              callbackUrl.searchParams.get('auth_token')
-                             
-          if (process.env.NODE_ENV === 'development') {
-            console.log('accessToken extracted:', accessToken ? 'FOUND' : 'NOT FOUND (this is normal for OAuth)')
-          }
           
           const refreshToken = (userDataFromParams && userDataFromParams.refresh_token) ||
                               (userDataFromParams && userDataFromParams.refreshToken) ||
@@ -358,6 +244,13 @@ export async function POST(request: NextRequest) {
           if (walletFromParams) {
             if (typeof walletFromParams === 'object' && walletFromParams !== null) {
               wallet = walletFromParams as CavosNormalizedResponse['wallet']
+              // Normalize network to mainnet (Cavos sometimes returns sepolia)
+              if (wallet && 'network' in wallet) {
+                wallet = {
+                  ...wallet,
+                  network: 'mainnet'
+                }
+              }
             }
           }
           if (!wallet) {
@@ -368,7 +261,10 @@ export async function POST(request: NextRequest) {
                 // Try to parse as JSON if it's a string
                 const parsed = JSON.parse(walletParam)
                 if (typeof parsed === 'object' && parsed !== null) {
-                  wallet = parsed as CavosNormalizedResponse['wallet']
+                  wallet = {
+                    ...parsed,
+                    network: 'mainnet' // Normalize to mainnet
+                  } as CavosNormalizedResponse['wallet']
                 }
               } catch {
                 // If parsing fails, ignore - wallet stays undefined
@@ -448,37 +344,7 @@ export async function POST(request: NextRequest) {
               timestamp: userDataFromParams?.timestamp ? Number(userDataFromParams.timestamp) : Date.now()
             }
             
-            if (!finalAccessToken) {
-              if (process.env.NODE_ENV === 'development') {
-                console.warn('OAuth callback received user data but no access_token. User may need to authenticate via email/password or token generation may be required.')
-              }
-            }
-            
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Extracted user data from callback URL:', {
-                source: userDataParam ? 'user_data parameter' : 'individual parameters',
-                userId: result.user.id,
-                email: result.user.email,
-                hasAccessToken: !!result.access_token,
-                hasRefreshToken: !!result.refresh_token,
-                hasWallet: !!result.wallet,
-                walletData: userDataFromParams?.wallet
-              })
-            }
           } else {
-            // Log what we found for debugging
-            if (process.env.NODE_ENV === 'development') {
-              console.error('Missing required fields in callback URL:', {
-                hasCode: !!code,
-                hasState: !!state,
-                hasUserDataParam: !!userDataParam,
-                userDataFromParams: userDataFromParams,
-                hasUserId: !!finalUserId,
-                hasEmail: !!finalEmail,
-                hasAccessToken: !!finalAccessToken,
-                allParams: Object.fromEntries(callbackUrl.searchParams.entries())
-              })
-            }
             
             // Provide helpful error message
             if (code && state) {
@@ -505,9 +371,6 @@ export async function POST(request: NextRequest) {
             }
           }
         } catch (urlError) {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Failed to extract data from URL:', urlError)
-          }
           // If we can't extract data, provide a more helpful error message
           const errorMsg = urlError instanceof Error ? urlError.message : 'Unknown error'
           throw new Error(
@@ -523,6 +386,14 @@ export async function POST(request: NextRequest) {
         throw new Error('OAuth callback processing failed: No result data available')
       }
       
+      // Normalize wallet network to mainnet if present
+      if (result.wallet && typeof result.wallet === 'object' && 'network' in result.wallet) {
+        result.wallet = {
+          ...result.wallet,
+          network: 'mainnet'
+        }
+      }
+
       // Save user to Supabase database
       if (result.user && result.user.id && result.user.email) {
         try {
@@ -535,28 +406,12 @@ export async function POST(request: NextRequest) {
         } catch (error) {
           // Log error but don't fail authentication
           console.error('Failed to save OAuth user to Supabase:', error)
-          if (error instanceof Error) {
-            console.error('Error details:', error.message, error.stack)
-          }
           // Authentication still succeeds even if DB save fails
         }
-      } else {
-        // Log when user data is incomplete - this helps debug why it's not saving sometimes
-        console.warn('OAuth callback: User data incomplete, skipping Supabase save:', {
-          hasUser: !!result.user,
-          hasId: !!result.user?.id,
-          hasEmail: !!result.user?.email,
-          userId: result.user?.id,
-          email: result.user?.email,
-          hasWallet: !!result.wallet
-        })
       }
 
       // Check if user is authenticated but no access token (may need password)
       if ((result.user.id || result.user.email) && !result.access_token) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('OAuth callback: User authenticated but no access_token provided. This may require additional authentication step.')
-        }
         
         const userData: CavosNormalizedResponse & { requires_password?: boolean; oauth_authenticated?: boolean } = {
           user: result.user,
@@ -582,10 +437,6 @@ export async function POST(request: NextRequest) {
       let statusCode = 400
       if (errorMessage.toLowerCase().includes('invalid') || errorMessage.toLowerCase().includes('invalid token')) {
         statusCode = 401
-      }
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.error('OAuth callback error:', error)
       }
       
       return NextResponse.json(

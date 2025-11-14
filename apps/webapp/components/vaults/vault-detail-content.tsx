@@ -16,9 +16,10 @@ import {
   AlertCircle, 
   Info
 } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { getVesuPools } from '@/app/api/vesuApi';
-import type { VesuPool } from '@/types/VesuPools';
+import type { VesuPool, ProcessedAsset } from '@/types/VesuPools';
 import { DepositWithdrawForm } from '@/components/vaults/deposit-withdraw-form';
 import { RebalanceForm } from '@/components/vaults/rebalance-form';
 import { VesuVaultPosition } from '@/components/vaults/position-card';
@@ -47,12 +48,14 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
   const [poolYields, setPoolYields] = useState<Record<string, number | null>>({});
   const [poolBalances, setPoolBalances] = useState<Record<string, bigint>>({});
   const [vesuPoolsData, setVesuPoolsData] = useState<VesuPool[] | null>(null);
+  const [poolBreakdowns, setPoolBreakdowns] = useState<Record<string, { lendingApr: number; rewardsApr: number } | null>>({});
   const [userPosition, setUserPosition] = useState<{
     assets: bigint;
     formatted: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(searchParams.get('action') || 'overview');
+  const activeTabFromUrl = searchParams.get('action') || 'overview';
+  const [activeTab, setActiveTab] = useState(activeTabFromUrl);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   
@@ -63,6 +66,27 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
     { id: 'rebalance', label: 'Rebalance' },
     { id: 'pools', label: 'Pools' },
   ] as const, []);
+
+  // Sync activeTab with URL parameter
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('action') || 'overview';
+    // Validate that the tab from URL is valid
+    if (tabs.some(tab => tab.id === tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams, tabs]);
+
+  // Handle tab change: update both state and URL
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    const currentUrl = new URL(window.location.href);
+    if (tabId === 'overview') {
+      currentUrl.searchParams.delete('action');
+    } else {
+      currentUrl.searchParams.set('action', tabId);
+    }
+    router.replace(currentUrl.pathname + currentUrl.search, { scroll: false });
+  };
 
   // Update indicator position when active tab changes
   useEffect(() => {
@@ -174,6 +198,166 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
     return pool?.name || `Pool ${poolId.slice(0, 8)}...`;
   };
 
+  useEffect(() => {
+    if (!pools.length || !vesuPoolsData) {
+      setPoolBreakdowns({});
+      return;
+    }
+
+    const breakdowns: Record<string, { lendingApr: number; rewardsApr: number } | null> = {};
+
+    for (const pool of pools) {
+      const poolAddressLower = pool.pool_id.toLowerCase();
+      
+      const vesuPool = vesuPoolsData.find((p: VesuPool) => {
+        if (p.id) {
+          const poolIdLower = p.id.toLowerCase();
+          if (poolIdLower === poolAddressLower) {
+            return true;
+          }
+        }
+        
+        // Fallback: try matching by address (extensionContractAddress) if available
+        if (p.address) {
+          const poolApiAddress = p.address.toLowerCase();
+          if (poolApiAddress === poolAddressLower) {
+            return true;
+          }
+        }
+        
+        return false;
+      });
+      
+      if (!vesuPool) {
+        console.warn(`[APY Breakdown] Pool ${pool.pool_id} not found in vesuPoolsData`);
+        console.warn(`[APY Breakdown] Available pools:`, vesuPoolsData.map((p: VesuPool) => ({
+          name: p.name,
+          id: p.id,
+          address: p.address,
+        })));
+        breakdowns[pool.pool_id] = null;
+        continue;
+      }
+
+      // Find WBTC asset in the processed pool data
+      const WBTC_ADDRESS = '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac';
+      
+      const assetAddress = WBTC_ADDRESS.toLowerCase();
+      const assetAddressFelt = BigInt(WBTC_ADDRESS).toString();
+      
+      const normalizeAddress = (addr: string): string => {
+        if (!addr) return '';
+        let normalized = addr.toLowerCase();
+        if (normalized.startsWith('0x')) {
+          normalized = normalized.slice(2);
+        }
+        // Pad to 64 chars (32 bytes in hex)
+        normalized = normalized.padStart(64, '0');
+        return normalized;
+      };
+      
+      const normalizedVaultAsset = normalizeAddress(assetAddress);
+      const normalizedKnownWbtc = normalizeAddress(WBTC_ADDRESS.toLowerCase());
+      
+      let wbtcAsset = vesuPool.assets.find((asset: ProcessedAsset) => {
+        if (!asset.address) return false;
+        
+        const assetAddressLower = assetAddress.toLowerCase();
+        const knownWbtcAddressLower = WBTC_ADDRESS.toLowerCase();
+        const poolAssetAddressLower = asset.address.toLowerCase();
+        
+        const normalizedPoolAsset = normalizeAddress(poolAssetAddressLower);
+        
+        // Try direct match
+        let match = normalizedPoolAsset === normalizedVaultAsset || 
+                   normalizedPoolAsset === normalizedKnownWbtc ||
+                   poolAssetAddressLower === assetAddressLower ||
+                   poolAssetAddressLower === knownWbtcAddressLower;
+        
+        // If no direct match, try converting pool asset address from felt252 to hex
+        if (!match && asset.address && !asset.address.startsWith('0x')) {
+          try {
+            const poolAssetFelt = BigInt(asset.address);
+            const poolAssetHex = `0x${poolAssetFelt.toString(16).padStart(64, '0')}`.toLowerCase();
+            const normalizedPoolHex = normalizeAddress(poolAssetHex);
+            match = normalizedPoolHex === normalizedVaultAsset || normalizedPoolHex === normalizedKnownWbtc;
+          } catch {
+            // Ignore
+          }
+        }
+        
+        // Also try the reverse: if pool asset is in hex, try comparing with felt252 format
+        if (!match && asset.address.startsWith('0x')) {
+          try {
+            const poolAssetFelt = BigInt(asset.address);
+            const poolAssetFeltStr = poolAssetFelt.toString();
+            if (poolAssetFeltStr === assetAddressFelt || poolAssetFeltStr === WBTC_ADDRESS.replace('0x', '')) {
+              match = true;
+            }
+          } catch {
+            // Ignore
+          }
+        }
+        
+        return match;
+      });
+      
+      if (!wbtcAsset) {
+        // First, try to find exact WBTC match
+        wbtcAsset = vesuPool.assets.find((asset: ProcessedAsset) => {
+          if (!asset.symbol) return false;
+          const symbolUpper = asset.symbol.toUpperCase();
+          return symbolUpper === 'WBTC' || symbolUpper === 'WBTC.E';
+        });
+        
+        if (!wbtcAsset) {
+          wbtcAsset = vesuPool.assets.find((asset: ProcessedAsset) => {
+            if (!asset.symbol) return false;
+            const symbolUpper = asset.symbol.toUpperCase();
+            return (symbolUpper.includes('WBTC') || symbolUpper === 'BTC') && 
+                   !symbolUpper.includes('X') &&
+                   !symbolUpper.includes('XWBTC');
+          });
+        }
+      }
+
+      if (wbtcAsset) {
+        const lendingApr = wbtcAsset.apy || 0;
+        const rewardsApr = wbtcAsset.defiSpringApy || 0;
+        
+        console.log(`[APY Breakdown] Found WBTC asset in pool ${pool.pool_id} (${vesuPool.name}):`, {
+          symbol: wbtcAsset.symbol,
+          address: wbtcAsset.address,
+          apy: wbtcAsset.apy,
+          defiSpringApy: wbtcAsset.defiSpringApy,
+          totalApy: (wbtcAsset.apy || 0) + (wbtcAsset.defiSpringApy || 0),
+        });
+        
+        console.log(`[APY Breakdown] All assets in pool ${pool.pool_id} (${vesuPool.name}):`, vesuPool.assets.map((a: ProcessedAsset) => ({
+          symbol: a.symbol,
+          address: a.address?.slice(0, 20) + '...',
+          apy: a.apy,
+          defiSpringApy: a.defiSpringApy,
+          totalApy: (a.apy || 0) + (a.defiSpringApy || 0),
+        })));
+        
+        breakdowns[pool.pool_id] = {
+          lendingApr,
+          rewardsApr,
+        };
+      } else {
+        console.warn(`[APY Breakdown] WBTC asset not found in pool ${pool.pool_id} (${vesuPool?.name})`);
+        console.warn(`[APY Breakdown] Available assets:`, vesuPool?.assets?.map((a: ProcessedAsset) => ({
+          symbol: a.symbol,
+          address: a.address,
+        })));
+        breakdowns[pool.pool_id] = null;
+      }
+    }
+
+    setPoolBreakdowns(breakdowns);
+  }, [pools, vesuPoolsData]);
+
   // Format total assets with full precision
   const formatTotalAssets = (assets: bigint | null | undefined) => {
     if (!assets || assets === null || assets === undefined) return '0.00000000';
@@ -260,13 +444,7 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="text-2xl font-bold text-bitcoin-gold">
-                {isLoading || isVaultLoading ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  </div>
-                ) : (
-                  `${formatTotalAssets(totalAssets || vaultData?.totalAssets)} wBTC`
-                )}
+                {isLoading || isVaultLoading ? '...' : `${formatTotalAssets(totalAssets || vaultData?.totalAssets)} wBTC`}
               </div>
             </CardContent>
           </Card>
@@ -300,42 +478,40 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
           transition={{ duration: 0.3, delay: 0.3 }}
           whileHover={{ y: -2 }}
         >
-          <Card className="relative overflow-hidden bg-gradient-to-r from-green-500/10 to-green-500/5 border-green-500/30 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300 group">
+          <Card className="relative overflow-hidden bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-orange/5 border-bitcoin-orange/30 hover:border-bitcoin-orange/50 hover:shadow-lg hover:shadow-bitcoin-orange/10 transition-all duration-300 group">
             {/* Shimmer effect */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <CardHeader className="pb-2 relative z-10">
-              <CardTitle className="text-sm font-medium text-green-500">Pools</CardTitle>
+              <CardTitle className="text-sm font-medium text-bitcoin-orange">Pools</CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-2xl font-bold text-green-500">
+              <div className="text-2xl font-bold text-bitcoin-orange">
                 {isLoading ? '...' : pools.length}
               </div>
             </CardContent>
           </Card>
         </motion.div>
         
-        {userPosition && (
-          <motion.div
-            key="stats-user-position"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-            whileHover={{ y: -2 }}
-          >
-            <Card className="relative overflow-hidden bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/30 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 group">
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              <CardHeader className="pb-2 relative z-10">
-                <CardTitle className="text-sm font-medium text-blue-500">Your Position</CardTitle>
-              </CardHeader>
-              <CardContent className="relative z-10">
-                <div className="text-2xl font-bold text-blue-500">
-                  {userPosition.formatted} wBTC
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+        <motion.div
+          key="stats-user-position"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          whileHover={{ y: -2 }}
+        >
+          <Card className="relative overflow-hidden bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-orange/5 border-bitcoin-orange/30 hover:border-bitcoin-orange/50 hover:shadow-lg hover:shadow-bitcoin-orange/10 transition-all duration-300 group">
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <CardHeader className="pb-2 relative z-10">
+              <CardTitle className="text-sm font-medium text-bitcoin-orange">Your Position</CardTitle>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-2xl font-bold text-bitcoin-orange">
+                {isLoading || isVaultLoading || !userPosition ? '...' : `${userPosition.formatted} wBTC`}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       {/* Pill Navigation */}
@@ -355,7 +531,7 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                 ref={(el) => {
                   tabRefs.current[index] = el;
                 }}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`
                   relative z-10 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap
                   ${isActive 
@@ -530,15 +706,77 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                               <span className="font-semibold">{poolName}</span>
                             </div>
                             {apy != null && typeof apy === 'number' && !isNaN(apy) ? (
-                              <Badge 
-                                key={`apy-badge-${pool.pool_id}`}
-                                className={apy > 0 
-                                  ? "bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30"
-                                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                                }
-                              >
-                                {formatApy(apy)} APY
-                              </Badge>
+                              <TooltipProvider delayDuration={0}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Badge 
+                                      key={`apy-badge-${pool.pool_id}`}
+                                      className={apy > 0 
+                                        ? "bg-bitcoin-gold/20 text-bitcoin-gold border-bitcoin-gold/30 cursor-help hover:bg-bitcoin-gold/30 transition-colors"
+                                        : "bg-gray-500/20 text-gray-400 border-gray-500/30 cursor-help"
+                                      }
+                                    >
+                                      {formatApy(apy)} APY
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="left" className="max-w-xs p-3" onPointerDownOutside={(e) => e.preventDefault()}>
+                                    {(() => {
+                                      const breakdown = poolBreakdowns[pool.pool_id];
+                                      if (breakdown) {
+                                        return (
+                                          <div className="space-y-3">
+                                            <div className="font-semibold text-sm">APY Breakdown</div>
+                                            <div className="space-y-2.5 text-xs">
+                                              <div className="space-y-1">
+                                                <div className="flex items-center justify-between gap-4">
+                                                  <span className="text-muted-foreground font-medium">Lending APR</span>
+                                                  <span className="font-semibold text-bitcoin-gold">
+                                                    {breakdown.lendingApr > 0 ? `+ ${breakdown.lendingApr.toFixed(2)}%` : `${breakdown.lendingApr.toFixed(2)}%`}
+                                                  </span>
+                                                </div>
+                                                <p className="text-muted-foreground text-[10px] leading-tight pl-1">
+                                                  Yield from lending on Vesu minus pool fee.
+                                                </p>
+                                              </div>
+                                              <div className="space-y-1">
+                                                <div className="flex items-center justify-between gap-4">
+                                                  <span className="text-muted-foreground font-medium">Rewards APR</span>
+                                                  <span className="font-semibold text-bitcoin-orange">
+                                                    {breakdown.rewardsApr > 0 ? `+ ${breakdown.rewardsApr.toFixed(2)}%` : `${breakdown.rewardsApr.toFixed(2)}%`}
+                                                  </span>
+                                                </div>
+                                                <p className="text-muted-foreground text-[10px] leading-tight pl-1">
+                                                  Yield from the BTCFi rewards program.
+                                                </p>
+                                              </div>
+                                              <div className="border-t border-border/50 pt-2 mt-2">
+                                                <div className="flex items-center justify-between gap-4">
+                                                  <span className="text-muted-foreground font-semibold">Total APY</span>
+                                                  <span className="font-bold text-foreground">
+                                                    ≈ {formatApy(apy)}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div className="text-[10px] text-muted-foreground pt-2 border-t border-border/50 leading-tight">
+                                              APR and its components are subject to change.
+                                            </div>
+                                          </div>
+                                        );
+                                      }
+                                      return (
+                                        <div className="text-xs">
+                                          <div className="font-semibold mb-1">Total APY</div>
+                                          <div className="text-muted-foreground">{formatApy(apy)}</div>
+                                          <p className="text-[10px] text-muted-foreground mt-1">
+                                            Loading breakdown...
+                                          </p>
+                                        </div>
+                                      );
+                                    })()}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             ) : (
                               <Badge 
                                 key={`apy-badge-${pool.pool_id}`}

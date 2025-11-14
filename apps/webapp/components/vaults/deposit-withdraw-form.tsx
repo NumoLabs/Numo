@@ -168,7 +168,13 @@ export function DepositWithdrawForm() {
     }
 
     try {
-      await withdraw(data.amount);
+      const txHash = await withdraw(data.amount);
+      
+      // Only proceed with success handling if we got a transaction hash
+      // This ensures we don't show success if the transaction was cancelled
+      if (!txHash) {
+        return;
+      }
       
       // Invalidate queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: vaultQueryKeys.all });
@@ -188,7 +194,7 @@ export function DepositWithdrawForm() {
       // Reset form after successful withdraw
       withdrawForm.reset();
       
-      // Show success toast
+      // Show success toast only if we have a transaction hash
       toast({
         title: 'Withdraw successful',
         description: `Successfully withdrew ${data.amount} wBTC`,

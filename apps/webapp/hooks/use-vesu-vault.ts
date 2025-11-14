@@ -584,6 +584,22 @@ export function useVesuVault() {
           throw new Error('Transaction was cancelled by user');
         }
         
+        // Check if it's an estimateFee error or similar execution error
+        const isEstimateFeeError = 
+          errorStr.includes('estimatefee') ||
+          errorStr.includes('estimate_fee') ||
+          errorStr.includes('u256_sub overflow') ||
+          errorStr.includes('entrypoint_not_found') ||
+          errorStr.includes('execute failed');
+        
+        if (isEstimateFeeError) {
+          // For estimateFee errors, throw a custom error that will be handled by outer catch
+          const customError = new Error('EXECUTE_FAILED_ESTIMATE_FEE');
+          (customError as any).isEstimateFeeError = true;
+          (customError as any).originalError = executeError;
+          throw customError;
+        }
+        
         // Check for other common error patterns
         let detailedError = 'Transaction execution failed';
         if (errorStr.includes('insufficient funds') || errorStr.includes('balance')) {
@@ -593,6 +609,12 @@ export function useVesuVault() {
         } else if (errorMessage) {
           detailedError = errorMessage;
         }
+        
+        // For other errors, log them for debugging
+        console.error('Withdraw execute failed (non-estimateFee error):', executeError);
+        console.error('Error type:', typeof executeError);
+        console.error('Error message:', executeError?.message);
+        console.error('Error structure:', JSON.stringify(executeError, null, 2));
         
         setError(detailedError);
         throw new Error(detailedError);
@@ -624,21 +646,82 @@ export function useVesuVault() {
       
       return tx.transaction_hash;
     } catch (err: any) {
+      // Check if it's a user cancellation first - this must be propagated to prevent success message
+      const errorMessage = err?.message || '';
+      const isUserCancellation = 
+        errorMessage.includes('Transaction was cancelled by user') ||
+        errorMessage.includes('cancelled by user') ||
+        errorMessage.includes('user abort') ||
+        errorMessage.includes('user rejected');
+      
+      if (isUserCancellation) {
+        // User cancelled - make sure to throw error so component doesn't show success
+        setIsSuccess(false);
+        setError('Transaction was cancelled by user');
+        throw new Error('Transaction was cancelled by user');
+      }
+      
+      if ((err as any)?.isEstimateFeeError === true) {
+        // Silently handle estimateFee errors - don't log them as they're expected
+        const errorMessage = 'Transaction failed during execution. This may be due to contract internal state. Please check your vault balance and try again, or contact support if the issue persists.';
+        setError(errorMessage);
+        // Return early without throwing to prevent error propagation
+        return;
+      }
+      
+      // Only log non-estimateFee errors for debugging
       console.error('Withdraw failed:', err);
       
       // Extract error message
-      let errorMessage = 'Withdraw failed';
+      let finalErrorMessage = 'Withdraw failed';
+      let isEstimateFeeError = false;
       
       if (err?.message) {
-        errorMessage = err.message;
+        finalErrorMessage = err.message;
       } else if (err?.toString) {
-        errorMessage = err.toString();
+        finalErrorMessage = err.toString();
       } else if (typeof err === 'string') {
-        errorMessage = err;
+        finalErrorMessage = err;
       }
       
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      // Check if it's an estimateFee or execution error
+      const errorStr = (finalErrorMessage || '').toLowerCase();
+      const errorJson = JSON.stringify(err).toLowerCase();
+      const fullErrorStr = (errorStr + ' ' + errorJson).toLowerCase();
+      
+      // Check if it's an estimateFee or execution error
+      if (
+        fullErrorStr.includes('estimatefee') ||
+        fullErrorStr.includes('estimate_fee') ||
+        fullErrorStr.includes('u256_sub overflow') ||
+        fullErrorStr.includes('entrypoint_not_found') ||
+        fullErrorStr.includes('execute failed') ||
+        errorStr.includes('execute failed') ||
+        errorJson.includes('execute failed')
+      ) {
+        isEstimateFeeError = true;
+        finalErrorMessage = 'Transaction failed during execution. This may be due to contract internal state. Please check your vault balance and try again, or contact support if the issue persists.';
+      }
+      
+      // Check for nested error structure
+      if (err?.error?.revert_error?.error?.error) {
+        const nestedError = err.error.revert_error.error.error;
+        if (typeof nestedError === 'string') {
+          if (nestedError.includes('ENTRYPOINT_NOT_FOUND') || 
+              nestedError.includes('454e545259504f494e545f4e4f545f464f554e44')) {
+            isEstimateFeeError = true;
+            finalErrorMessage = 'Withdraw failed: Error during fee estimation. This may be a known issue with the contract. The transaction may still succeed - please check your transaction history.';
+          }
+        }
+      }
+      
+      setError(finalErrorMessage);
+      
+      if (isEstimateFeeError) {
+        return;
+      }
+      
+      throw new Error(finalErrorMessage);
     } finally {
       setIsPending(false);
     }
@@ -1428,9 +1511,96 @@ export function useVesuVault() {
       return tx.transaction_hash;
     } catch (err: any) {
       console.error('Rebalance failed:', err);
-      const errorMessage = err?.message || 'Rebalance failed';
+      
+      // Parse error message to provide user-friendly feedback
+      let errorMessage = 'Rebalance failed. Please try again.';
+      
+      // Helper function to recursively extract error messages from nested error structures
+      const extractErrorMessage = (errorObj: any, depth: number = 0): string | null => {
+        if (!errorObj || depth > 10) return null; // Prevent infinite recursion
+        
+        // Check direct message property
+        if (errorObj.message && typeof errorObj.message === 'string') {
+          return errorObj.message;
+        }
+        
+        // Check if error object contains the error string directly (for Starknet errors)
+        if (errorObj.error && typeof errorObj.error === 'string') {
+          return errorObj.error;
+        }
+        
+        // Check error property (may be nested object)
+        if (errorObj.error && typeof errorObj.error === 'object') {
+          const nestedError = extractErrorMessage(errorObj.error, depth + 1);
+          if (nestedError) return nestedError;
+        }
+        
+        // Check execution_error property
+        if (errorObj.execution_error) {
+          const nestedError = extractErrorMessage(errorObj.execution_error, depth + 1);
+          if (nestedError) return nestedError;
+        }
+        
+        // Check if error object contains the error string directly
+        if (typeof errorObj === 'string') {
+          return errorObj;
+        }
+        
+        // Check for stringified JSON in message
+        if (errorObj.toString && typeof errorObj.toString === 'function') {
+          const stringified = errorObj.toString();
+          if (stringified && stringified !== '[object Object]') {
+            try {
+              const parsed = JSON.parse(stringified);
+              const parsedError = extractErrorMessage(parsed, depth + 1);
+              if (parsedError) return parsedError;
+            } catch {
+              // If parsing fails, use the string as-is if it contains error info
+              if (stringified.includes('Insufficient yield') || stringified.includes('insufficient yield')) {
+                return stringified;
+              }
+            }
+          }
+        }
+        
+        // Try stringifying the entire object and searching for error messages
+        try {
+          const stringified = JSON.stringify(errorObj);
+          if (stringified.includes('Insufficient yield') || stringified.includes('insufficient yield')) {
+            // Try to extract the actual error message from the JSON string
+            const match = stringified.match(/(?:'|")(.*?insufficient yield.*?)(?:'|")/i);
+            if (match && match[1]) {
+              return match[1];
+            }
+          }
+        } catch {
+          // Ignore JSON stringify errors
+        }
+        
+        return null;
+      };
+      
+      // Extract error message from potentially nested structure
+      const extractedError = extractErrorMessage(err);
+      const errMsg = (extractedError || err?.message || JSON.stringify(err) || '').toLowerCase();
+      
+      // Check for specific error conditions
+      if (errMsg.includes('insufficient yield') || 
+          errMsg.includes('0x496e73756666696369656e74207969656c64') ||
+          errMsg.includes("'insufficient yield'")) {
+        errorMessage = 'Insufficient yield: The source pool does not have enough yield generated to perform this rebalance. Please try a smaller amount or wait for more yield to accumulate.';
+      } else if (errMsg.includes('insufficient balance') || errMsg.includes('insufficient funds')) {
+        errorMessage = 'Insufficient balance: The source pool does not have enough funds for this rebalance.';
+      } else if (errMsg.includes('user rejected') || errMsg.includes('user abort') || errMsg.includes('rejected')) {
+        errorMessage = 'Transaction cancelled by user.';
+      } else if (extractedError) {
+        errorMessage = extractedError;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
       setError(errorMessage);
-      throw err;
+      throw new Error(errorMessage);
     } finally {
       setIsPending(false);
     }
@@ -2356,6 +2526,7 @@ export function useVesuVault() {
     isSuccess,
     error,
     account,
+    contract,
     contractAddress: VESU_VAULT_ADDRESS,
     totalAssets: vaultData?.totalAssets || null,
     wbtcBalance,
