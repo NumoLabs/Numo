@@ -81,21 +81,19 @@ export async function getVesuPools() {
 		// Handle different response structures
 		const data = response.data?.data || response.data || [];
 		
-		// Log raw API response for debugging (first pool's first asset)
-		if (data.length > 0 && data[0]?.assets?.length > 0) {
-			const firstAsset = data[0].assets[0];
-			console.log('[getVesuPools] Raw API response sample (first asset):', {
-				symbol: firstAsset.symbol,
-				address: firstAsset.address,
-				stats: firstAsset.stats,
-				supplyApyRaw: firstAsset.stats?.supplyApy,
-				defiSpringSupplyAprRaw: firstAsset.stats?.defiSpringSupplyApr,
-				// Log all fields in stats to see what's available
-				allStatsFields: Object.keys(firstAsset.stats || {}),
-				// Log all asset fields to see if there are reward fields at asset level
-				allAssetFields: Object.keys(firstAsset || {}),
-			});
-		}
+		// Log raw API response for debugging (only in development)
+		// if (process.env.NODE_ENV === 'development' && data.length > 0 && data[0]?.assets?.length > 0) {
+		// 	const firstAsset = data[0].assets[0];
+		// 	console.log('[getVesuPools] Raw API response sample (first asset):', {
+		// 		symbol: firstAsset.symbol,
+		// 		address: firstAsset.address,
+		// 		stats: firstAsset.stats,
+		// 		supplyApyRaw: firstAsset.stats?.supplyApy,
+		// 		defiSpringSupplyAprRaw: firstAsset.stats?.defiSpringSupplyApr,
+		// 		allStatsFields: Object.keys(firstAsset.stats || {}),
+		// 		allAssetFields: Object.keys(firstAsset || {}),
+		// 	});
+		// }
 		
 	return data
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -130,26 +128,25 @@ export async function getVesuPools() {
 				const defiSpringApy = (Number(defiSpringAprValue) / 10 ** defiSpringAprDecimals) * 100;
 				const btcfiRewardsApy = btcfiRewardsAprValue ? (Number(btcfiRewardsAprValue) / 10 ** btcfiRewardsAprDecimals) * 100 : 0;
 				
-				// Log WBTC assets specifically for debugging with full stats structure
-				if (asset.symbol?.toUpperCase().includes('WBTC') || asset.symbol?.toUpperCase().includes('BTC')) {
-					console.log(`[getVesuPools] Processing ${asset.symbol} in pool ${pool.name}:`, {
-						symbol: asset.symbol,
-						address: asset.address,
-						supplyApyValue,
-						supplyApyDecimals,
-						calculatedApy: apy,
-						defiSpringAprValue,
-						defiSpringAprDecimals,
-						calculatedDefiSpringApy: defiSpringApy,
-						btcfiRewardsAprValue: btcfiRewardsAprValue || 'not found',
-						calculatedBtcfiRewardsApy: btcfiRewardsApy,
-						totalApy: apy + defiSpringApy + btcfiRewardsApy,
-						// Log all available fields to help identify where rewards are stored
-						allStatsFields,
-						allAssetFields: allAssetFields.filter(f => !['stats', 'name', 'symbol', 'address', 'decimals', 'vToken'].includes(f)),
-						fullStats: asset.stats, // Log full stats object to see all available fields
-					});
-				}
+				// Log WBTC assets specifically for debugging (only in development)
+				// if (process.env.NODE_ENV === 'development' && (asset.symbol?.toUpperCase().includes('WBTC') || asset.symbol?.toUpperCase().includes('BTC'))) {
+				// 	console.log(`[getVesuPools] Processing ${asset.symbol} in pool ${pool.name}:`, {
+				// 		symbol: asset.symbol,
+				// 		address: asset.address,
+				// 		supplyApyValue,
+				// 		supplyApyDecimals,
+				// 		calculatedApy: apy,
+				// 		defiSpringAprValue,
+				// 		defiSpringAprDecimals,
+				// 		calculatedDefiSpringApy: defiSpringApy,
+				// 		btcfiRewardsAprValue: btcfiRewardsAprValue || 'not found',
+				// 		calculatedBtcfiRewardsApy: btcfiRewardsApy,
+				// 		totalApy: apy + defiSpringApy + btcfiRewardsApy,
+				// 		allStatsFields,
+				// 		allAssetFields: allAssetFields.filter(f => !['stats', 'name', 'symbol', 'address', 'decimals', 'vToken'].includes(f)),
+				// 		fullStats: asset.stats,
+				// 	});
+				// }
 				
 				// Calculate total rewards APY (DeFi Spring + BTCFi rewards)
 				// If defiSpringApy is 0 but there are BTCFi rewards, use BTCFi rewards
@@ -159,56 +156,36 @@ export async function getVesuPools() {
 				// If we found BTCFi rewards, add them to the total rewards
 				if (btcfiRewardsApy > 0) {
 					totalRewardsApy += btcfiRewardsApy;
-					console.log(`[getVesuPools] Found BTCFi rewards for ${asset.symbol} in pool ${pool.name}: ${btcfiRewardsApy.toFixed(4)}%`);
+					// Log only in development
+					// if (process.env.NODE_ENV === 'development') {
+					// 	console.log(`[getVesuPools] Found BTCFi rewards for ${asset.symbol} in pool ${pool.name}: ${btcfiRewardsApy.toFixed(4)}%`);
+					// }
 				}
 				
-				// If defiSpringApy is 0, search more thoroughly for reward fields
-				// The API might store BTCFi rewards under a different field name
+				// If defiSpringApy is 0, search for other reward fields (btcFiSupplyApr, lstApr, etc.)
 				if (totalRewardsApy === 0) {
-					// Try to find any reward-related field in stats
-					const rewardFields = allStatsFields.filter((field: string) => 
-						field.toLowerCase().includes('reward') || 
-						field.toLowerCase().includes('apr') || 
-						field.toLowerCase().includes('apy') ||
-						field.toLowerCase().includes('btcfi') ||
-						field.toLowerCase().includes('btc')
-					);
+					// Check for btcFiSupplyApr (BTCFi rewards)
+					const btcFiApr = asset.stats?.btcFiSupplyApr;
+					if (btcFiApr && typeof btcFiApr === 'object' && 'value' in btcFiApr) {
+						const btcFiValue = btcFiApr.value;
+						const btcFiDecimals = btcFiApr.decimals ?? 18;
+						const btcFiApy = (Number(btcFiValue) / 10 ** btcFiDecimals) * 100;
+						if (btcFiApy > 0) {
+							totalRewardsApy = btcFiApy;
+						}
+					}
 					
-					// Also check all fields that might contain numeric reward values
-					allStatsFields.forEach((field: string) => {
-						const fieldValue = asset.stats?.[field];
-						// Check if this field has a value property (like supplyApy.value)
-						if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
-							const fieldVal = fieldValue.value;
-							const fieldDecimals = fieldValue.decimals ?? 18;
-							const fieldApy = (Number(fieldVal) / 10 ** fieldDecimals) * 100;
-							
-							// If this field has a non-zero APY value, it might be a reward field
-							if (fieldApy > 0 && field !== 'supplyApy' && field !== 'currentUtilization') {
-								console.log(`[getVesuPools] 🔍 Found potential reward field for ${asset.symbol} in pool ${pool.name}:`);
-								console.log(`[getVesuPools]   - Field: ${field}`);
-								console.log(`[getVesuPools]   - Value: ${fieldVal}`);
-								console.log(`[getVesuPools]   - Decimals: ${fieldDecimals}`);
-								console.log(`[getVesuPools]   - Calculated APY: ${fieldApy.toFixed(4)}%`);
-								
-								// If this looks like a rewards field and we don't have rewards yet, use it
-								if (field.toLowerCase().includes('reward') || 
-								    field.toLowerCase().includes('btcfi') ||
-								    (fieldApy > 0.1 && field.toLowerCase().includes('apr'))) {
-									console.log(`[getVesuPools] ✅ Using ${field} as rewards APY: ${fieldApy.toFixed(4)}%`);
-									totalRewardsApy = fieldApy;
-								}
+					// If still no rewards, check for lstApr (LST rewards)
+					if (totalRewardsApy === 0) {
+						const lstApr = asset.stats?.lstApr;
+						if (lstApr && typeof lstApr === 'object' && 'value' in lstApr) {
+							const lstValue = lstApr.value;
+							const lstDecimals = lstApr.decimals ?? 18;
+							const lstApy = (Number(lstValue) / 10 ** lstDecimals) * 100;
+							if (lstApy > 0) {
+								totalRewardsApy = lstApy;
 							}
 						}
-					});
-					
-					if (rewardFields.length > 0 && totalRewardsApy === 0) {
-						console.log(`[getVesuPools] Found reward-related fields for ${asset.symbol} in pool ${pool.name}:`, rewardFields);
-						// Log the values of these fields
-						rewardFields.forEach((field: string) => {
-							const fieldValue = asset.stats?.[field];
-							console.log(`[getVesuPools]   - ${field}:`, fieldValue);
-						});
 					}
 				}
 				
