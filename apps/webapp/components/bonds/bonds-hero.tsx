@@ -1,5 +1,4 @@
-import Link from "next/link"
-import { ArrowLeft, Lock, TrendingUp, Shield, Clock } from "lucide-react"
+import { Lock, TrendingUp, Shield, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -9,14 +8,6 @@ export function BondsHero() {
       <div className="absolute inset-0 bg-black/20"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-bitcoin-gold/20 to-bitcoin-orange/20 rounded-full blur-3xl"></div>
       <div className="relative z-10">
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/20">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </Link>
-        </div>
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="flex items-center gap-2 mb-4">

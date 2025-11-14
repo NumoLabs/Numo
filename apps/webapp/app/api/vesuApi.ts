@@ -99,15 +99,14 @@ export async function getVesuPools() {
 				// Otherwise fall back to supplyApy
 				const supplyAprValue = asset.stats?.supplyApr?.value || asset.stats?.supplyApy?.value || '0';
 				const supplyAprDecimals = asset.stats?.supplyApr?.decimals ?? asset.stats?.supplyApy?.decimals ?? 18;
-				const supplyApyValue = asset.stats?.supplyApy?.value || '0';
-				const supplyApyDecimals = asset.stats?.supplyApy?.decimals ?? 18;
+				// const supplyApyValue = asset.stats?.supplyApy?.value || '0';
+				// const supplyApyDecimals = asset.stats?.supplyApy?.decimals ?? 18;
 				const defiSpringAprValue = asset.stats?.defiSpringSupplyApr?.value || '0';
 				const defiSpringAprDecimals = asset.stats?.defiSpringSupplyApr?.decimals ?? 18;
 				
 				// Check for additional reward fields (BTCFi rewards, etc.)
 				// The API might have other reward fields that we're not reading
 				const allStatsFields = asset.stats ? Object.keys(asset.stats) : [];
-				const allAssetFields = Object.keys(asset || {});
 				
 				// Look for BTCFi rewards or other reward fields
 				// Common field names: btcFiSupplyApr, btcfiRewardsApr, btcfiRewards, rewardsApr, totalRewardsApr, etc.
@@ -120,9 +119,9 @@ export async function getVesuPools() {
 				// Convert from wei to percentage
 				// Prefer APR if available (matches Vesu website), otherwise use APY
 				const apr = (Number(supplyAprValue) / 10 ** supplyAprDecimals) * 100;
-				const apyFromField = supplyApyValue && supplyApyValue !== supplyAprValue 
-					? (Number(supplyApyValue) / 10 ** supplyApyDecimals) * 100 
-					: null;
+				// const apyFromField = supplyApyValue && supplyApyValue !== supplyAprValue 
+				// 	? (Number(supplyApyValue) / 10 ** supplyApyDecimals) * 100 
+				// 	: null;
 				
 				const apy = apr;
 				
@@ -143,8 +142,7 @@ export async function getVesuPools() {
 					totalRewardsApy = defiSpringApy;
 				}
 				
-				// If defiSpringApy is 0, search more thoroughly for reward fields
-				// The API might store BTCFi rewards under a different field name
+				// If defiSpringApy is 0, search for other reward fields (btcFiSupplyApr, lstApr, etc.)
 				if (totalRewardsApy === 0) {
 					// Try to find any reward-related field in stats
 					const rewardFields = allStatsFields.filter((field: string) => 

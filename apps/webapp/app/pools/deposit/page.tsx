@@ -1,32 +1,22 @@
 "use client"
 
-import { useState } from "react"
-import { Sidebar } from "@/components/dashboard/layout/sidebar"
-import { TopNavigation } from "@/components/dashboard/layout/top-navigation"
-import { Footer } from "@/components/ui/footer"
-import { PoolsContent } from "@/components/pools/pools-content"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { CavosAuthGuard } from "@/components/auth"
 
-export default function PoolsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+export default function DepositPage() {
+  const router = useRouter()
+
+  // Redirect to pools page - custom vaults feature not yet available
+  useEffect(() => {
+    router.replace("/pools")
+  }, [router])
 
   return (
     <CavosAuthGuard>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-      {/* Main content */}
-      <div className="lg:pl-72">
-        <TopNavigation setSidebarOpen={setSidebarOpen} />
-
-        {/* Page content */}
-        <main className="py-8">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <PoolsContent />
-          </div>
-        </main>
-
-        <Footer />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Redirecting...</p>
       </div>
       </div>
     </CavosAuthGuard>
