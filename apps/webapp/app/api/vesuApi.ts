@@ -111,8 +111,8 @@ export async function getVesuPools() {
 				// Otherwise fall back to supplyApy
 				const supplyAprValue = asset.stats?.supplyApr?.value || asset.stats?.supplyApy?.value || '0';
 				const supplyAprDecimals = asset.stats?.supplyApr?.decimals ?? asset.stats?.supplyApy?.decimals ?? 18;
-				const supplyApyValue = asset.stats?.supplyApy?.value || '0';
-				const supplyApyDecimals = asset.stats?.supplyApy?.decimals ?? 18;
+				// const supplyApyValue = asset.stats?.supplyApy?.value || '0';
+				// const supplyApyDecimals = asset.stats?.supplyApy?.decimals ?? 18;
 				const defiSpringAprValue = asset.stats?.defiSpringSupplyApr?.value || '0';
 				const defiSpringAprDecimals = asset.stats?.defiSpringSupplyApr?.decimals ?? 18;
 				
@@ -132,9 +132,9 @@ export async function getVesuPools() {
 				// Convert from wei to percentage
 				// Prefer APR if available (matches Vesu website), otherwise use APY
 				const apr = (Number(supplyAprValue) / 10 ** supplyAprDecimals) * 100;
-				const apyFromField = supplyApyValue && supplyApyValue !== supplyAprValue 
-					? (Number(supplyApyValue) / 10 ** supplyApyDecimals) * 100 
-					: null;
+				// const apyFromField = supplyApyValue && supplyApyValue !== supplyAprValue 
+				// 	? (Number(supplyApyValue) / 10 ** supplyApyDecimals) * 100 
+				// 	: null;
 				
 				const apy = apr;
 				
