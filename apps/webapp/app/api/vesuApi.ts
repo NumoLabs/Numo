@@ -144,15 +144,6 @@ export async function getVesuPools() {
 				
 				// If defiSpringApy is 0, search for other reward fields (btcFiSupplyApr, lstApr, etc.)
 				if (totalRewardsApy === 0) {
-					// Try to find any reward-related field in stats
-					const rewardFields = allStatsFields.filter((field: string) => 
-						field.toLowerCase().includes('reward') || 
-						field.toLowerCase().includes('apr') || 
-						field.toLowerCase().includes('apy') ||
-						field.toLowerCase().includes('btcfi') ||
-						field.toLowerCase().includes('btc')
-					);
-					
 					// Also check all fields that might contain numeric reward values
 					// Priority order for reward fields: btcFiSupplyApr > defiSpringSupplyApr > lstApr > other rewards
 					const rewardFieldPriority = ['btcfisupplyapr', 'defispringsupplyapr', 'lstapr'];
