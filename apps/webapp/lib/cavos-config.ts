@@ -36,7 +36,7 @@ export const getCavosConfig = () => {
   const baseURL = customApiUrl || 'https://services.cavos.xyz/api/v1/external'
   
   const isDevelopment = process.env.NODE_ENV === 'development'
-  const defaultNetwork = process.env.NEXT_PUBLIC_CAVOS_NETWORK || (isDevelopment ? 'sepolia' : 'mainnet')
+  const defaultNetwork = process.env.NEXT_PUBLIC_CAVOS_NETWORK || 'mainnet'
   
   return {
     appId: process.env.NEXT_PUBLIC_CAVOS_APP_ID!,

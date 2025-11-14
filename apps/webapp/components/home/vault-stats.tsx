@@ -116,7 +116,7 @@ export function VaultStats() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-bitcoin-gold transition-all duration-300 group-hover:scale-105">
-                  Ekubo, Vesu, Custom
+                  Vesu, Custom
                 </div>
                 <p className="text-xs text-gray-400">Community and protocol strategies live</p>
               </CardContent>
