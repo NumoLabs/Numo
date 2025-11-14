@@ -246,15 +246,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
                       History
                     </Link>
                     <Link
-                      href="/pools"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/pools" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Pools
-                    </Link>
-                    <Link
                       href="/bonds"
                       className={cn(
                         "hover:text-foreground",
@@ -352,15 +343,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
               )}
             >
               History
-            </Link>
-            <Link
-              href="/pools"
-              className={cn(
-                "text-sm font-medium",
-                pathname === "/pools" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Pools
             </Link>
             <Link
               href="/bonds"

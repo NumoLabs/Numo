@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, Plus, TrendingUp, Info } from "lucide-react"
+import { ArrowLeft, Plus, TrendingUp, Info, Loader2 } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -14,63 +14,20 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useVesuPoolsData } from "@/hooks/use-vault-queries"
+import { fetchTopPools } from "@/app/api/ekuboApi"
+import type { VesuPool } from "@/types/VesuPools"
+import type { EkuboPoolsDisplay } from "@/types/EkuboPoolsDisplay"
 
-// Mock data - in a real application this would come from an API
-const poolsData = {
-  "ekubo-btc-usdc": {
-    name: "Ekubo BTC/USDC",
-    protocol: "Ekubo",
-    apy: "4.8%",
-    tvl: "$2.4M",
-    risk: "Medium",
-    tokens: ["BTC", "USDC"],
-    description: "BTC/USDC liquidity pool on Ekubo DEX with automatic rebalancing",
-  },
-  "vesu-btc-lending": {
-    name: "Vesu BTC Lending",
-    protocol: "Vesu",
-    apy: "5.8%",
-    tvl: "$3.7M",
-    risk: "Low",
-    tokens: ["BTC"],
-    description: "BTC lending pool on Vesu Finance with collateralized guarantees",
-  },
-  "ekubo-btc-eth": {
-    name: "Ekubo BTC/ETH",
-    protocol: "Ekubo",
-    apy: "5.2%",
-    tvl: "$1.8M",
-    risk: "Medium",
-    tokens: ["BTC", "ETH"],
-    description: "BTC/ETH liquidity pool on Ekubo DEX for trading between major cryptocurrencies",
-  },
-  "vesu-btc-vault": {
-    name: "Vesu BTC Vault",
-    protocol: "Vesu",
-    apy: "4.5%",
-    tvl: "$5.2M",
-    risk: "Low",
-    tokens: ["BTC"],
-    description: "Automated BTC vault on Vesu Finance with optimized strategies",
-  },
-  "ekubo-btc-usdt": {
-    name: "Ekubo BTC/USDT",
-    protocol: "Ekubo",
-    apy: "4.6%",
-    tvl: "$1.2M",
-    risk: "Medium-High",
-    tokens: ["BTC", "USDT"],
-    description: "BTC/USDT liquidity pool on Ekubo DEX with high volatility",
-  },
-  "ekubo-btc-dai": {
-    name: "Ekubo BTC/DAI",
-    protocol: "Ekubo",
-    apy: "4.3%",
-    tvl: "$0.9M",
-    risk: "Medium",
-    tokens: ["BTC", "DAI"],
-    description: "BTC/DAI liquidity pool on Ekubo DEX with decentralized stablecoin",
-  },
+interface PoolData {
+  id: string
+  name: string
+  protocol: string
+  apy: string
+  tvl: string
+  risk: string
+  tokens: string[]
+  description: string
 }
 
 const vaultsData = [
@@ -108,8 +65,96 @@ export function AddPoolToVaultContent() {
   const [amount, setAmount] = useState("")
   const [allocation, setAllocation] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [ekuboPools, setEkuboPools] = useState<EkuboPoolsDisplay[]>([])
+  const [loadingPools, setLoadingPools] = useState(true)
+  
+  const { data: vesuPools, isLoading: isLoadingVesu } = useVesuPoolsData()
 
-  const poolData = poolsData[poolSlug as keyof typeof poolsData]
+  // Fetch Ekubo pools
+  useEffect(() => {
+    const loadEkuboPools = async () => {
+      try {
+        setLoadingPools(true)
+        const pools = await fetchTopPools()
+        setEkuboPools(pools)
+      } catch (error) {
+        console.error('Error loading Ekubo pools:', error)
+        setEkuboPools([])
+      } finally {
+        setLoadingPools(false)
+      }
+    }
+    loadEkuboPools()
+  }, [])
+
+  // Combine and transform pools data
+  const allPools = useMemo<PoolData[]>(() => {
+    const pools: PoolData[] = []
+
+    // Add Vesu pools
+    if (Array.isArray(vesuPools)) {
+      vesuPools.forEach((p: VesuPool) => {
+        if (!p.assets || p.assets.length === 0) return
+
+        const bestAsset = p.assets.reduce((best, current) => {
+          const currentApy = (current.apy || 0) + (current.defiSpringApy || 0)
+          const bestApy = (best.apy || 0) + (best.defiSpringApy || 0)
+          return currentApy > bestApy ? current : best
+        }, p.assets[0])
+
+        const totalApy = ((bestAsset.apy || 0) + (bestAsset.defiSpringApy || 0)).toFixed(2)
+        const tokens = p.assets.map(a => a.symbol).filter(Boolean)
+
+        pools.push({
+          id: `vesu-${p.id}`,
+          name: p.name,
+          description: `Lending pool on Vesu Finance with ${tokens.join(', ')} support`,
+          apy: `${totalApy}%`,
+          tvl: "N/A",
+          protocol: "Vesu",
+          risk: bestAsset.currentUtilization && bestAsset.currentUtilization > 80 ? "Medium" : "Low",
+          tokens
+        })
+      })
+    }
+
+    // Add Ekubo pools
+    ekuboPools.forEach((p: EkuboPoolsDisplay) => {
+      const token0Symbol = p.token0?.symbol || 'Unknown'
+      const token1Symbol = p.token1?.symbol || 'Unknown'
+      const apy = p.pool?.apy ? `${(p.pool.apy * 100).toFixed(2)}%` : "N/A"
+      const tvl = p.totalTvl ? `$${(p.totalTvl / 1e6).toFixed(1)}M` : "N/A"
+
+      pools.push({
+        id: `ekubo-${p.pool?.key_hash || `${token0Symbol}-${token1Symbol}`}`,
+        name: `Ekubo ${token0Symbol}/${token1Symbol}`,
+        description: `${token0Symbol}/${token1Symbol} liquidity pool on Ekubo DEX`,
+        apy,
+        tvl,
+        protocol: "Ekubo",
+        risk: "Medium",
+        tokens: [token0Symbol, token1Symbol]
+      })
+    })
+
+    return pools
+  }, [vesuPools, ekuboPools])
+
+  // Find the requested pool
+  const poolData = useMemo(() => {
+    return allPools.find(p => p.id === poolSlug || p.id.endsWith(poolSlug))
+  }, [allPools, poolSlug])
+
+  if (loadingPools || isLoadingVesu) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading pool data...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!poolData) {
     return (

@@ -33,7 +33,7 @@ const BASE_URL =
 	// biome-ignore lint/suspicious/noDoubleEquals: <explanation>
 	chainId == 'SN_MAIN'
 		? 'https://mainnet-api.ekubo.org'
-		: 'https://sepolia-api.ekubo.org';
+		: 'https://mainnet-api.ekubo.org';
 const NODE_URL = getNodeUrl(chainId);
 const tokenPriceCache = new TokenPriceCache(60000);
 
