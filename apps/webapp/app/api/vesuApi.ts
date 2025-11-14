@@ -81,19 +81,7 @@ export async function getVesuPools() {
 		// Handle different response structures
 		const data = response.data?.data || response.data || [];
 		
-		// Log raw API response for debugging (only in development)
-		// if (process.env.NODE_ENV === 'development' && data.length > 0 && data[0]?.assets?.length > 0) {
-		// 	const firstAsset = data[0].assets[0];
-		// 	console.log('[getVesuPools] Raw API response sample (first asset):', {
-		// 		symbol: firstAsset.symbol,
-		// 		address: firstAsset.address,
-		// 		stats: firstAsset.stats,
-		// 		supplyApyRaw: firstAsset.stats?.supplyApy,
-		// 		defiSpringSupplyAprRaw: firstAsset.stats?.defiSpringSupplyApr,
-		// 		allStatsFields: Object.keys(firstAsset.stats || {}),
-		// 		allAssetFields: Object.keys(firstAsset || {}),
-		// 	});
-		// }
+		// Process API response
 		
 	return data
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -118,8 +106,7 @@ export async function getVesuPools() {
 				
 				// Check for additional reward fields (BTCFi rewards, etc.)
 				// The API might have other reward fields that we're not reading
-				// const allStatsFields = asset.stats ? Object.keys(asset.stats) : [];
-				// const allAssetFields = Object.keys(asset || {});
+				const allStatsFields = asset.stats ? Object.keys(asset.stats) : [];
 				
 				// Look for BTCFi rewards or other reward fields
 				// Common field names: btcFiSupplyApr, btcfiRewardsApr, btcfiRewards, rewardsApr, totalRewardsApr, etc.
@@ -141,25 +128,6 @@ export async function getVesuPools() {
 				const defiSpringApy = (Number(defiSpringAprValue) / 10 ** defiSpringAprDecimals) * 100;
 				const btcfiRewardsApy = btcfiRewardsAprValue ? (Number(btcfiRewardsAprValue) / 10 ** btcfiRewardsAprDecimals) * 100 : 0;
 				
-				// Log WBTC assets specifically for debugging (only in development)
-				// if (process.env.NODE_ENV === 'development' && (asset.symbol?.toUpperCase().includes('WBTC') || asset.symbol?.toUpperCase().includes('BTC'))) {
-				// 	console.log(`[getVesuPools] Processing ${asset.symbol} in pool ${pool.name}:`, {
-				// 		symbol: asset.symbol,
-				// 		address: asset.address,
-				// 		supplyApyValue,
-				// 		supplyApyDecimals,
-				// 		calculatedApy: apy,
-				// 		defiSpringAprValue,
-				// 		defiSpringAprDecimals,
-				// 		calculatedDefiSpringApy: defiSpringApy,
-				// 		btcfiRewardsAprValue: btcfiRewardsAprValue || 'not found',
-				// 		calculatedBtcfiRewardsApy: btcfiRewardsApy,
-				// 		totalApy: apy + defiSpringApy + btcfiRewardsApy,
-				// 		allStatsFields,
-				// 		allAssetFields: allAssetFields.filter(f => !['stats', 'name', 'symbol', 'address', 'decimals', 'vToken'].includes(f)),
-				// 		fullStats: asset.stats,
-				// 	});
-				// }
 				
 				// Calculate total rewards APY (DeFi Spring + BTCFi rewards)
 				// According to Vesu website, BTCFi rewards are separate from DeFi Spring rewards
@@ -168,11 +136,7 @@ export async function getVesuPools() {
 				let totalRewardsApy = 0;
 				
 				if (btcfiRewardsApy > 0) {
-					totalRewardsApy += btcfiRewardsApy;
-					// Log only in development
-					// if (process.env.NODE_ENV === 'development') {
-					// 	console.log(`[getVesuPools] Found BTCFi rewards for ${asset.symbol} in pool ${pool.name}: ${btcfiRewardsApy.toFixed(4)}%`);
-					// }
+					totalRewardsApy = btcfiRewardsApy;
 				} else if (defiSpringApy > 0) {
 					// Fallback to DeFi Spring rewards if BTCFi rewards are not available
 					totalRewardsApy = defiSpringApy;
@@ -180,29 +144,45 @@ export async function getVesuPools() {
 				
 				// If defiSpringApy is 0, search for other reward fields (btcFiSupplyApr, lstApr, etc.)
 				if (totalRewardsApy === 0) {
-					// Check for btcFiSupplyApr (BTCFi rewards)
-					const btcFiApr = asset.stats?.btcFiSupplyApr;
-					if (btcFiApr && typeof btcFiApr === 'object' && 'value' in btcFiApr) {
-						const btcFiValue = btcFiApr.value;
-						const btcFiDecimals = btcFiApr.decimals ?? 18;
-						const btcFiApy = (Number(btcFiValue) / 10 ** btcFiDecimals) * 100;
-						if (btcFiApy > 0) {
-							totalRewardsApy = btcFiApy;
-						}
-					}
+					// Also check all fields that might contain numeric reward values
+					// Priority order for reward fields: btcFiSupplyApr > defiSpringSupplyApr > lstApr > other rewards
+					const rewardFieldPriority = ['btcfisupplyapr', 'defispringsupplyapr', 'lstapr'];
+					const excludedFields = ['supplyapy', 'borrowapr', 'totalsupplied', 'totaldebt', 'currentutilization'];
 					
-					// If still no rewards, check for lstApr (LST rewards)
-					if (totalRewardsApy === 0) {
-						const lstApr = asset.stats?.lstApr;
-						if (lstApr && typeof lstApr === 'object' && 'value' in lstApr) {
-							const lstValue = lstApr.value;
-							const lstDecimals = lstApr.decimals ?? 18;
-							const lstApy = (Number(lstValue) / 10 ** lstDecimals) * 100;
-							if (lstApy > 0) {
-								totalRewardsApy = lstApy;
+					for (const field of allStatsFields) {
+						if (totalRewardsApy > 0) break; // Stop if we already found rewards
+						
+						const fieldValue = asset.stats?.[field];
+						// Check if this field has a value property (like supplyApy.value)
+						if (fieldValue && typeof fieldValue === 'object' && 'value' in fieldValue) {
+							const fieldVal = fieldValue.value;
+							const fieldDecimals = fieldValue.decimals ?? 18;
+							const fieldApy = (Number(fieldVal) / 10 ** fieldDecimals) * 100;
+							
+							// Skip excluded fields
+							if (fieldApy <= 0 || excludedFields.includes(field.toLowerCase())) {
+								continue;
+							}
+							
+							
+							// Check if this is a reward field (explicitly rewards-related, not borrow/lending)
+							const fieldLower = field.toLowerCase();
+							const isRewardField = 
+								fieldLower === 'btcfisupplyapr' ||
+								fieldLower === 'defispringsupplyapr' ||
+								fieldLower === 'lstapr' ||
+								(fieldLower.includes('reward') && !fieldLower.includes('borrow')) || 
+								(fieldLower.includes('btcfi') && !fieldLower.includes('borrow'));
+							
+							if (isRewardField && !fieldLower.includes('borrow')) {
+								const priority = rewardFieldPriority.indexOf(fieldLower);
+								if (totalRewardsApy === 0 || (priority >= 0 && (rewardFieldPriority.indexOf(asset.stats?.[field]?.name || '') === -1 || rewardFieldPriority.indexOf(asset.stats?.[field]?.name || '') > priority))) {
+								totalRewardsApy = fieldApy;
+								}
 							}
 						}
 					}
+					
 				}
 				
 				return {

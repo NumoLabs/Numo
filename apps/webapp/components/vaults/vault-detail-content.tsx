@@ -229,12 +229,6 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
       });
       
       if (!vesuPool) {
-        console.warn(`[APY Breakdown] Pool ${pool.pool_id} not found in vesuPoolsData`);
-        console.warn(`[APY Breakdown] Available pools:`, vesuPoolsData.map((p: VesuPool) => ({
-          name: p.name,
-          id: p.id,
-          address: p.address,
-        })));
         breakdowns[pool.pool_id] = null;
         continue;
       }
@@ -325,32 +319,12 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
         const lendingApr = wbtcAsset.apy || 0;
         const rewardsApr = wbtcAsset.defiSpringApy || 0;
         
-        console.log(`[APY Breakdown] Found WBTC asset in pool ${pool.pool_id} (${vesuPool.name}):`, {
-          symbol: wbtcAsset.symbol,
-          address: wbtcAsset.address,
-          apy: wbtcAsset.apy,
-          defiSpringApy: wbtcAsset.defiSpringApy,
-          totalApy: (wbtcAsset.apy || 0) + (wbtcAsset.defiSpringApy || 0),
-        });
-        
-        console.log(`[APY Breakdown] All assets in pool ${pool.pool_id} (${vesuPool.name}):`, vesuPool.assets.map((a: ProcessedAsset) => ({
-          symbol: a.symbol,
-          address: a.address?.slice(0, 20) + '...',
-          apy: a.apy,
-          defiSpringApy: a.defiSpringApy,
-          totalApy: (a.apy || 0) + (a.defiSpringApy || 0),
-        })));
         
         breakdowns[pool.pool_id] = {
           lendingApr,
           rewardsApr,
         };
       } else {
-        console.warn(`[APY Breakdown] WBTC asset not found in pool ${pool.pool_id} (${vesuPool?.name})`);
-        console.warn(`[APY Breakdown] Available assets:`, vesuPool?.assets?.map((a: ProcessedAsset) => ({
-          symbol: a.symbol,
-          address: a.address,
-        })));
         breakdowns[pool.pool_id] = null;
       }
     }
