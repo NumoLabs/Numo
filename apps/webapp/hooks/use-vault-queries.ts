@@ -1,5 +1,6 @@
-import { useQuery, useQueries } from '@tanstack/react-query';
+import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
 import { useAccount } from '@starknet-react/core';
+import { useEffect } from 'react';
 import { useVesuVault, type PoolProps } from './use-vesu-vault';
 import { getVesuPools } from '@/app/api/vesuApi';
 
@@ -109,16 +110,50 @@ export function useUserVaultPosition() {
 // Hook to get total assets
 export function useVaultTotalAssets() {
   const { address } = useAccount();
-  const { totalAssets, isConnected } = useVesuVault();
+  const { contract, isConnected, vaultData } = useVesuVault();
+  const queryClient = useQueryClient();
 
+  // Update query data when vaultData changes
+  useEffect(() => {
+    if (vaultData?.totalAssets !== undefined) {
+      console.log('[useVaultTotalAssets] Updating query data with vaultData:', vaultData.totalAssets);
+      queryClient.setQueryData(vaultQueryKeys.totalAssets(), vaultData.totalAssets);
+    }
+  }, [vaultData?.totalAssets, queryClient]);
+
+  // Use vaultData.totalAssets directly from useVesuVault instead of making another contract call
+  // This avoids duplicate calls and timing issues
   return useQuery({
     queryKey: vaultQueryKeys.totalAssets(),
     queryFn: async () => {
-      return totalAssets;
+      // Return the totalAssets from vaultData if available
+      // This is already loaded by loadVaultData() in useVesuVault
+      if (vaultData?.totalAssets) {
+        console.log('[useVaultTotalAssets] Using totalAssets from vaultData:', vaultData.totalAssets);
+        return vaultData.totalAssets;
+      }
+
+      // Fallback: call contract directly if vaultData is not available yet
+      if (!isConnected || !contract) {
+        console.warn('[useVaultTotalAssets] Missing requirements:', { isConnected, hasContract: !!contract, address });
+        return null;
+      }
+      try {
+        console.log('[useVaultTotalAssets] Calling contract.total_assets directly...');
+        const totalAssets = await contract.call('total_assets', [], { blockIdentifier: 'latest' }) as bigint;
+        console.log('[useVaultTotalAssets] Total assets received:', totalAssets);
+        console.log('[useVaultTotalAssets] Total assets (formatted):', Number(totalAssets) / 1e8, 'wBTC');
+        return totalAssets;
+      } catch (err) {
+        console.error('[useVaultTotalAssets] Failed to get total assets:', err);
+        return null;
+      }
     },
     enabled: isConnected && !!address,
     staleTime: 1 * 60 * 1000, // 1 minute
-    initialData: null,
+    initialData: vaultData?.totalAssets || null,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 

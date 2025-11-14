@@ -79,7 +79,7 @@ export function RebalanceForm() {
     defaultValues: {
       fromPool: '',
       toPool: '',
-      amount: '',
+      amount: '' as string,
     },
     mode: 'onChange',
   });
@@ -225,6 +225,15 @@ export function RebalanceForm() {
   const amount = form.watch('amount');
   const fromPoolBalance = fromPool ? poolBalances[fromPool.toLowerCase()] : undefined;
   const toPoolBalance = toPool ? poolBalances[toPool.toLowerCase()] : undefined;
+
+  // Clear amount field when pool has no balance
+  useEffect(() => {
+    const currentAmount = form.getValues('amount');
+    if ((!fromPoolBalance || fromPoolBalance === BigInt(0)) && currentAmount && currentAmount !== '' && currentAmount !== '0' && currentAmount !== '0.') {
+      // Clear the amount field if pool has no balance and field has a value
+      form.setValue('amount', '', { shouldValidate: false });
+    }
+  }, [fromPoolBalance, form]);
   
 
   const onSubmit = async (data: RebalanceFormValues) => {
@@ -297,20 +306,48 @@ export function RebalanceForm() {
         for (const pool of pools) {
           try {
             const balance = await getPoolBalance(pool.v_token);
-            balances[pool.pool_id] = balance;
+            // Normalize pool_id to lowercase for consistent key matching
+            const normalizedPoolId = pool.pool_id.toLowerCase();
+            balances[normalizedPoolId] = balance;
           } catch (err) {
             console.error(`Failed to reload balance for pool ${pool.pool_id}:`, err);
+            // Set balance to 0 if failed to load
+            const normalizedPoolId = pool.pool_id.toLowerCase();
+            balances[normalizedPoolId] = BigInt(0);
           }
         }
         setPoolBalances(balances);
-      }
 
-      // Reset form
-      form.reset();
-      // Reset to default values if pools are available
-      if (pools.length >= 2) {
-        form.setValue('fromPool', pools[0].pool_id);
-        form.setValue('toPool', pools[1].pool_id);
+        // Reset form with smart defaults after rebalance
+        form.reset();
+        
+        // Find pools with available balance for smart defaults
+        const poolsWithBalance = pools.filter(pool => {
+          const normalizedPoolId = pool.pool_id.toLowerCase();
+          const balance = balances[normalizedPoolId];
+          return balance && balance > BigInt(0);
+        });
+
+        if (poolsWithBalance.length >= 2) {
+          // Use pools with balance as defaults
+          form.setValue('fromPool', poolsWithBalance[0].pool_id);
+          form.setValue('toPool', poolsWithBalance[1].pool_id);
+        } else if (poolsWithBalance.length === 1) {
+          // Only one pool has balance, set it as source
+          form.setValue('fromPool', poolsWithBalance[0].pool_id);
+          // Find a destination pool (can be empty)
+          const destinationPool = pools.find(p => p.pool_id !== poolsWithBalance[0].pool_id);
+          if (destinationPool) {
+            form.setValue('toPool', destinationPool.pool_id);
+          }
+        } else if (pools.length >= 2) {
+          // All pools are empty, but still allow selection
+          form.setValue('fromPool', pools[0].pool_id);
+          form.setValue('toPool', pools[1].pool_id);
+        }
+      } else {
+        // No pools available
+        form.reset();
       }
     } catch (err: unknown) {
       console.error('Rebalance failed:', err);
@@ -575,54 +612,83 @@ export function RebalanceForm() {
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="relative z-10">
-                
+              <CardContent className="relative z-10 pt-6">
                 <FormField
                   control={form.control}
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>
-                        <div className="relative mt-5">
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10 pointer-events-none">
-                            <Image src="/wbtc-icon.png" alt="wBTC" width={28} height={28} className="rounded-full" />
-                            <span className="text-foreground font-semibold text-base">wBTC</span>
-                          </div>
-                          <Input
-                            type="number"
-                            step="0.000001"
-                            min="0"
-                            placeholder="0.00000000"
-                            className="w-full pl-28 pr-20 h-14 bg-background border border-border text-foreground text-xl font-semibold focus:border-bitcoin-orange/50 focus:ring-2 focus:ring-bitcoin-orange/20 transition-all"
-                            {...field}
-                            disabled={!fromPoolBalance || isLoadingBalances}
+                      <div className="relative h-14">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10 pointer-events-none">
+                          <Image 
+                            src="/wbtc-icon.png" 
+                            alt="wBTC" 
+                            width={28} 
+                            height={28} 
+                            className="rounded-full flex-shrink-0" 
                           />
-                          {fromPoolBalance && fromPoolBalance > BigInt(0) && !isLoadingBalances && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 text-sm font-semibold bg-bitcoin-orange/10 hover:bg-bitcoin-orange/20 text-bitcoin-orange border border-bitcoin-orange/30 rounded-md transition-all"
-                              onClick={setMaxAmount}
-                            >
-                              MAX
-                            </Button>
-                          )}
+                          <span className="text-foreground font-semibold text-base whitespace-nowrap">wBTC</span>
                         </div>
-                      </FormControl>
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <FormDescription className="text-muted-foreground text-xs">
+                        <FormControl>
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            step="0.000001"
+                            placeholder={fromPoolBalance && fromPoolBalance > BigInt(0) ? "0.00000000" : "No balance available"}
+                            className="w-full pl-[130px] pr-20 h-14 bg-background border border-border text-foreground text-xl font-semibold focus:border-bitcoin-orange/50 focus:ring-2 focus:ring-bitcoin-orange/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-gray-500/70 text-right"
+                            value={
+                              !field.value || 
+                              String(field.value).trim() === ''
+                                ? '' 
+                                : String(field.value)
+                            }
+                            disabled={!fromPoolBalance || fromPoolBalance === BigInt(0) || isLoadingBalances}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                                field.onChange(value);
+                              }
+                            }}
+                            onBlur={() => {
+                              const currentValue = form.getValues('amount');
+                              if (!currentValue || currentValue === '0' || currentValue === '0.' || String(currentValue).trim() === '' || String(currentValue) === '0') {
+                                form.setValue('amount', '', { shouldValidate: false });
+                              }
+                              field.onBlur();
+                            }}
+                            name={field.name}
+                            ref={field.ref}
+                          />
+                        </FormControl>
+                        {fromPoolBalance && fromPoolBalance > BigInt(0) && !isLoadingBalances && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 text-sm font-semibold bg-bitcoin-orange/10 hover:bg-bitcoin-orange/20 text-bitcoin-orange border border-bitcoin-orange/30 rounded-md transition-all"
+                            onClick={setMaxAmount}
+                          >
+                            MAX
+                          </Button>
+                        )}
+                      </div>
+                      <div className="mt-4 pt-1 flex items-center justify-between w-full">
+                        <div className="flex items-center gap-4 flex-wrap">
+                          <FormDescription className="text-muted-foreground text-xs m-0 whitespace-nowrap">
                             <span className="font-semibold">Min:</span> 0.000001 wBTC
                           </FormDescription>
-                          {fromPoolBalance && (
-                            <FormDescription className="text-muted-foreground text-xs">
+                          {fromPoolBalance !== undefined && fromPoolBalance > BigInt(0) ? (
+                            <FormDescription className="text-muted-foreground text-xs m-0 whitespace-nowrap">
                               <span className="font-semibold">Max:</span> {formatBalanceFull(fromPoolBalance)} wBTC
                             </FormDescription>
-                          )}
+                          ) : fromPoolBalance !== undefined && fromPoolBalance === BigInt(0) ? (
+                            <FormDescription className="text-muted-foreground text-xs m-0 whitespace-nowrap">
+                              <span className="font-semibold">Max:</span> <span className="text-red-400">0.00000000 wBTC</span>
+                            </FormDescription>
+                          ) : null}
                         </div>
-                        {amountFloat > 0 && fromPoolBalance && (
-                          <div className="text-xs">
+                        {amountFloat > 0 && fromPoolBalance && fromPoolBalance > BigInt(0) && (
+                          <div className="text-xs whitespace-nowrap">
                             <span className="text-muted-foreground">Percentage: </span>
                             <span className="font-bold text-bitcoin-orange">
                               {((amountFloat / (Number(fromPoolBalance) / 1e8)) * 100).toFixed(2)}%

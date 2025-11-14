@@ -30,8 +30,10 @@ export async function POST(request: NextRequest) {
     try {
       const config = getCavosConfig()
       
-      let url: string
+      let url: string | undefined
       
+      // Try SDK method first
+      let useFallback = false
       try {
         const { createCavosAuth } = await import('@/lib/cavos-config')
         const aegisAccount = createCavosAuth()
@@ -61,18 +63,26 @@ export async function POST(request: NextRequest) {
             if (process.env.NODE_ENV === 'development') {
               console.error('SDK method execution error:', sdkMethodError)
             }
-            // Re-throw to fall back to API call
-            throw sdkMethodError
+            // Use fallback
+            useFallback = true
           }
         } else {
+          // SDK method not available, use direct API call fallback
           if (process.env.NODE_ENV === 'development') {
             console.log('getGoogleOAuthUrl method not found on SDK, using direct API call')
           }
-          throw new Error('SDK method not available')
+          useFallback = true
         }
       } catch (sdkError) {
         if (process.env.NODE_ENV === 'development') {
           console.error('SDK OAuth method error:', sdkError)
+        }
+        useFallback = true
+      }
+      
+      // Fallback: Direct API call (either SDK method not available or it failed)
+      if (useFallback) {
+        if (process.env.NODE_ENV === 'development') {
           console.log('Attempting direct API call fallback...')
         }
 

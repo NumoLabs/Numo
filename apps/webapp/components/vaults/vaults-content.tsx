@@ -48,7 +48,7 @@ export function VaultsContent() {
   const { data: vesuPoolsData } = useVesuPoolsData();
   const yieldQueries = usePoolYields(pools ?? null);
   const balanceQueries = usePoolBalances(pools ?? null);
-  const { data: totalAssets } = useVaultTotalAssets();
+  const { data: totalAssets, isLoading: isLoadingTotalAssets } = useVaultTotalAssets();
 
   // Transform query results into usable data
   const poolYields = useMemo(() => {
@@ -107,7 +107,7 @@ export function VaultsContent() {
     ];
   }, [pools, poolMap, poolYields, poolBalances, totalAssets, isLoadingPools, yieldQueries, balanceQueries]);
 
-  const isLoading = isLoadingPools || yieldQueries.some((q) => q.isLoading) || balanceQueries.some((q) => q.isLoading);
+  const isLoading = isLoadingPools || yieldQueries.some((q) => q.isLoading) || balanceQueries.some((q) => q.isLoading) || isLoadingTotalAssets;
 
   // Filter vaults based on search term
   const filteredVaults = useMemo(() => {
@@ -121,11 +121,23 @@ export function VaultsContent() {
 
   // Calculate total TVL across all vaults
   const totalTVL = useMemo(() => {
-    return vaults.reduce((sum, vault) => {
-      if (!vault.totalAssets) return sum;
-      return sum + Number(vault.totalAssets) / 1e8;
+    console.log('[VaultsContent] Calculating totalTVL', { 
+      vaultsCount: vaults.length, 
+      totalAssets,
+      vaults: vaults.map(v => ({ id: v.id, totalAssets: v.totalAssets }))
+    });
+    const result = vaults.reduce((sum, vault) => {
+      if (!vault.totalAssets) {
+        console.log('[VaultsContent] Vault', vault.id, 'has no totalAssets');
+        return sum;
+      }
+      const vaultTVL = Number(vault.totalAssets) / 1e8;
+      console.log('[VaultsContent] Vault', vault.id, 'TVL:', vaultTVL, 'wBTC');
+      return sum + vaultTVL;
     }, 0);
-  }, [vaults]);
+    console.log('[VaultsContent] Total TVL calculated:', result, 'wBTC');
+    return result;
+  }, [vaults, totalAssets]);
 
   // Calculate average APY across all vaults
   const avgApy = useMemo(() => {
@@ -409,7 +421,21 @@ export function VaultsContent() {
                 {isLoading ? (
                   <span className="inline-block w-24 h-6 bg-muted rounded animate-pulse" />
                 ) : (
-                  `${totalTVL.toFixed(4)} wBTC`
+                  (() => {
+                    console.log('[VaultsContent] Rendering Total TVL card', { 
+                      totalTVL, 
+                      isLoading, 
+                      isLoadingTotalAssets,
+                      totalAssets,
+                      formatted4: totalTVL.toFixed(4),
+                      formatted8: totalTVL.toFixed(8) 
+                    });
+                    // Show more decimal places for very small values
+                    if (totalTVL > 0 && totalTVL < 0.0001) {
+                      return `${totalTVL.toFixed(8)} wBTC`;
+                    }
+                    return `${totalTVL.toFixed(4)} wBTC`;
+                  })()
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-1">Total value locked</p>
