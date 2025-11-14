@@ -58,9 +58,10 @@ export function DashboardLayout() {
     if (pathname === "/pools") {
       return <PoolsContent />
     }
-    if (pathname === "/pools-vault") {
-      return <PoolsVaultContent />
-    }
+    // Pools Vault page hidden from frontend but logic preserved
+    // if (pathname === "/pools-vault") {
+    //   return <PoolsVaultContent />
+    // }
     if (pathname === "/pools/create") {
       return <CreateVaultContent />
     }
