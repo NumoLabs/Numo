@@ -50,10 +50,27 @@ export function VaultCard({
   })();
 
   // Format total assets
-  const formatTotalAssets = (assets: bigint | null) => {
-    if (!assets) return '0.00';
-    // wBTC has 8 decimals
-    return (Number(assets) / 1e8).toFixed(4);
+  const formatTotalAssets = (assets: bigint | null | undefined): string => {
+    // Handle null, undefined, or zero values
+    if (assets === null || assets === undefined || assets === BigInt(0)) {
+      return '0.0000';
+    }
+    
+    try {
+      // wBTC has 8 decimals
+      const decimalValue = Number(assets) / 1e8;
+      
+      // Handle very small values with more precision
+      if (decimalValue > 0 && decimalValue < 0.0001) {
+        return decimalValue.toFixed(8);
+      }
+      
+      // Format with 4 decimal places for normal values
+      return decimalValue.toFixed(4);
+    } catch (error) {
+      console.error('Error formatting total assets:', error, assets);
+      return '0.0000';
+    }
   };
 
   return (
@@ -130,7 +147,7 @@ export function VaultCard({
       {/* TVL */}
       <div className="flex flex-col items-center min-w-[110px] flex-shrink-0 relative z-10">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">TVL</p>
-        {isLoading ? (
+        {isLoading || totalAssets === null || totalAssets === undefined ? (
           <span className="inline-block w-16 h-4 bg-muted rounded animate-pulse" />
         ) : (
           <span className="text-sm font-semibold text-bitcoin-orange group-hover:scale-105 transition-transform inline-block">
