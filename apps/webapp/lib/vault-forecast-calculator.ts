@@ -113,26 +113,24 @@ function generateTimeSeries(
   initialAmount: number,
   apy: number,
   days: number,
-  compoundingFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'daily',
-  dataPoints?: number
+  compoundingFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'daily'
 ): Array<{ day: number; balance: number; gain: number }> {
   const points: Array<{ day: number; balance: number; gain: number }> = [];
   
-  // Default to one point per day, but limit to reasonable number for performance
-  const step = dataPoints ? Math.max(1, Math.floor(days / dataPoints)) : 1;
-  const maxPoints = 365; // Limit to 365 points max for performance
+  // Always generate one point per day for smooth curves (up to 365 days)
+  // This ensures the growth is visible and the curve is smooth
+  const step = 1; // One point per day
+  const maxDays = Math.min(days, 365); // Limit to 365 days max for performance
   
-  for (let day = 0; day <= days; day += step) {
-    if (points.length >= maxPoints) break;
-    
+  for (let day = 0; day <= maxDays; day += step) {
     const balance = calculateCompoundInterest(initialAmount, apy, day, compoundingFrequency);
     const gain = balance - initialAmount;
     
     points.push({ day, balance, gain });
   }
   
-  // Always include the final day
-  if (points[points.length - 1]?.day !== days) {
+  // Always include the final day if it's beyond maxDays
+  if (days > 365 && points[points.length - 1]?.day !== days) {
     const finalBalance = calculateCompoundInterest(initialAmount, apy, days, compoundingFrequency);
     const finalGain = finalBalance - initialAmount;
     points.push({ day: days, balance: finalBalance, gain: finalGain });
