@@ -128,14 +128,11 @@ export function VaultsContent() {
     });
     const result = vaults.reduce((sum, vault) => {
       if (!vault.totalAssets) {
-        console.log('[VaultsContent] Vault', vault.id, 'has no totalAssets');
         return sum;
       }
       const vaultTVL = Number(vault.totalAssets) / 1e8;
-      console.log('[VaultsContent] Vault', vault.id, 'TVL:', vaultTVL, 'wBTC');
       return sum + vaultTVL;
     }, 0);
-    console.log('[VaultsContent] Total TVL calculated:', result, 'wBTC');
     return result;
   }, [vaults, totalAssets]);
 
@@ -422,14 +419,6 @@ export function VaultsContent() {
                   <span className="inline-block w-24 h-6 bg-muted rounded animate-pulse" />
                 ) : (
                   (() => {
-                    console.log('[VaultsContent] Rendering Total TVL card', { 
-                      totalTVL, 
-                      isLoading, 
-                      isLoadingTotalAssets,
-                      totalAssets,
-                      formatted4: totalTVL.toFixed(4),
-                      formatted8: totalTVL.toFixed(8) 
-                    });
                     // Show more decimal places for very small values
                     if (totalTVL > 0 && totalTVL < 0.0001) {
                       return `${totalTVL.toFixed(8)} wBTC`;

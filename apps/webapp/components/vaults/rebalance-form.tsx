@@ -86,11 +86,9 @@ export function RebalanceForm() {
 
   const loadPoolBalances = useCallback(async (poolsToLoad: PoolProps[]) => {
     if (!poolsToLoad || poolsToLoad.length === 0) {
-      console.log('[Rebalance] No pools to load balances for');
       return;
     }
     
-    console.log('[Rebalance] ===== loadPoolBalances called =====');
     setIsLoadingBalances(true);
     const balances: Record<string, bigint> = {};
     
@@ -99,12 +97,10 @@ export function RebalanceForm() {
       const balancePromises = poolsToLoad.map(async (pool) => {
         try {
           const normalizedPoolId = pool.pool_id.toLowerCase();
-          console.log(`[Rebalance] Loading balance for pool ${normalizedPoolId}...`);
           
           const balance = await getPoolBalance(pool.v_token);
           balances[normalizedPoolId] = balance;
           
-          console.log(`[Rebalance] Balance loaded for pool ${normalizedPoolId}:`, balance.toString());
         } catch (err) {
           console.error(`[Rebalance] Failed to load balance for pool ${pool.pool_id}:`, err);
           balances[pool.pool_id.toLowerCase()] = BigInt(0);
@@ -113,7 +109,6 @@ export function RebalanceForm() {
       
       await Promise.all(balancePromises);
       setPoolBalances(balances);
-      console.log('[Rebalance] All balances loaded:', balances);
     } catch (err) {
       console.error('[Rebalance] Error loading pool balances:', err);
     } finally {
@@ -134,7 +129,6 @@ export function RebalanceForm() {
       try {
         // Load pools first
         const poolsData = await getAllowedPools();
-        console.log('[Rebalance] Pools data loaded:', poolsData);
         
         if (poolsData && poolsData.length > 0) {
           setPools(poolsData);
@@ -180,7 +174,6 @@ export function RebalanceForm() {
   const totalAssetsString = vaultData?.totalAssets?.toString();
   useEffect(() => {
     if (isConnected && pools && pools.length > 0 && vaultData) {
-      console.log('[Rebalance] Vault data changed, reloading pool balances...');
       loadPoolBalances(pools);
     }
   }, [totalAssetsString, isConnected, pools, vaultData, loadPoolBalances]);
@@ -285,13 +278,6 @@ export function RebalanceForm() {
           amount: amountInWei.toString(),
         },
       ];
-
-      console.log('Rebalancing:', {
-        from: getPoolName(data.fromPool),
-        to: getPoolName(data.toPool),
-        amount: data.amount,
-        actions: serializedActions,
-      });
 
       const txHash = await rebalance(serializedActions);
 
@@ -462,12 +448,6 @@ export function RebalanceForm() {
                           {field.value && (() => {
                             const normalizedPoolId = field.value.toLowerCase();
                             const balance = poolBalances[normalizedPoolId];
-                            console.log(`[Rebalance] Source Pool Balance Lookup:`, {
-                              fieldValue: field.value,
-                              normalizedPoolId,
-                              balance: balance?.toString(),
-                              allBalances: Object.keys(poolBalances)
-                            });
                             return (
                               <div className="space-y-2 pt-2 border-t">
                                 <div className="flex items-center justify-between">
@@ -557,12 +537,6 @@ export function RebalanceForm() {
                           {field.value && (() => {
                             const normalizedPoolId = field.value.toLowerCase();
                             const balance = poolBalances[normalizedPoolId];
-                            console.log(`[Rebalance] Destination Pool Balance Lookup:`, {
-                              fieldValue: field.value,
-                              normalizedPoolId,
-                              balance: balance?.toString(),
-                              allBalances: Object.keys(poolBalances)
-                            });
                             return (
                               <div className="space-y-2 pt-2 border-t">
                                 <div className="flex items-center justify-between">
