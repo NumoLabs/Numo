@@ -115,7 +115,7 @@ export function useVaultTotalAssets() {
 
   // Update query data when vaultData changes
   useEffect(() => {
-    if (vaultData?.totalAssets !== undefined) {
+    if (vaultData?.totalAssets !== undefined && vaultData?.totalAssets !== null) {
       console.log('[useVaultTotalAssets] Updating query data with vaultData:', vaultData.totalAssets);
       queryClient.setQueryData(vaultQueryKeys.totalAssets(), vaultData.totalAssets);
     }
@@ -128,7 +128,8 @@ export function useVaultTotalAssets() {
     queryFn: async () => {
       // Return the totalAssets from vaultData if available
       // This is already loaded by loadVaultData() in useVesuVault
-      if (vaultData?.totalAssets) {
+      // Check for null/undefined explicitly since BigInt(0) is truthy
+      if (vaultData?.totalAssets !== undefined && vaultData?.totalAssets !== null) {
         console.log('[useVaultTotalAssets] Using totalAssets from vaultData:', vaultData.totalAssets);
         return vaultData.totalAssets;
       }
@@ -151,7 +152,9 @@ export function useVaultTotalAssets() {
     },
     enabled: isConnected && !!address,
     staleTime: 1 * 60 * 1000, // 1 minute
-    initialData: vaultData?.totalAssets || null,
+    initialData: vaultData?.totalAssets !== undefined && vaultData?.totalAssets !== null 
+      ? vaultData.totalAssets 
+      : null,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });

@@ -121,20 +121,46 @@ export function VaultsContent() {
 
   // Calculate total TVL across all vaults
   const totalTVL = useMemo(() => {
+    if (vaults.length === 0) return 0;
+    
     console.log('[VaultsContent] Calculating totalTVL', { 
       vaultsCount: vaults.length, 
-      totalAssets,
-      vaults: vaults.map(v => ({ id: v.id, totalAssets: v.totalAssets }))
+      vaults: vaults.map(v => ({ 
+        id: v.id, 
+        name: v.name,
+        totalAssets: v.totalAssets,
+        totalAssetsFormatted: v.totalAssets ? (Number(v.totalAssets) / 1e8).toFixed(8) : 'null'
+      }))
     });
+    
     const result = vaults.reduce((sum, vault) => {
-      if (!vault.totalAssets) {
+      // Handle null, undefined, or BigInt(0) values
+      if (vault.totalAssets === null || vault.totalAssets === undefined) {
+        console.log(`[VaultsContent] Skipping vault ${vault.id} - totalAssets is null/undefined`);
         return sum;
       }
-      const vaultTVL = Number(vault.totalAssets) / 1e8;
-      return sum + vaultTVL;
+      
+      try {
+        // Convert bigint to number (wBTC has 8 decimals)
+        const vaultTVL = Number(vault.totalAssets) / 1e8;
+        
+        // Validate the conversion
+        if (isNaN(vaultTVL) || vaultTVL < 0) {
+          console.warn(`[VaultsContent] Invalid TVL for vault ${vault.id}:`, vault.totalAssets, vaultTVL);
+          return sum;
+        }
+        
+        console.log(`[VaultsContent] Adding vault ${vault.id} TVL:`, vaultTVL, 'wBTC');
+        return sum + vaultTVL;
+      } catch (error) {
+        console.error(`[VaultsContent] Error calculating TVL for vault ${vault.id}:`, error, vault.totalAssets);
+        return sum;
+      }
     }, 0);
+    
+    console.log('[VaultsContent] Total TVL calculated:', result, 'wBTC');
     return result;
-  }, [vaults, totalAssets]);
+  }, [vaults]);
 
   // Calculate average APY across all vaults
   const avgApy = useMemo(() => {
@@ -216,9 +242,6 @@ export function VaultsContent() {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-bitcoin-gold/15 rounded-full blur-2xl -ml-24 -mb-24" />
           <CardHeader className="relative z-10">
             <CardTitle className="flex items-center gap-3 text-bitcoin-orange text-xl">
-              <div className="w-10 h-10 rounded-lg bg-bitcoin-orange/20 border border-bitcoin-orange/30 flex items-center justify-center">
-                <Wallet className="h-5 w-5" />
-              </div>
               Connect StarkNet Wallet
             </CardTitle>
             <CardDescription className="text-gray-300 mt-2">
@@ -340,12 +363,10 @@ export function VaultsContent() {
         transition={{ duration: 0.4 }}
       >
         <div className="flex flex-col mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-bitcoin-orange to-bitcoin-gold bg-clip-text text-transparent">
-              Vaults
-            </span>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mt-8">
+            Vaults
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-4">
             Explore yield farming vaults and optimize your returns
           </p>
         </div>
@@ -415,19 +436,28 @@ export function VaultsContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {isLoading ? (
+                {isLoading || vaults.length === 0 ? (
                   <span className="inline-block w-24 h-6 bg-muted rounded animate-pulse" />
                 ) : (
                   (() => {
+                    // Handle zero or very small values
+                    if (totalTVL === 0) {
+                      return '0.0000 wBTC';
+                    }
+                    
                     // Show more decimal places for very small values
                     if (totalTVL > 0 && totalTVL < 0.0001) {
                       return `${totalTVL.toFixed(8)} wBTC`;
                     }
+                    
+                    // Format with 4 decimal places for normal values
                     return `${totalTVL.toFixed(4)} wBTC`;
                   })()
                 )}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Total value locked</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Total value locked {vaults.length > 1 ? `across ${vaults.length} vaults` : ''}
+              </p>
             </CardContent>
           </Card>
         </motion.div>
