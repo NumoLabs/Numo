@@ -523,13 +523,16 @@ export async function POST(request: NextRequest) {
         throw new Error('OAuth callback processing failed: No result data available')
       }
       
-      // Save user to Supabase database (non-blocking)
-      // Save even if no access token yet (user authenticated via OAuth)
+      // Save user to Supabase database
+      // Wait for save to complete (adds ~50-200ms latency but ensures data is persisted)
       if (result.user && (result.user.id || result.user.email)) {
-        saveCavosUser(result.user).catch((error) => {
-          // Log error but don't throw - authentication should still succeed
+        try {
+          await saveCavosUser(result.user)
+        } catch (error) {
+          // Log error but don't fail authentication
           console.error('Failed to save OAuth user to Supabase:', error)
-        })
+          // Authentication still succeeds even if DB save fails
+        }
       }
 
       // Check if user is authenticated but no access token (may need password)
