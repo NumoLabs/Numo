@@ -68,11 +68,11 @@ export default function PerformanceChart() {
   }
 
   return (
-    <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-bitcoin-gold shadow-lg hover:shadow-xl transition-all duration-300">
-      <CardHeader className="bg-bitcoin-gold/10 rounded-t-lg">
+    <Card className="bg-black border border-white shadow-lg hover:shadow-xl transition-all duration-300">
+      <CardHeader className="bg-black/50 rounded-t-lg border-b border-white/20">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-bitcoin-orange">
-            <BarChart3 className="h-5 w-5 text-bitcoin-gold" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <BarChart3 className="h-5 w-5 text-white" />
             Projected Growth Comparison
           </CardTitle>
           <div className="flex gap-2">
@@ -110,8 +110,8 @@ export default function PerformanceChart() {
         {isLoading ? (
           <div className="h-80 w-full flex items-center justify-center">
             <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-bitcoin-orange" />
-              <p className="text-muted-foreground">Loading vault data...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-white" />
+              <p className="text-white/70">Loading vault data...</p>
             </div>
           </div>
         ) : error ? (
@@ -189,31 +189,31 @@ export default function PerformanceChart() {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg border-2 border-bitcoin-gold shadow-md hover:shadow-lg transition-all duration-200">
-                <div className="w-4 h-4 bg-yellow-400 rounded mx-auto mb-2"></div>
-                <div className="font-semibold text-bitcoin-orange">BTC Vault</div>
-                <div className="text-sm text-foreground">
+              <div className="text-center p-3 bg-black rounded-lg border border-white shadow-md hover:shadow-lg transition-all duration-200">
+                <div className="w-4 h-4 bg-bitcoin-gold rounded mx-auto mb-2"></div>
+                <div className="font-semibold text-white">BTC Vault</div>
+                <div className="text-sm text-bitcoin-gold">
                   {apy ? `${apy.toFixed(2)}% APY` : 'N/A'}
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">Real-time from pools</div>
+                <div className="text-xs text-white/70 mt-1">Real-time from pools</div>
               </div>
-              <div className="text-center p-3 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg border border-gray-300 dark:border-gray-700">
+              <div className="text-center p-3 bg-black rounded-lg border border-white shadow-md hover:shadow-lg transition-all duration-200">
                 <div className="w-4 h-4 bg-gray-500 rounded mx-auto mb-2 border-2 border-dashed border-gray-400"></div>
-                <div className="font-semibold text-gray-700 dark:text-gray-300">HODL</div>
-                <div className="text-sm text-foreground">0% APY</div>
-                <div className="text-xs text-muted-foreground mt-1">No yield</div>
+                <div className="font-semibold text-white/80">HODL</div>
+                <div className="text-sm text-white/80">0% APY</div>
+                <div className="text-xs text-white/70 mt-1">No yield</div>
               </div>
             </div>
 
             <div className="mt-4 space-y-2">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <div className="text-xs text-muted-foreground">
-                  <strong>What this chart shows:</strong> This is a <strong>projection</strong> (not historical data) showing how 1 BTC would grow over {timeframe} days if invested in the vault vs holding (HODL). The green line shows the advantage gained by using the vault strategy.
+              <div className="p-3 bg-bitcoin-gold/60 rounded-lg border border-bitcoin-gold">
+                <div className="text-xs text-white/90">
+                  <strong className="text-white">What this chart shows:</strong> This is a <strong className="text-white">projection</strong> (not historical data) showing how 1 BTC would grow over {timeframe} days if invested in the vault vs holding (HODL). The green line shows the advantage gained by using the vault strategy.
                 </div>
               </div>
-              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                <div className="text-xs text-muted-foreground">
-                  <strong>Note:</strong> Projections assume the current APY ({apy.toFixed(2)}%) remains constant and daily compounding. Actual returns may vary. This is a read-only forecast and does not affect your vault.
+              <div className="p-3 bg-bitcoin-gold/60 rounded-lg border border-bitcoin-gold">
+                <div className="text-xs text-white/90">
+                  <strong className="text-white">Note:</strong> Projections assume the current APY ({apy.toFixed(2)}%) remains constant and daily compounding. Actual returns may vary. This is a read-only forecast and does not affect your vault.
                 </div>
               </div>
             </div>

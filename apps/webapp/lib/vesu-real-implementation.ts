@@ -331,6 +331,7 @@ export class VesuV2TransactionFlow {
         
         currentAllowance = BigInt(getContractResult(allowanceResult, 'allowance'));
         console.log('✅ Allowance check successful:', currentAllowance.toString());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (allowanceError: any) {
         console.warn('⚠️ Allowance check failed, proceeding with approval anyway:', allowanceError?.message || allowanceError);
         // If allowance check fails, we'll proceed with approval to be safe
@@ -353,7 +354,8 @@ export class VesuV2TransactionFlow {
             accountAddress: account?.address,
             accountType: account?.constructor?.name,
             hasExecute: typeof account?.execute === 'function',
-            hasProvider: !!account?.provider
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            hasProvider: !!(account as any)?.provider
           });
           
           approvalResult = await account.execute({
@@ -367,6 +369,7 @@ export class VesuV2TransactionFlow {
           
           approvalTxHash = approvalResult.transaction_hash;
           console.log('✅ V2 Approval transaction submitted:', approvalTxHash);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (executeError: any) {
           console.error('❌ Account.execute error details:', {
             error: executeError,
@@ -378,7 +381,8 @@ export class VesuV2TransactionFlow {
             accountAvailable: !!account,
             accountAddress: account?.address,
             accountMethods: account ? Object.keys(account).slice(0, 20) : [],
-            accountProvider: account?.provider ? 'has provider' : 'no provider'
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            accountProvider: (account as any)?.provider ? 'has provider' : 'no provider'
           });
           
           // Re-throw with more context

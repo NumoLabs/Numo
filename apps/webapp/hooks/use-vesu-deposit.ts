@@ -1,7 +1,8 @@
 // Vesu Deposit Hook - Real implementation for depositing into Vesu pools
 import { useState, useCallback } from 'react';
 import { Account, Contract, RpcProvider, CallData, CairoCustomEnum } from 'starknet';
-import { useWalletStatus, useWallet } from './use-wallet';
+import { useAccount } from '@starknet-react/core';
+import { useWalletStatus } from './use-wallet';
 import { useToast } from './use-toast';
 import { getVesuConfig } from '@/lib/vesu-config';
 // MAINNET ONLY: Removed isTestnet import
@@ -256,7 +257,7 @@ export function useVesuDeposit() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { address, isConnected } = useWalletStatus();
-  const { account } = useWallet(); // Get account from wallet context
+  const { account } = useAccount(); // Get account from starknet-react
   const { toast } = useToast();
 
   const deposit = useCallback(async (params: DepositParams): Promise<DepositResult> => {
@@ -511,15 +512,17 @@ export function useVesuDeposit() {
         throw modifyError;
       }
 
-      console.log('Deposit transaction:', depositResult.transaction_hash);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = depositResult as any;
+      console.log('Deposit transaction:', result.transaction_hash);
 
       // Wait for deposit transaction to be confirmed
-      await provider.waitForTransaction(depositResult.transaction_hash);
+      await provider.waitForTransaction(result.transaction_hash);
 
       console.log('✅ DEPOSIT COMPLETED SUCCESSFULLY!');
       console.log('📊 Transaction Details:', {
         approvalTxHash: approvalResult.transaction_hash,
-        depositTxHash: depositResult.transaction_hash,
+        depositTxHash: result.transaction_hash,
         amount: params.amount,
         asset: params.assetAddress,
         poolId: params.poolId,
@@ -548,7 +551,7 @@ export function useVesuDeposit() {
 
       return {
         approvalTxHash: approvalResult.transaction_hash,
-        depositTxHash: depositResult.transaction_hash,
+        depositTxHash: result.transaction_hash,
         success: true
       };
 

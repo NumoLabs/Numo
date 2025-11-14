@@ -93,7 +93,7 @@ function CopyButton({ value, "aria-label": ariaLabel }: CopyButtonProps) {
 export function PoolsVaultContent() {
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const { toast } = useToast()
+  // const { toast } = useToast()
 
   const { data, isLoading, isError, refetch } = useVesuPoolsData()
 

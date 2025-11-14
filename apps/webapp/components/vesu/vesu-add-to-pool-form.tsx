@@ -20,7 +20,7 @@ import { useWallet } from '@/hooks/use-wallet';
 import { useVesuTransactions } from '@/hooks/use-vesu-transactions';
 import { useVesuV2Transactions } from '@/hooks/use-vesu-v2-transactions';
 import type { VesuPool } from '@/types/VesuPools';
-import { formatApy, getVesuConfig, getVesuV2Config } from '@/lib/vesu-config';
+import { formatApy } from '@/lib/vesu-config';
 import { Contract, RpcProvider } from 'starknet';
 import { useProvider } from '@starknet-react/core';
 import { useEffect, useCallback } from 'react';
@@ -45,7 +45,8 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
   const contextProvider = useProvider();
   
   // Determine if this is a V2 pool
-  const isV2Pool = pool.version === 'v2' || (pool as any).poolFactoryAddress !== undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isV2Pool = (pool as any).version === 'v2' || (pool as any).poolFactoryAddress !== undefined;
   
   // Use the appropriate hook based on pool version
   const v1Hook = useVesuTransactions();
@@ -56,7 +57,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
   const currentStep = isV2Pool ? v2Hook.currentStep : v1Hook.currentStep;
   
   // Get the correct config based on version
-  const vesuConfig = isV2Pool ? getVesuV2Config() : getVesuConfig();
+  // const vesuConfig = isV2Pool ? getVesuV2Config() : getVesuConfig();
 
   // Official Mainnet addresses from vesu-v1 repository
   const mainnetAddresses = {
@@ -79,8 +80,10 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     try {
       // Use provider from context if available, otherwise create new one
       let provider: RpcProvider;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (contextProvider && (contextProvider as any).baseUrl) {
-        provider = contextProvider as RpcProvider;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        provider = contextProvider as any as RpcProvider;
       } else {
         const rpcUrl = process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
           'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
@@ -130,6 +133,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
       
       console.log(`🔍 Direct balance for ${tokenAddress}: ${balance} (${balanceWei} wei, ${decimals} decimals)`);
       return balance;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // Silently handle errors - don't log to console.error to avoid Next.js error overlay
       // Only log in development mode
@@ -229,17 +233,21 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     //   return;
     // }
 
+    // Declare assetAddress outside try block so it's available in catch
+    let assetAddress: string = selectedAsset.address;
+    
     try {
       // MAINNET ONLY: Always use mainnet addresses
       console.log('🔍 DEBUG - Using Mainnet Configuration');
-      console.log('🔍 DEBUG - Pool Version:', pool.version || 'v1');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      console.log('🔍 DEBUG - Pool Version:', (pool as any).version || 'v1');
       console.log('🔍 DEBUG - Is V2 Pool:', isV2Pool);
       console.log('🔍 DEBUG - Mainnet Addresses Available:', mainnetAddresses);
       console.log('🔍 DEBUG - Selected Asset Symbol:', selectedAsset.symbol);
       console.log('🔍 DEBUG - All Available Assets:', pool.assets.map((a) => ({ symbol: a.symbol, address: a.address })));
       
       // Always use mainnet addresses
-      const assetAddress = mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] || selectedAsset.address;
+      assetAddress = mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] || selectedAsset.address;
       
       console.log('🔍 DEBUG - Asset Selection:', {
         symbol: selectedAsset.symbol,
@@ -247,7 +255,8 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         mainnetAddress: assetAddress,
         isUsingMainnet: mainnetAddresses[selectedAsset.symbol as keyof typeof mainnetAddresses] !== undefined,
         selectedAssetFull: selectedAsset,
-        poolVersion: pool.version,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        poolVersion: (pool as any).version,
         isV2Pool
       });
       
@@ -288,6 +297,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
           variant: "destructive",
         });
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('❌ Deposit failed:', error);
       console.error('❌ Error details:', {

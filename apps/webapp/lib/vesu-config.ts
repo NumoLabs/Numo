@@ -1,5 +1,5 @@
 // Vesu V2 Configuration
-import { isTestnet } from './utils';
+// import { isTestnet } from './utils';
 
 export interface VesuV2Config {
 	apiUrl: string;
@@ -72,7 +72,8 @@ export function getVesuV2Config(): VesuV2Config {
 
 // Get Vesu V2 configuration by chain ID
 // MAINNET ONLY: Always returns mainnet configuration
-export function getVesuV2ConfigByChainId(chainId: string): VesuV2Config {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getVesuV2ConfigByChainId(_chainId: string): VesuV2Config {
 	return VESU_V2_MAINNET_CONFIG;
 }
 
@@ -84,7 +85,8 @@ export function getVesuConfig(): VesuConfig {
 
 // Get Vesu configuration by chain ID (V1 - Legacy)
 // MAINNET ONLY: Always returns mainnet configuration
-export function getVesuConfigByChainId(chainId: string): VesuConfig {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getVesuConfigByChainId(_chainId: string): VesuConfig {
 	return VESU_MAINNET_CONFIG;
 }
 

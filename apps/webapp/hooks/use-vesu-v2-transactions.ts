@@ -78,7 +78,8 @@ export function useVesuV2Transactions() {
         address,
         hasAccount: !!account,
         accountAddress: account?.address,
-        accountProvider: account?.provider ? 'has provider' : 'no provider',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        accountProvider: (account as any)?.provider ? 'has provider' : 'no provider',
         vTokenAddress
       });
       

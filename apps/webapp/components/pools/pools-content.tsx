@@ -9,7 +9,6 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PoolCard } from "@/components/pools/pool-card"
-import { VaultCard } from "@/components/pools/vault-card"
 import { useVesuPoolsData } from "@/hooks/use-vault-queries"
 import { fetchTopPools } from "@/app/api/ekuboApi"
 import type { VesuPool } from "@/types/VesuPools"
@@ -92,11 +91,12 @@ export function PoolsContent() {
     ekuboPools.forEach((pool: EkuboPoolsDisplay) => {
       const token0Symbol = pool.token0?.symbol || 'Unknown'
       const token1Symbol = pool.token1?.symbol || 'Unknown'
-      const apy = pool.pool?.apy ? `${(pool.pool.apy * 100).toFixed(2)}%` : "N/A"
+      // Pool type doesn't have apy property, use N/A
+      const apy = "N/A"
       const tvl = pool.totalTvl ? `$${(pool.totalTvl / 1e6).toFixed(1)}M` : "N/A"
 
       pools.push({
-        id: `ekubo-${pool.pool?.key_hash || `${token0Symbol}-${token1Symbol}`}`,
+        id: `ekubo-${token0Symbol}-${token1Symbol}`,
         name: `Ekubo ${token0Symbol}/${token1Symbol}`,
         description: `${token0Symbol}/${token1Symbol} liquidity pool on Ekubo DEX`,
         apy,

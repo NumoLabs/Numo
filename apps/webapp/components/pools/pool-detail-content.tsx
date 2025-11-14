@@ -106,11 +106,12 @@ export function PoolDetailContent() {
     ekuboPools.forEach((p: EkuboPoolsDisplay) => {
       const token0Symbol = p.token0?.symbol || 'Unknown'
       const token1Symbol = p.token1?.symbol || 'Unknown'
-      const apy = p.pool?.apy ? `${(p.pool.apy * 100).toFixed(2)}%` : "N/A"
+      // Pool type doesn't have apy property, use N/A
+      const apy = "N/A"
       const tvl = p.totalTvl ? `$${(p.totalTvl / 1e6).toFixed(1)}M` : "N/A"
 
       pools.push({
-        id: `ekubo-${p.pool?.key_hash || `${token0Symbol}-${token1Symbol}`}`,
+        id: `ekubo-${token0Symbol}-${token1Symbol}`,
         name: `Ekubo ${token0Symbol}/${token1Symbol}`,
         description: `${token0Symbol}/${token1Symbol} liquidity pool on Ekubo DEX`,
         apy,

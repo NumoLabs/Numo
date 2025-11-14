@@ -113,8 +113,8 @@ export async function getVesuPools() {
 				
 				// Check for additional reward fields (BTCFi rewards, etc.)
 				// The API might have other reward fields that we're not reading
-				const allStatsFields = asset.stats ? Object.keys(asset.stats) : [];
-				const allAssetFields = Object.keys(asset || {});
+				// const allStatsFields = asset.stats ? Object.keys(asset.stats) : [];
+				// const allAssetFields = Object.keys(asset || {});
 				
 				// Look for BTCFi rewards or other reward fields
 				// Common field names: btcfiRewards, rewardsApr, totalRewardsApr, etc.

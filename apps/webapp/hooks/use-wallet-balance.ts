@@ -34,7 +34,8 @@ export function useWalletBalance(): UseWalletBalanceReturn {
     // If context provider is available and has a valid nodeUrl, use it
     if (contextProvider && (contextProvider as any).baseUrl) {
       console.log('🔧 Using provider from Starknet context');
-      return contextProvider as RpcProvider;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return contextProvider as any as RpcProvider;
     }
     
     // Otherwise, create a new provider
