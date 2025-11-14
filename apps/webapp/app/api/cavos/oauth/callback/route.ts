@@ -524,15 +524,32 @@ export async function POST(request: NextRequest) {
       }
       
       // Save user to Supabase database
-      // Wait for save to complete (adds ~50-200ms latency but ensures data is persisted)
-      if (result.user && (result.user.id || result.user.email)) {
+      if (result.user && result.user.id && result.user.email) {
         try {
-          await saveCavosUser(result.user)
+          // Ensure wallet is included if available from result (it's at the top level)
+          const userToSave = {
+            ...result.user,
+            wallet: result.wallet
+          }
+          await saveCavosUser(userToSave)
         } catch (error) {
           // Log error but don't fail authentication
           console.error('Failed to save OAuth user to Supabase:', error)
+          if (error instanceof Error) {
+            console.error('Error details:', error.message, error.stack)
+          }
           // Authentication still succeeds even if DB save fails
         }
+      } else {
+        // Log when user data is incomplete - this helps debug why it's not saving sometimes
+        console.warn('OAuth callback: User data incomplete, skipping Supabase save:', {
+          hasUser: !!result.user,
+          hasId: !!result.user?.id,
+          hasEmail: !!result.user?.email,
+          userId: result.user?.id,
+          email: result.user?.email,
+          hasWallet: !!result.wallet
+        })
       }
 
       // Check if user is authenticated but no access token (may need password)
