@@ -45,16 +45,19 @@ export async function POST(request: NextRequest) {
         timestamp: result.data.authData.timestamp
       }
 
-      // Save user to Supabase database (non-blocking)
-      // Don't fail authentication if database save fails
+      // Save user to Supabase database
+      // Wait for save to complete (adds ~50-200ms latency but ensures data is persisted)
       const cavosUser = {
         ...userData.user,
         wallet: userData.wallet
       }
-      saveCavosUser(cavosUser).catch((error) => {
-        // Log error but don't throw - authentication should still succeed
+      try {
+        await saveCavosUser(cavosUser)
+      } catch (error) {
+        // Log error but don't fail authentication
         console.error('Failed to save user to Supabase:', error)
-      })
+        // Authentication still succeeds even if DB save fails
+      }
 
       return NextResponse.json(userData)
     } catch (error: unknown) {

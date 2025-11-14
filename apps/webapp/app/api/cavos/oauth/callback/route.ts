@@ -523,12 +523,32 @@ export async function POST(request: NextRequest) {
         throw new Error('OAuth callback processing failed: No result data available')
       }
       
-      // Save user to Supabase database (non-blocking)
-      // Save even if no access token yet (user authenticated via OAuth)
-      if (result.user && (result.user.id || result.user.email)) {
-        saveCavosUser(result.user).catch((error) => {
-          // Log error but don't throw - authentication should still succeed
+      // Save user to Supabase database
+      if (result.user && result.user.id && result.user.email) {
+        try {
+          // Ensure wallet is included if available from result (it's at the top level)
+          const userToSave = {
+            ...result.user,
+            wallet: result.wallet
+          }
+          await saveCavosUser(userToSave)
+        } catch (error) {
+          // Log error but don't fail authentication
           console.error('Failed to save OAuth user to Supabase:', error)
+          if (error instanceof Error) {
+            console.error('Error details:', error.message, error.stack)
+          }
+          // Authentication still succeeds even if DB save fails
+        }
+      } else {
+        // Log when user data is incomplete - this helps debug why it's not saving sometimes
+        console.warn('OAuth callback: User data incomplete, skipping Supabase save:', {
+          hasUser: !!result.user,
+          hasId: !!result.user?.id,
+          hasEmail: !!result.user?.email,
+          userId: result.user?.id,
+          email: result.user?.email,
+          hasWallet: !!result.wallet
         })
       }
 
