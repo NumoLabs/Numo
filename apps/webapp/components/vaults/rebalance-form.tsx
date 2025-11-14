@@ -634,7 +634,7 @@ export function RebalanceForm() {
                             ref={field.ref}
                           />
                         </FormControl>
-                        {fromPoolBalance && fromPoolBalance > BigInt(0) && !isLoadingBalances && (
+                        {fromPoolBalance !== undefined && fromPoolBalance > BigInt(0) && !isLoadingBalances ? (
                           <Button
                             type="button"
                             variant="ghost"
@@ -644,7 +644,7 @@ export function RebalanceForm() {
                           >
                             MAX
                           </Button>
-                        )}
+                        ) : null}
                       </div>
                       <div className="mt-4 pt-1 flex items-center justify-between w-full">
                         <div className="flex items-center gap-4 flex-wrap">
