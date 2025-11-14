@@ -1,8 +1,9 @@
 "use client"
 
-import { Menu, Bell, Search, User, Settings } from "lucide-react"
-import { memo, useMemo } from "react"
+import { Menu, Bell, Search, User, Settings, LogOut } from "lucide-react"
+import { memo, useMemo, useCallback } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -15,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import WalletConnector from "@/components/ui/connectWallet"
+import { useCavosAuthContext } from "@/components/cavos-auth-provider"
 
 interface TopNavigationProps {
   setSidebarOpen: (open: boolean) => void
@@ -48,6 +50,14 @@ const UserAvatar = memo(() => {
 UserAvatar.displayName = 'UserAvatar'
 
 export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
+  const router = useRouter()
+  const { signOut: cavosSignOut } = useCavosAuthContext()
+
+  const handleCavosSignOut = useCallback(() => {
+    cavosSignOut()
+    router.push('/')
+  }, [cavosSignOut, router])
+
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-800/50 bg-black px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
       <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -109,7 +119,13 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleCavosSignOut} 
+                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:text-red-600 dark:hover:text-red-400 dark:hover:bg-red-950/50 cursor-pointer focus:text-red-500 focus:bg-red-50 dark:focus:text-red-500 dark:focus:bg-red-950/50"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
