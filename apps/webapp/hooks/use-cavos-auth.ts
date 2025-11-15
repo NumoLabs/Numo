@@ -122,13 +122,25 @@ export function useCavosAuth() {
         isInitialized: true
       }
       
+      // Update state first
       setAuthState(newAuthState)
+      
+      // Store data in localStorage
       storeAuthData(user, accessToken, refreshToken)
       
-      // Dispatch custom event to notify other components
+      // Dispatch custom event to notify other components immediately
+      // This helps components that listen to events to update
       if (typeof window !== 'undefined') {
+        // Dispatch event synchronously to ensure components react immediately
         window.dispatchEvent(new CustomEvent('cavos-auth-update', { 
-          detail: { isAuthenticated: true, user } 
+          detail: { isAuthenticated: true, user, accessToken, refreshToken } 
+        }))
+
+        // This simulates a localStorage change event
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'cavos_access_token',
+          newValue: accessToken,
+          storageArea: localStorage
         }))
       }
 

@@ -80,6 +80,21 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       setIsSignUp(true)
     }
   }, [view])
+  
+  // Close modal automatically when user becomes authenticated (for mobile redirects)
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Close modal if it's open
+      if (isOpen) {
+        setIsOpen(false)
+      }
+      
+      // Call success callback if provided
+      if (onSuccess && user) {
+        onSuccess(user)
+      }
+    }
+  }, [isAuthenticated, isOpen, user, onSuccess])
 
   // Password validation
   const getPasswordValidation = (password: string) => {
