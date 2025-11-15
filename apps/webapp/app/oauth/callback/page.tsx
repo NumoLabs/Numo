@@ -48,7 +48,41 @@ function OAuthCallbackContent() {
           })
         }
         
-        if (code && state && !url.searchParams.get('user_id') && !url.searchParams.get('access_token')) {
+        // Check if we have user data directly in URL (after Cavos callback processing)
+        const userId = url.searchParams.get('user_id')
+        const accessToken = url.searchParams.get('access_token')
+        
+        if (userId && accessToken) {
+          // We have user data directly in URL - process immediately
+          console.log('OAuth callback has user data in URL, processing directly...')
+          
+          if (isPopup) {
+            window.opener.postMessage(
+              {
+                type: 'OAUTH_CALLBACK',
+                callbackResult: callbackResult
+              },
+              window.location.origin
+            )
+            window.close()
+          } else {
+            // Store callback result in both localStorage and sessionStorage for reliability
+            // Also pass in URL as fallback (most reliable for Chrome mobile)
+            try {
+              localStorage.setItem('oauth_callback_result', callbackResult)
+              sessionStorage.setItem('oauth_callback_result', callbackResult)
+            } catch (storageError) {
+              console.error('Error storing callback result:', storageError)
+            }
+            
+            // Redirect immediately with callback in URL (most reliable for Chrome mobile)
+            // The hook will check URL params first, then storage
+            window.location.href = `/?oauth_callback=${encodeURIComponent(callbackResult)}`
+          }
+          return
+        }
+        
+        if (code && state && !userId && !accessToken) {
           const storedProvider = localStorage.getItem('oauth_provider') || 'google'
           const isGoogle = storedProvider === 'google' || url.pathname.includes('google')
           const provider = isGoogle ? 'google' : 'apple'
@@ -91,11 +125,18 @@ function OAuthCallbackContent() {
           // Close the popup
           window.close()
         } else {
-          // If not in popup, store callback result for processing
-          localStorage.setItem('oauth_callback_result', callbackResult)
+          // If not in popup, store callback result in both storages for reliability
+          // Also pass in URL as fallback (most reliable for Chrome mobile)
+          try {
+            localStorage.setItem('oauth_callback_result', callbackResult)
+            sessionStorage.setItem('oauth_callback_result', callbackResult)
+          } catch (storageError) {
+            console.error('Error storing callback result:', storageError)
+          }
           
-          // Redirect to home - the app should check localStorage and process the callback
-          window.location.href = '/'
+          // Redirect immediately with callback in URL (most reliable for Chrome mobile)
+          // The hook will check URL params first, then storage
+          window.location.href = `/?oauth_callback=${encodeURIComponent(callbackResult)}`
         }
       } catch (error) {
         console.error('OAuth callback error:', error)

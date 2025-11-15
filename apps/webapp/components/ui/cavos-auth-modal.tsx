@@ -80,6 +80,21 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       setIsSignUp(true)
     }
   }, [view])
+  
+  // Close modal automatically when user becomes authenticated (for mobile redirects)
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Close modal if it's open
+      if (isOpen) {
+        setIsOpen(false)
+      }
+      
+      // Call success callback if provided
+      if (onSuccess && user) {
+        onSuccess(user)
+      }
+    }
+  }, [isAuthenticated, isOpen, user, onSuccess])
 
   // Password validation
   const getPasswordValidation = (password: string) => {
@@ -364,18 +379,29 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       // Get Google OAuth URL
       const oauthUrl = await getGoogleOAuthUrl(redirectUri)
       
-      // Open OAuth URL in a popup window
+      // Detect if device is mobile
+      const isMobile = typeof window !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768
+      )
+      
       if (typeof window !== 'undefined') {
-        const width = 500
-        const height = 600
-        const left = (window.screen.width - width) / 2
-        const top = (window.screen.height - height) / 2
-        
-        window.open(
-          oauthUrl,
-          'Google Sign In',
-          `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
-        )
+        if (isMobile) {
+          // On mobile, redirect directly instead of popup (popups are blocked on mobile)
+          window.location.href = oauthUrl
+        } else {
+          // On desktop, open in popup window
+          const width = 500
+          const height = 600
+          const left = (window.screen.width - width) / 2
+          const top = (window.screen.height - height) / 2
+          
+          window.open(
+            oauthUrl,
+            'Google Sign In',
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+          )
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Google authentication failed'
@@ -388,6 +414,11 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       setLocalError(null)
       clearError()
       
+      // Store provider for callback page
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oauth_provider', 'apple')
+      }
+      
       // Get redirect URI (callback page URL)
       const redirectUri = typeof window !== 'undefined' 
         ? `${window.location.origin}/oauth/callback`
@@ -396,18 +427,29 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       // Get Apple OAuth URL
       const oauthUrl = await getAppleOAuthUrl(redirectUri)
       
-      // Open OAuth URL in a popup window
+      // Detect if device is mobile
+      const isMobile = typeof window !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768
+      )
+      
       if (typeof window !== 'undefined') {
-        const width = 500
-        const height = 600
-        const left = (window.screen.width - width) / 2
-        const top = (window.screen.height - height) / 2
-        
-        window.open(
-          oauthUrl,
-          'Apple Sign In',
-          `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
-        )
+        if (isMobile) {
+          // On mobile, redirect directly instead of popup (popups are blocked on mobile)
+          window.location.href = oauthUrl
+        } else {
+          // On desktop, open in popup window
+          const width = 500
+          const height = 600
+          const left = (window.screen.width - width) / 2
+          const top = (window.screen.height - height) / 2
+          
+          window.open(
+            oauthUrl,
+            'Apple Sign In',
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+          )
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Apple authentication failed'

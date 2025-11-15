@@ -88,7 +88,8 @@ export function VaultCTA() {
                 <CavosAuthModal
                   trigger={
                     <Button
-                      className="group relative w-full sm:flex-1 overflow-hidden font-bold rounded-xl py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse"
+                      size={undefined}
+                      className="!h-auto group relative w-80 overflow-hidden font-bold rounded-lg !py-2 !px-4 mr-11 text-base shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         Join to Numo
