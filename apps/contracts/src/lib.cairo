@@ -37,6 +37,10 @@ pub mod strategies {
         #[cfg(test)]
         pub mod test;
     }
+    pub mod lock_to_earn_bond {
+        pub mod interface;
+        pub mod lock_to_earn_bond;
+    }
 }
 
 #[cfg(test)]
