@@ -42,13 +42,24 @@ export default function WalletConnector() {
   
   const [localAuthState, setLocalAuthState] = useState(() => checkLocalStorageAuth())
   
-  // Sync with context and localStorage
+  // Sync local state with context state whenever context changes
+  useEffect(() => {
+    if (isInitialized && isCavosAuthenticated !== localAuthState) {
+      setLocalAuthState(isCavosAuthenticated)
+    }
+  }, [isCavosAuthenticated, isInitialized, localAuthState])
+  
+  // Listen for auth update events and sync with localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return
     
+    let mounted = true
+    
     const handleAuthUpdate = () => {
+      if (!mounted) return
       // Update local state immediately when event fires
       const hasAuth = checkLocalStorageAuth()
+      console.log('[WalletConnector] Auth update event received, hasAuth:', hasAuth)
       setLocalAuthState(hasAuth)
     }
     
@@ -56,28 +67,51 @@ export default function WalletConnector() {
     window.addEventListener('cavos-auth-update', handleAuthUpdate)
     
     // Also sync with localStorage periodically for the first few seconds (mobile fallback)
+    // This ensures we catch auth state changes even if events are missed
+    let checkCount = 0
+    const maxChecks = 50 // 5 seconds at 100ms intervals
     const interval = setInterval(() => {
+      if (!mounted) {
+        clearInterval(interval)
+        return
+      }
+      
+      checkCount++
       const hasAuth = checkLocalStorageAuth()
-      if (hasAuth !== localAuthState) {
-        setLocalAuthState(hasAuth)
+      setLocalAuthState(prev => {
+        if (prev !== hasAuth) {
+          console.log('[WalletConnector] LocalStorage changed, updating state. hasAuth:', hasAuth)
+          return hasAuth
+        }
+        return prev
+      })
+      
+      // Stop checking after maxChecks or if we're authenticated and context is ready
+      if (checkCount >= maxChecks || (hasAuth && isInitialized && isCavosAuthenticated)) {
+        clearInterval(interval)
       }
     }, 100)
     
     const timeout = setTimeout(() => {
       clearInterval(interval)
-    }, 3000) // Stop checking after 3 seconds
+    }, 5000) // Stop checking after 5 seconds
     
-    // Sync local state with context state
-    if (isCavosAuthenticated !== localAuthState && isInitialized) {
-      setLocalAuthState(isCavosAuthenticated)
-    }
+    // Initial check in case auth was set before component mounted
+    const initialAuth = checkLocalStorageAuth()
+    setLocalAuthState(prev => {
+      if (prev !== initialAuth) {
+        return initialAuth
+      }
+      return prev
+    })
     
     return () => {
+      mounted = false
       window.removeEventListener('cavos-auth-update', handleAuthUpdate)
       clearInterval(interval)
       clearTimeout(timeout)
     }
-  }, [isCavosAuthenticated, isInitialized, localAuthState, checkLocalStorageAuth])
+  }, [checkLocalStorageAuth, isInitialized, isCavosAuthenticated])
   
   // Use localAuthState if context is not yet updated (for immediate feedback on mobile)
   // Otherwise use context state (more reliable)
