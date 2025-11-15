@@ -232,6 +232,24 @@ export function useCavosAuth() {
         // Try to process callback immediately
         const processed = await checkAndProcessCallback()
         if (processed) {
+          // Check if we're on mobile and callback was processed successfully
+          // Force a page reload on mobile to ensure all components re-initialize with correct auth state
+          const isMobile = typeof window !== 'undefined' && (
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+            (window.innerWidth <= 768)
+          )
+          
+          // If callback was processed successfully and we're on mobile, reload the page
+          // to ensure all components (especially WalletConnector) re-initialize with correct state
+          if (isMobile && typeof window !== 'undefined') {
+            // Wait a brief moment for localStorage to be fully written
+            setTimeout(() => {
+              console.log('[useCavosAuth] Mobile OAuth callback processed, reloading page to ensure state sync...')
+              window.location.reload()
+            }, 100)
+            return
+          }
+          
           return // Callback was processed
         }
         
