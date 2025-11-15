@@ -1,13 +1,79 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState, useCallback } from "react"
 import { ArrowRight, Settings, TrendingUp, Download, Plus, MoreVertical, Bitcoin } from "lucide-react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
+import { CavosAuthModal } from "@/components/ui/cavos-auth-modal"
+import { useCavosAuth } from "@/hooks/use-cavos-auth"
 
 export function VaultHero() {
+  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized } = useCavosAuth()
+  
+  // Check localStorage directly for immediate feedback
+  const checkLocalStorage = useCallback(() => {
+    if (typeof window === 'undefined') return false
+    
+    const accessToken = localStorage.getItem('cavos_access_token')
+    const refreshToken = localStorage.getItem('cavos_refresh_token')
+    const storedUser = localStorage.getItem('cavos_user')
+    
+    return !!(
+      accessToken && 
+      accessToken !== 'undefined' && 
+      accessToken !== 'null' &&
+      accessToken.trim().length > 0 &&
+      refreshToken && 
+      refreshToken !== 'undefined' && 
+      refreshToken !== 'null' &&
+      refreshToken.trim().length > 0 &&
+      storedUser && 
+      storedUser !== 'undefined' && 
+      storedUser !== 'null' &&
+      storedUser.trim().length > 0
+    )
+  }, [])
+  
+  const [hasLocalStorageAuth, setHasLocalStorageAuth] = useState(() => checkLocalStorage())
+  
+  // Force re-render when localStorage changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const handleStorageChange = () => {
+      setHasLocalStorageAuth(checkLocalStorage())
+    }
+    
+    // Listen for custom storage event
+    window.addEventListener('cavos-auth-update', handleStorageChange)
+    
+    // Also check periodically for the first few seconds after mount
+    const interval = setInterval(() => {
+      const hasAuth = checkLocalStorage()
+      if (hasAuth !== hasLocalStorageAuth) {
+        setHasLocalStorageAuth(hasAuth)
+        clearInterval(interval)
+      }
+    }, 100)
+    
+    const timeout = setTimeout(() => {
+      clearInterval(interval)
+    }, 5000) // Stop checking after 5 seconds
+    
+    return () => {
+      window.removeEventListener('cavos-auth-update', handleStorageChange)
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [checkLocalStorage, hasLocalStorageAuth])
+  
+  // Use both context and localStorage to determine if authenticated
+  const isAuthenticated = isCavosInitialized 
+    ? (isCavosAuthenticated || hasLocalStorageAuth)
+    : hasLocalStorageAuth
   return (
     <section className="w-full pt-4 pb-12 md:pt-8 md:pb-20 lg:pt-12 lg:pb-28 relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
       {/* Animated floating background elements */}
@@ -213,35 +279,36 @@ export function VaultHero() {
               </p>
             </div>
 
-            {/* Stats preview */}
-            <div className="flex items-center gap-6 py-4 animate-slide-up-fade-in" style={{ animationDelay: "0.3s" }}>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-bitcoin-gold">127.45</div>
-                <div className="text-xs text-gray-400">BTC Locked</div>
-              </div>
-              <div className="w-px h-8 bg-gray-600"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-bitcoin-gold">5.8%</div>
-                <div className="text-xs text-gray-400">Current APY</div>
-              </div>
-              <div className="w-px h-8 bg-gray-600"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-bitcoin-gold">4,400+</div>
-                <div className="text-xs text-gray-400">Active Users</div>
-              </div>
-            </div>
+            {/* Spacer to maintain layout */}
+            <div className="py-4"></div>
 
             <div
               className="flex flex-col gap-2 min-[400px]:flex-row animate-slide-up-fade-in"
               style={{ animationDelay: "0.4s" }}
             >
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
-              >
-                Start Earning BTC
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
+              {isAuthenticated ? (
+                <Link href="/dashboard">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
+                  >
+                    Start Earning BTC
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+              ) : (
+                <CavosAuthModal
+                  trigger={
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
+                    >
+                      Start Earning BTC
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Button>
+                  }
+                />
+              )}
               <Link href="#features">
                 <Button
                   size="lg"

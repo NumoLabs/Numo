@@ -68,7 +68,7 @@ export function VaultCTA() {
           </motion.div>
 
           <motion.div 
-            className="relative"
+            className="relative max-w-md mx-auto"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
@@ -77,9 +77,9 @@ export function VaultCTA() {
             {/* Animated border */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 rounded-3xl blur-sm opacity-60"></div>
 
-            <div className="relative bg-black/95 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border border-orange-500/30 p-4 sm:p-5 md:p-6 flex flex-col gap-4 md:gap-6">
+            <div className="relative bg-black/95 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border border-orange-500/30 p-3 sm:p-4 md:p-5 flex flex-col gap-3 md:gap-4">
               <motion.div 
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center"
+                className="flex flex-col sm:flex-row gap-4 items-center justify-center"
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
@@ -89,10 +89,10 @@ export function VaultCTA() {
                   trigger={
                     <Button
                       size={undefined}
-                      className="!h-auto group relative w-80 overflow-hidden font-bold rounded-lg !py-2 !px-4 mr-11 text-base shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse"
+                      className="!h-auto group relative w-full sm:w-48 overflow-hidden font-bold rounded-lg !py-2 !px-6 text-base shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse sm:mr-4"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        Join to Numo
+                        Join Numo
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </Button>
@@ -100,16 +100,16 @@ export function VaultCTA() {
                 />
 
                 <div className="text-center sm:text-left w-full sm:w-auto">
-                  <div className="text-xs sm:text-sm text-gray-400">
+                  <div className="text-[10px] sm:text-xs text-gray-400">
                     <span className="font-semibold text-green-400">
                       {userCount !== null ? userCount.toLocaleString() : '...'}
                     </span> already joined
                   </div>
                   <div className="flex items-center justify-center sm:justify-start gap-1 mt-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="w-2 h-2 sm:w-2.5 sm:h-2.5 fill-yellow-400 text-yellow-400" />
                     ))}
-                    <span className="text-[10px] sm:text-xs text-gray-400 ml-1">Trusted by users</span>
+                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-1">Trusted by users</span>
                   </div>
                 </div>
               </motion.div>
