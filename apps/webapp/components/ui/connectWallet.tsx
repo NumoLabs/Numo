@@ -44,12 +44,16 @@ export default function WalletConnector() {
   const [localAuthState, setLocalAuthState] = useState(() => checkLocalStorageAuth())
   
   // Sync local state with context state whenever context changes
+  // But don't override if local state is already false (for immediate sign out feedback)
   useEffect(() => {
     if (isInitialized) {
-      // Always sync with context state when initialized
-      setLocalAuthState(isCavosAuthenticated)
+      // Only sync if context says authenticated, or if local state is true
+      // This prevents overriding immediate sign out state
+      if (isCavosAuthenticated || localAuthState) {
+        setLocalAuthState(isCavosAuthenticated)
+      }
     }
-  }, [isCavosAuthenticated, isInitialized])
+  }, [isCavosAuthenticated, isInitialized, localAuthState])
   
   // Listen for auth update events and sync with localStorage
   useEffect(() => {
@@ -115,10 +119,10 @@ export default function WalletConnector() {
     }
   }, [checkLocalStorageAuth, isInitialized, isCavosAuthenticated])
   
-  // Use context state as source of truth when initialized
-  // Use localAuthState only as fallback when not initialized
+  // Use both context and local state - local state takes precedence for immediate updates
+  // This ensures immediate UI updates when sign out happens
   const effectiveIsAuthenticated = isInitialized 
-    ? isCavosAuthenticated
+    ? (localAuthState && isCavosAuthenticated)
     : localAuthState
 
   const handleCavosSuccess = useCallback(() => {
@@ -130,12 +134,20 @@ export default function WalletConnector() {
   const handleCavosSignOut = useCallback(async () => {
     // Update local state immediately before sign out
     setLocalAuthState(false)
+    // Clear localStorage immediately for instant feedback
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cavos_access_token')
+      localStorage.removeItem('cavos_refresh_token')
+      localStorage.removeItem('cavos_user')
+      // Dispatch event to notify other components
+      window.dispatchEvent(new Event('cavos-auth-update'))
+    }
     await cavosSignOut()
     // Ensure local state is cleared
     setLocalAuthState(false)
     // Redirect to landing page after sign out
     router.push('/')
-  }, [cavosSignOut])
+  }, [cavosSignOut, router])
 
   // Check if we're on the dashboard or a dashboard-related page
   const dashboardPages = ['/dashboard', '/history', '/bonds', '/forecast', '/marketplace', '/learn', '/vaults']
