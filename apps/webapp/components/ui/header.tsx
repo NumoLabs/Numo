@@ -146,12 +146,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
             >
               Features
             </Link>
-            <Link
-              href="#waitlist"
-              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
-            >
-              Waitlist
-            </Link>
             {shouldShowDashboard ? (
               <Button
                 asChild
