@@ -1,5 +1,5 @@
 "use client"
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from "./button"
 import { useCavosAuthContext } from '@/components/cavos-auth-provider'
 import { CavosAuthModal } from './cavos-auth-modal'
@@ -15,13 +15,86 @@ export default function WalletConnector() {
     isLoading
   } = useCavosAuthContext()
   const pathname = usePathname()
+  
+  // Local auth state as fallback to force immediate re-render on mobile
+  const checkLocalStorageAuth = useCallback(() => {
+    if (typeof window === 'undefined') return false
+    
+    const accessToken = localStorage.getItem('cavos_access_token')
+    const refreshToken = localStorage.getItem('cavos_refresh_token')
+    const storedUser = localStorage.getItem('cavos_user')
+    
+    return !!(
+      accessToken && 
+      accessToken !== 'undefined' && 
+      accessToken !== 'null' &&
+      accessToken.trim().length > 0 &&
+      refreshToken && 
+      refreshToken !== 'undefined' && 
+      refreshToken !== 'null' &&
+      refreshToken.trim().length > 0 &&
+      storedUser && 
+      storedUser !== 'undefined' && 
+      storedUser !== 'null' &&
+      storedUser.trim().length > 0
+    )
+  }, [])
+  
+  const [localAuthState, setLocalAuthState] = useState(() => checkLocalStorageAuth())
+  
+  // Sync with context and localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const handleAuthUpdate = () => {
+      // Update local state immediately when event fires
+      const hasAuth = checkLocalStorageAuth()
+      setLocalAuthState(hasAuth)
+    }
+    
+    // Listen for auth update events
+    window.addEventListener('cavos-auth-update', handleAuthUpdate)
+    
+    // Also sync with localStorage periodically for the first few seconds (mobile fallback)
+    const interval = setInterval(() => {
+      const hasAuth = checkLocalStorageAuth()
+      if (hasAuth !== localAuthState) {
+        setLocalAuthState(hasAuth)
+      }
+    }, 100)
+    
+    const timeout = setTimeout(() => {
+      clearInterval(interval)
+    }, 3000) // Stop checking after 3 seconds
+    
+    // Sync local state with context state
+    if (isCavosAuthenticated !== localAuthState && isInitialized) {
+      setLocalAuthState(isCavosAuthenticated)
+    }
+    
+    return () => {
+      window.removeEventListener('cavos-auth-update', handleAuthUpdate)
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [isCavosAuthenticated, isInitialized, localAuthState, checkLocalStorageAuth])
+  
+  // Use localAuthState if context is not yet updated (for immediate feedback on mobile)
+  // Otherwise use context state (more reliable)
+  const effectiveIsAuthenticated = isInitialized 
+    ? (localAuthState || isCavosAuthenticated)
+    : isCavosAuthenticated
 
   const handleCavosSuccess = useCallback(() => {
     // Authentication successful callback
+    // Update local state immediately
+    setLocalAuthState(true)
   }, [])
 
   const handleCavosSignOut = useCallback(() => {
     cavosSignOut()
+    // Update local state immediately
+    setLocalAuthState(false)
   }, [cavosSignOut])
 
   // Check if we're on the dashboard or a dashboard-related page
@@ -45,7 +118,7 @@ export default function WalletConnector() {
   }
 
   // Show Cavos authentication if user is not authenticated
-  if (!isCavosAuthenticated) {
+  if (!effectiveIsAuthenticated) {
     return (
       <div className="flex items-center gap-4">
         <CavosAuthModal 
