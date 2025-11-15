@@ -235,15 +235,13 @@ export function VaultHero() {
               className="flex flex-col gap-2 min-[400px]:flex-row animate-slide-up-fade-in"
               style={{ animationDelay: "0.4s" }}
             >
-              <Link href="/app">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
-                >
-                  Start Earning BTC
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
+              >
+                Start Earning BTC
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Button>
               <Link href="#features">
                 <Button
                   size="lg"
