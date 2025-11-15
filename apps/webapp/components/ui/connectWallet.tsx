@@ -25,7 +25,8 @@ export default function WalletConnector() {
   }, [cavosSignOut])
 
   // Check if we're on the dashboard or a dashboard-related page
-  const isOnDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard')
+  const dashboardPages = ['/dashboard', '/history', '/bonds', '/forecast', '/marketplace', '/learn', '/vaults']
+  const isOnDashboard = dashboardPages.some(page => pathname === page || pathname.startsWith(`${page}/`))
 
   // Show loading state while initializing
   if (!isInitialized || isLoading) {

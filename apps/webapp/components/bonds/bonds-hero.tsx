@@ -1,8 +1,23 @@
 import { Lock, TrendingUp, Shield, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Loader2 } from "lucide-react"
 
-export function BondsHero() {
+interface BondsHeroProps {
+  totalTVL?: string
+  lockOptions?: number
+  minLock?: string
+  apy?: string | null
+  isLoading?: boolean
+}
+
+export function BondsHero({ 
+  totalTVL = '0.0000', 
+  lockOptions = 3, 
+  minLock = '7d',
+  apy = null,
+  isLoading = false 
+}: BondsHeroProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-bitcoin-gradient p-8 md:p-12 mb-8 text-white">
       <div className="absolute inset-0 bg-black/20"></div>
@@ -46,23 +61,39 @@ export function BondsHero() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <TrendingUp className="h-8 w-8 mx-auto mb-2 text-bitcoin-gold" />
-                    <p className="text-sm font-medium">Max APY</p>
-                    <p className="text-2xl font-bold">15.8%</p>
+                    <p className="text-sm font-medium">Total TVL</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-gold" />
+                    ) : (
+                      <p className="text-2xl font-bold">{totalTVL} wBTC</p>
+                    )}
                   </div>
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <Lock className="h-8 w-8 mx-auto mb-2 text-bitcoin-orange" />
                     <p className="text-sm font-medium">Lock Options</p>
-                    <p className="text-2xl font-bold">3</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-orange" />
+                    ) : (
+                      <p className="text-2xl font-bold">{lockOptions}</p>
+                    )}
                   </div>
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <Shield className="h-8 w-8 mx-auto mb-2 text-bitcoin-gold" />
-                    <p className="text-sm font-medium">Security</p>
-                    <p className="text-2xl font-bold">100%</p>
+                    <p className="text-sm font-medium">Max APY</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-gold" />
+                    ) : (
+                      <p className="text-2xl font-bold">{apy || 'N/A'}</p>
+                    )}
                   </div>
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-bitcoin-orange" />
                     <p className="text-sm font-medium">Min Lock</p>
-                    <p className="text-2xl font-bold">7d</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-orange" />
+                    ) : (
+                      <p className="text-2xl font-bold">{minLock}</p>
+                    )}
                   </div>
                 </div>
               </div>
