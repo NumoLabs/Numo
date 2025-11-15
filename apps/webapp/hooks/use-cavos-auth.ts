@@ -157,31 +157,66 @@ export function useCavosAuth() {
       }
 
       try {
-        // Check for OAuth callback result in localStorage (mobile redirect flow)
-        const oauthCallbackResult = localStorage.getItem('oauth_callback_result')
-        if (oauthCallbackResult) {
-          console.log('Processing OAuth callback result from localStorage...')
+        // Function to check for and process OAuth callback
+        const checkAndProcessCallback = async (): Promise<boolean> => {
+          // Check for OAuth callback result in URL params first (most reliable)
+          const urlParams = new URLSearchParams(window.location.search)
+          const urlOAuthCallback = urlParams.get('oauth_callback')
           
-          // Remove from localStorage immediately to prevent duplicate processing
-          localStorage.removeItem('oauth_callback_result')
-          
-          // Process the callback
+          // Check for OAuth callback result in sessionStorage (more reliable than localStorage on mobile)
+          let sessionCallbackResult = null
+          let localStorageCallbackResult = null
           try {
-            await handleOAuthCallbackHandler(oauthCallbackResult)
-          } catch (callbackError) {
-            console.error('Error processing OAuth callback:', callbackError)
-            const errorMessage = callbackError instanceof Error ? callbackError.message : 'Failed to process OAuth callback'
-            setAuthState(prev => ({
-              ...prev,
-              error: errorMessage,
-              isInitialized: true,
-              isLoading: false
-            }))
-            return
+            sessionCallbackResult = sessionStorage.getItem('oauth_callback_result')
+            localStorageCallbackResult = localStorage.getItem('oauth_callback_result')
+          } catch (storageError) {
+            console.warn('Error reading from storage:', storageError)
           }
           
-          // After processing callback, return early (callback handler will set auth state)
-          return
+          // Priority: URL params > sessionStorage > localStorage
+          const oauthCallbackResult = urlOAuthCallback || sessionCallbackResult || localStorageCallbackResult
+          
+          if (oauthCallbackResult) {
+            console.log('Processing OAuth callback result...')
+            console.log('Source:', urlOAuthCallback ? 'URL' : sessionCallbackResult ? 'sessionStorage' : 'localStorage')
+            
+            // Remove from all storages immediately to prevent duplicate processing
+            try {
+              if (urlOAuthCallback) {
+                // Clear from URL
+                const newUrl = window.location.pathname
+                window.history.replaceState({}, '', newUrl)
+              }
+              sessionStorage.removeItem('oauth_callback_result')
+              localStorage.removeItem('oauth_callback_result')
+            } catch (clearError) {
+              console.error('Error clearing callback result from storage:', clearError)
+            }
+            
+            // Process the callback
+            try {
+              await handleOAuthCallbackHandler(oauthCallbackResult)
+              return true // Successfully processed
+            } catch (callbackError) {
+              console.error('Error processing OAuth callback:', callbackError)
+              const errorMessage = callbackError instanceof Error ? callbackError.message : 'Failed to process OAuth callback'
+              setAuthState(prev => ({
+                ...prev,
+                error: errorMessage,
+                isInitialized: true,
+                isLoading: false
+              }))
+              return true // Processed (even if error)
+            }
+          }
+          
+          return false // No callback found
+        }
+        
+        // Try to process callback immediately
+        const processed = await checkAndProcessCallback()
+        if (processed) {
+          return // Callback was processed
         }
         
         // Check for error in URL params (mobile redirect with error)
