@@ -37,6 +37,7 @@ export function ForecastContent() {
           </div>
           <InsightsDashboard />
         </section>
+
       </div>
     </>
   )
