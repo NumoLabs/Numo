@@ -5,7 +5,7 @@ import { useCavosAuthContext } from '@/components/cavos-auth-provider'
 import { CavosAuthModal } from './cavos-auth-modal'
 import { User, LogOut, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function WalletConnector() {
   const { 
@@ -15,14 +15,17 @@ export default function WalletConnector() {
     isLoading
   } = useCavosAuthContext()
   const pathname = usePathname()
+  const router = useRouter()
 
   const handleCavosSuccess = useCallback(() => {
     // Authentication successful callback
   }, [])
 
-  const handleCavosSignOut = useCallback(() => {
-    cavosSignOut()
-  }, [cavosSignOut])
+  const handleCavosSignOut = useCallback(async () => {
+    await cavosSignOut()
+    // Redirect to landing page after sign out
+    router.push('/')
+  }, [cavosSignOut, router])
 
   // Check if we're on the dashboard or a dashboard-related page
   const dashboardPages = ['/dashboard', '/history', '/bonds', '/forecast', '/marketplace', '/learn', '/vaults']
@@ -65,22 +68,34 @@ export default function WalletConnector() {
   }
 
   // Show authenticated state
+  // When on dashboard, don't show anything (Sign Out is in the profile dropdown)
   if (isOnDashboard) {
     return null
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <Link href="/dashboard">
+    <div className="flex items-center gap-2 sm:gap-4">
+      {/* Dashboard button - only visible on mobile */}
+      <Link href="/dashboard" className="sm:hidden">
+        <Button
+          variant="default"
+          className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 text-xs"
+        >
+          <User className="mr-1 h-3 w-3" />
+          Dashboard
+        </Button>
+      </Link>
+      {/* Sign Out button - only visible on desktop */}
+      <div className="hidden sm:block">
         <Button
           onClick={handleCavosSignOut}
           variant="ghost"
-          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-sm focus-visible:shadow-sm"
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-sm focus-visible:shadow-sm text-sm"
         >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
         </Button>
-      </Link>
+      </div>
     </div>
   )
 }

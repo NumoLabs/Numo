@@ -56,14 +56,14 @@ export function AdditionalResources() {
             <h4 className="font-semibold text-lg">Official Documentation</h4>
             <div className="space-y-3">
               {officialDocs.map((doc) => (
-                <Link key={doc.title} href={doc.href} target={doc.external ? "_blank" : "_self"}>
-                  <div className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
-                    <div className={`h-10 w-10 rounded-lg ${doc.bgColor} flex items-center justify-center`}>
+                <Link key={doc.title} href={doc.href} target={doc.external ? "_blank" : "_self"} className="block">
+                  <div className="flex items-start gap-3 p-4 rounded-lg border hover:bg-accent transition-colors h-full">
+                    <div className={`h-10 w-10 rounded-lg ${doc.bgColor} flex items-center justify-center flex-shrink-0`}>
                       <doc.icon className={`h-5 w-5 ${doc.iconColor}`} />
                     </div>
-                    <div>
-                      <p className="font-medium">{doc.title}</p>
-                      <p className="text-sm text-muted-foreground">{doc.description}</p>
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      <p className="font-medium break-words mb-1">{doc.title}</p>
+                      <p className="text-sm text-muted-foreground break-words leading-relaxed">{doc.description}</p>
                     </div>
                   </div>
                 </Link>
@@ -74,13 +74,13 @@ export function AdditionalResources() {
             <h4 className="font-semibold text-lg">Useful Tools</h4>
             <div className="space-y-3">
               {tools.map((tool) => (
-                <div key={tool.title} className="flex items-center gap-3 p-3 rounded-lg border">
-                  <div className={`h-10 w-10 rounded-lg ${tool.bgColor} flex items-center justify-center`}>
+                <div key={tool.title} className="flex items-start gap-3 p-4 rounded-lg border hover:bg-accent transition-colors h-full">
+                  <div className={`h-10 w-10 rounded-lg ${tool.bgColor} flex items-center justify-center flex-shrink-0`}>
                     <tool.icon className={`h-5 w-5 ${tool.iconColor}`} />
                   </div>
-                  <div>
-                    <p className="font-medium">{tool.title}</p>
-                    <p className="text-sm text-muted-foreground">{tool.description}</p>
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <p className="font-medium break-words mb-1">{tool.title}</p>
+                    <p className="text-sm text-muted-foreground break-words leading-relaxed">{tool.description}</p>
                   </div>
                 </div>
               ))}

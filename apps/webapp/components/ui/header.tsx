@@ -219,24 +219,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
                       Dashboard
                     </Link>
                     <Link
-                      href="/deposit"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/deposit" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Deposit
-                    </Link>
-                    <Link
-                      href="/withdraw"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Withdraw
-                    </Link>
-                    <Link
                       href="/history"
                       className={cn(
                         "hover:text-foreground transition-colors",
@@ -316,24 +298,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
               )}
             >
               Dashboard
-            </Link>
-            <Link
-              href="/deposit"
-              className={cn(
-                "text-sm font-medium",
-                pathname === "/deposit" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Deposit
-            </Link>
-            <Link
-              href="/withdraw"
-              className={cn(
-                "text-sm font-medium",
-                pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Withdraw
             </Link>
             <Link
               href="/history"

@@ -496,44 +496,46 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
         className="space-y-6"
       >
         {/* Pill Nav */}
-        <div className="relative inline-flex items-center gap-1 p-1.5 bg-muted/50 rounded-full border border-border/50 backdrop-blur-sm">
-          {tabs.map((tab, index) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={`tab-button-${tab.id}`}
-                ref={(el) => {
-                  tabRefs.current[index] = el;
+        <div className="relative w-full overflow-x-auto">
+          <div className="relative inline-flex items-center gap-1 p-1 sm:p-1.5 bg-muted/50 rounded-full border border-border/50 backdrop-blur-sm min-w-max sm:min-w-0">
+            {tabs.map((tab, index) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={`tab-button-${tab.id}`}
+                  ref={(el) => {
+                    tabRefs.current[index] = el;
+                  }}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`
+                    relative z-10 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap flex-shrink-0
+                    ${isActive 
+                      ? 'text-bitcoin-orange' 
+                      : 'text-muted-foreground hover:text-foreground'
+                    }
+                  `}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+            {/* Active indicator pill */}
+            {indicatorStyle.width > 0 && (
+              <motion.div
+                className="absolute top-1 sm:top-1.5 bottom-1 sm:bottom-1.5 bg-background border border-bitcoin-orange/30 rounded-full shadow-lg shadow-bitcoin-orange/10 z-0"
+                initial={false}
+                animate={{
+                  left: indicatorStyle.left,
+                  width: indicatorStyle.width,
                 }}
-                onClick={() => handleTabChange(tab.id)}
-                className={`
-                  relative z-10 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap
-                  ${isActive 
-                    ? 'text-bitcoin-orange' 
-                    : 'text-muted-foreground hover:text-foreground'
-                  }
-                `}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-          {/* Active indicator pill */}
-          {indicatorStyle.width > 0 && (
-            <motion.div
-              className="absolute top-1.5 bottom-1.5 bg-background border border-bitcoin-orange/30 rounded-full shadow-lg shadow-bitcoin-orange/10 z-0"
-              initial={false}
-              animate={{
-                left: indicatorStyle.left,
-                width: indicatorStyle.width,
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 30,
-              }}
-            />
-          )}
+                transition={{
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 30,
+                }}
+              />
+            )}
+          </div>
         </div>
 
         {/* Tab Content */}
