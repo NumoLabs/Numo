@@ -15,6 +15,7 @@ export default function WalletConnector() {
     isLoading
   } = useCavosAuthContext()
   const pathname = usePathname()
+  const router = useRouter()
   
   // Local auth state as fallback to force immediate re-render on mobile
   const checkLocalStorageAuth = useCallback(() => {
@@ -129,7 +130,7 @@ export default function WalletConnector() {
     await cavosSignOut()
     // Redirect to landing page after sign out
     router.push('/')
-  }, [cavosSignOut, router])
+  }, [cavosSignOut])
 
   // Check if we're on the dashboard or a dashboard-related page
   const dashboardPages = ['/dashboard', '/history', '/bonds', '/forecast', '/marketplace', '/learn', '/vaults']

@@ -194,8 +194,8 @@ export function VaultCard({
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Vault</p>
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-xs sm:text-sm font-semibold group-hover:text-bitcoin-orange transition-colors duration-300 break-words">
-              {name}
-            </h3>
+            {name}
+          </h3>
             <Badge className={cn("text-[10px] sm:text-xs whitespace-nowrap flex-shrink-0", getRiskBadgeStyle(vaultRisk))}>
               {vaultRisk} Risk
             </Badge>
@@ -205,48 +205,48 @@ export function VaultCard({
 
       {/* Stats Grid - Mobile */}
       <div className="grid grid-cols-2 sm:grid-cols-none sm:flex gap-3 sm:gap-0 w-full sm:w-auto mb-3 sm:mb-0 relative z-10">
-        {/* Assets */}
+      {/* Assets */}
         <div className="flex flex-col items-start sm:items-center min-w-0 sm:min-w-[70px] flex-shrink-0">
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Assets</p>
-          <div className="flex items-center gap-1.5 group-hover:gap-2 transition-all">
+        <div className="flex items-center gap-1.5 group-hover:gap-2 transition-all">
             <Coins className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground group-hover:text-bitcoin-gold transition-colors" />
             <span className="text-[10px] sm:text-xs font-medium">wBTC</span>
-          </div>
         </div>
+      </div>
 
-        {/* Pools Count */}
+      {/* Pools Count */}
         <div className="flex flex-col items-start sm:items-center min-w-0 sm:min-w-[70px] flex-shrink-0">
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Pools</p>
           <span className="text-xs sm:text-sm font-semibold group-hover:scale-110 transition-transform inline-block">{pools.length}</span>
-        </div>
+      </div>
 
-        {/* APY */}
+      {/* APY */}
         <div className="flex flex-col items-start sm:items-center min-w-0 sm:min-w-[90px] flex-shrink-0">
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">APY</p>
-          <div className="flex items-center gap-1">
-            {isLoading ? (
+        <div className="flex items-center gap-1">
+          {isLoading ? (
               <span className="inline-block w-10 sm:w-12 h-3 sm:h-4 bg-muted rounded animate-pulse" />
-            ) : (
-              <>
+          ) : (
+            <>
                 <span className="text-xs sm:text-sm font-semibold text-bitcoin-gold group-hover:text-bitcoin-orange transition-colors break-words">
-                  {formatApy(avgApy > 0 ? avgApy : null)}
-                </span>
+                {formatApy(avgApy > 0 ? avgApy : null)}
+              </span>
                 <TrendingUp className="h-2.5 sm:h-3 w-2.5 sm:w-3 text-bitcoin-gold opacity-70 group-hover:opacity-100 group-hover:translate-y-[-2px] transition-all flex-shrink-0" />
-              </>
-            )}
-          </div>
+            </>
+          )}
         </div>
+      </div>
 
-        {/* TVL */}
+      {/* TVL */}
         <div className="flex flex-col items-start sm:items-center min-w-0 sm:min-w-[110px] flex-shrink-0">
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">TVL</p>
-          {isLoading || totalAssets === null || totalAssets === undefined ? (
+        {isLoading || totalAssets === null || totalAssets === undefined ? (
             <span className="inline-block w-12 sm:w-16 h-3 sm:h-4 bg-muted rounded animate-pulse" />
-          ) : (
+        ) : (
             <span className="text-xs sm:text-sm font-semibold text-bitcoin-orange group-hover:scale-105 transition-transform inline-block break-words">
-              {formatTotalAssets(totalAssets)} wBTC
-            </span>
-          )}
+            {formatTotalAssets(totalAssets)} wBTC
+          </span>
+        )}
         </div>
       </div>
 

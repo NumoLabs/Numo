@@ -114,39 +114,39 @@ export function StrategySelector() {
   return (
     <div className="w-full">
       <Card className="relative bg-black border border-white shadow-lg hover:shadow-xl transition-all duration-300 group w-full">
-        {/* Shimmer effect */}
+      {/* Shimmer effect */}
         <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
-        
-        <CardHeader className="bg-black/50 rounded-t-lg border-b border-white/20 pb-4 relative z-10">
+      
+      <CardHeader className="bg-black/50 rounded-t-lg border-b border-white/20 pb-4 relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-lg font-bold text-white flex items-center gap-3">
-                <Target className="h-5 w-5 text-bitcoin-gold flex-shrink-0" />
-                <span className="whitespace-nowrap">Rebalance Strategy</span>
-              </CardTitle>
+            <CardTitle className="text-lg font-bold text-white flex items-center gap-3">
+              <Target className="h-5 w-5 text-bitcoin-gold flex-shrink-0" />
+              <span className="whitespace-nowrap">Rebalance Strategy</span>
+            </CardTitle>
               <CardDescription className="text-white/70 mt-2 break-words">
-                Select a rebalancing strategy to guide your pool allocation decisions
-              </CardDescription>
-            </div>
-            <div className="flex-shrink-0 self-start">
-              {riskProfile ? (
-                <Badge className={`${getRiskProfileColor(riskProfile)} whitespace-nowrap`}>
-                  {(() => {
-                    const RiskIcon = getRiskProfileIcon(riskProfile);
-                    return (
-                      <div className="flex items-center gap-1.5">
-                        <RiskIcon className="h-3 w-3 flex-shrink-0" />
-                        <span>{riskProfile} Risk</span>
-                      </div>
-                    );
-                  })()}
-                </Badge>
-              ) : (
-                <div className="h-6 min-w-[80px]" aria-hidden="true" />
-              )}
-            </div>
+              Select a rebalancing strategy to guide your pool allocation decisions
+            </CardDescription>
           </div>
-        </CardHeader>
+            <div className="flex-shrink-0 self-start">
+            {riskProfile ? (
+              <Badge className={`${getRiskProfileColor(riskProfile)} whitespace-nowrap`}>
+                {(() => {
+                  const RiskIcon = getRiskProfileIcon(riskProfile);
+                  return (
+                    <div className="flex items-center gap-1.5">
+                      <RiskIcon className="h-3 w-3 flex-shrink-0" />
+                      <span>{riskProfile} Risk</span>
+                    </div>
+                  );
+                })()}
+              </Badge>
+            ) : (
+                <div className="h-6 min-w-[80px]" aria-hidden="true" />
+            )}
+          </div>
+        </div>
+      </CardHeader>
         <CardContent className="relative z-10 space-y-4 pt-6 pb-12">
         <Select
           onValueChange={setSelectedStrategy}
@@ -170,11 +170,11 @@ export function StrategySelector() {
                   <div className="flex items-center gap-2 w-full text-white">
                     <span className="font-semibold text-white">{strategyOption.name}</span>
                     <Badge className={`${getRiskProfileColor(strategyOption.riskProfile)} text-xs whitespace-nowrap pointer-events-none`}>
-                      <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1">
                         <RiskIcon className="h-3 w-3" />
-                        <span>{strategyOption.riskProfile}</span>
-                      </div>
-                    </Badge>
+                          <span>{strategyOption.riskProfile}</span>
+                        </div>
+                      </Badge>
                   </div>
                 </SelectItem>
               );
@@ -221,8 +221,8 @@ export function StrategySelector() {
             </div>
           </div>
         )}
-        </CardContent>
-      </Card>
+      </CardContent>
+    </Card>
     </div>
   );
 }
