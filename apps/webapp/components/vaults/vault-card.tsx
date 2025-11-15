@@ -7,6 +7,7 @@ import { TrendingUp, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export interface VaultPool {
   poolId: string;
@@ -23,6 +24,87 @@ export interface VaultCardProps {
   isLoading?: boolean;
 }
 
+type RiskProfile = 'Low' | 'Medium' | 'High';
+
+// Calculate vault risk based on pools
+function calculateVaultRisk(pools: VaultPool[]): RiskProfile {
+  if (pools.length === 0) return 'Medium';
+
+  let riskScore = 0;
+  let lendingPoolsCount = 0;
+  let dexPoolsCount = 0;
+
+  pools.forEach((pool) => {
+    const poolName = pool.poolName.toLowerCase();
+    
+    // Identify pool type
+    if (poolName.includes('vesu') || poolName.includes('lending')) {
+      lendingPoolsCount++;
+      riskScore += 1; // Lending pools are lower risk
+    } else if (poolName.includes('ekubo') || poolName.includes('dex') || poolName.includes('liquidity')) {
+      dexPoolsCount++;
+      riskScore += 3; // DEX/liquidity pools are higher risk
+    } else {
+      riskScore += 2; // Unknown pools = medium risk
+    }
+
+    // APY factor (higher APY can indicate higher risk)
+    if (pool.apy !== null && typeof pool.apy === 'number' && !isNaN(pool.apy)) {
+      if (pool.apy > 15) {
+        riskScore += 2; // Very high APY = higher risk
+      } else if (pool.apy > 10) {
+        riskScore += 1; // High APY = moderate risk
+      }
+    }
+  });
+
+  // Diversification factor (more pools = lower risk)
+  if (pools.length >= 3) {
+    riskScore -= 2; // Well diversified
+  } else if (pools.length === 2) {
+    riskScore -= 1; // Somewhat diversified
+  }
+
+  // If mostly lending pools, reduce risk
+  const lendingRatio = lendingPoolsCount / pools.length;
+  if (lendingRatio >= 0.7) {
+    riskScore -= 2; // Mostly safe lending pools
+  } else if (lendingRatio >= 0.5) {
+    riskScore -= 1; // Balanced
+  }
+
+  // If mostly DEX pools, increase risk
+  const dexRatio = dexPoolsCount / pools.length;
+  if (dexRatio >= 0.7) {
+    riskScore += 2; // Mostly risky DEX pools
+  } else if (dexRatio >= 0.5) {
+    riskScore += 1; // Balanced towards risk
+  }
+
+  // Normalize risk score to Low/Medium/High
+  if (riskScore <= 2) {
+    return 'Low';
+  } else if (riskScore <= 5) {
+    return 'Medium';
+  } else {
+    return 'High';
+  }
+}
+
+// Get risk badge styling
+function getRiskBadgeStyle(risk: RiskProfile): string {
+  switch (risk) {
+    case 'Low':
+      return 'bg-black/50 text-white border-white/20';
+    case 'Medium':
+      return 'bg-black/50 text-white border-white/20';
+    case 'High':
+      return 'bg-black/50 text-white border-white/20';
+    default:
+      return 'bg-black/50 text-white border-white/20';
+  }
+}
+
 export function VaultCard({
   id,
   name,
@@ -31,6 +113,9 @@ export function VaultCard({
   isLoading = false,
 }: VaultCardProps) {
   const router = useRouter();
+  
+  // Calculate vault risk
+  const vaultRisk = calculateVaultRisk(pools);
 
   // Safe APY formatter
   const formatApy = (apy: number | null | undefined): string => {
@@ -104,11 +189,16 @@ export function VaultCard({
             className="object-contain"
           />
         </motion.div>
-        <div className="flex flex-col min-w-0">
+        <div className="flex flex-col min-w-0 flex-1">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Vault</p>
-          <h3 className="text-sm font-semibold truncate group-hover:text-bitcoin-orange transition-colors duration-300">
-            {name}
-          </h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-sm font-semibold group-hover:text-bitcoin-orange transition-colors duration-300">
+              {name}
+            </h3>
+            <Badge className={cn("text-xs whitespace-nowrap flex-shrink-0", getRiskBadgeStyle(vaultRisk))}>
+              {vaultRisk} Risk
+            </Badge>
+          </div>
         </div>
       </div>
 
