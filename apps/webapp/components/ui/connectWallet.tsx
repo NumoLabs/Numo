@@ -45,10 +45,11 @@ export default function WalletConnector() {
   
   // Sync local state with context state whenever context changes
   useEffect(() => {
-    if (isInitialized && isCavosAuthenticated !== localAuthState) {
+    if (isInitialized) {
+      // Always sync with context state when initialized
       setLocalAuthState(isCavosAuthenticated)
     }
-  }, [isCavosAuthenticated, isInitialized, localAuthState])
+  }, [isCavosAuthenticated, isInitialized])
   
   // Listen for auth update events and sync with localStorage
   useEffect(() => {
@@ -114,11 +115,11 @@ export default function WalletConnector() {
     }
   }, [checkLocalStorageAuth, isInitialized, isCavosAuthenticated])
   
-  // Use localAuthState if context is not yet updated (for immediate feedback on mobile)
-  // Otherwise use context state (more reliable)
+  // Use context state as source of truth when initialized
+  // Use localAuthState only as fallback when not initialized
   const effectiveIsAuthenticated = isInitialized 
-    ? (localAuthState || isCavosAuthenticated)
-    : isCavosAuthenticated
+    ? isCavosAuthenticated
+    : localAuthState
 
   const handleCavosSuccess = useCallback(() => {
     // Authentication successful callback
@@ -127,7 +128,11 @@ export default function WalletConnector() {
   }, [])
 
   const handleCavosSignOut = useCallback(async () => {
+    // Update local state immediately before sign out
+    setLocalAuthState(false)
     await cavosSignOut()
+    // Ensure local state is cleared
+    setLocalAuthState(false)
     // Redirect to landing page after sign out
     router.push('/')
   }, [cavosSignOut])
