@@ -1,58 +1,35 @@
 "use client"
 
-import { useState } from "react"
-import { Mail, User, CheckCircle2, Sparkles, ArrowRight, Star } from "lucide-react"
+import { useState, useEffect } from "react"
+import { CheckCircle2, Sparkles, Star } from "lucide-react"
 import { motion } from "framer-motion"
-import { supabase } from "../../lib/supabase"
+import { CavosAuthModal } from "../ui/cavos-auth-modal"
+import { Button } from "../ui/button"
 
 export function VaultCTA() {
-  const [status, setStatus] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [userCount, setUserCount] = useState<number | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget as HTMLFormElement
-    const email = (form.email as HTMLInputElement).value.trim()
-    const handle = (form.handle as HTMLInputElement).value.trim()
-    
-    // Validación
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setStatus("Please enter a valid email.")
-      return
+  // Fetch real user count from Supabase via API route
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const response = await fetch('/api/users/count')
+        if (!response.ok) {
+          console.error('Failed to fetch user count')
+          return
+        }
+        
+        const data = await response.json()
+        if (data.count !== undefined) {
+          setUserCount(data.count)
+        }
+      } catch (error) {
+        console.error('Error fetching user count:', error)
+      }
     }
 
-    setIsLoading(true)
-    setStatus("Adding you to the waitlist...")
-
-    try {
-      const { error } = await supabase
-        .from('waitlist')
-        .insert([
-          { 
-            email: email.toLowerCase(),
-            social_handle: handle || null
-          }
-        ])
-
-      if (error) {
-        throw error
-      }
-
-      setStatus("You are on the waitlist! 🚀")
-      form.reset() // Limpiar formulario
-      
-    } catch (error: unknown) {
-      console.error('Error saving to waitlist:', error)
-      
-      if (error instanceof Error && 'code' in error && error.code === '23505') {
-        setStatus("You're already on our waitlist! 🎉")
-      } else {
-        setStatus("Something went wrong. Please try again.")
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    fetchUserCount()
+  }, [])
 
   return (
     <section id="waitlist" className="w-full py-12 md:py-20 relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
@@ -100,81 +77,32 @@ export function VaultCTA() {
             {/* Animated border */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 rounded-3xl blur-sm opacity-60"></div>
 
-            <form
-              className="relative bg-black/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-orange-500/30 p-4 md:p-6 flex flex-col gap-6"
-              onSubmit={handleSubmit}
-            >
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="relative group">
-                  <label className="block text-sm font-semibold text-white mb-2">
-                    Email Address *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      disabled={isLoading}
-                      placeholder="your@email.com"
-                      className="w-full rounded-xl border-2 border-gray-600 bg-gray-900 px-4 py-4 pl-12 text-base text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all placeholder:text-gray-400 group-focus-within:border-orange-500 disabled:bg-gray-800 disabled:cursor-not-allowed"
-                    />
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-orange-400 transition-transform group-focus-within:scale-110" />
-                  </div>
-                </div>
-                <div className="relative group">
-                  <label className="block text-sm font-semibold text-white mb-2">
-                    Social Handle
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="handle"
-                      disabled={isLoading}
-                      placeholder="@username (optional)"
-                      className="w-full rounded-xl border-2 border-gray-600 bg-gray-900 px-4 py-4 pl-12 text-base text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all placeholder:text-gray-400 group-focus-within:border-orange-500 disabled:bg-gray-800 disabled:cursor-not-allowed"
-                    />
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-orange-400 transition-transform group-focus-within:scale-110" />
-                  </div>
-                </div>
-              </div>
-
+            <div className="relative bg-black/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-orange-500/30 p-4 md:p-6 flex flex-col gap-6">
               <motion.div 
-                className="flex flex-col sm:flex-row gap-4 items-center"
+                className="flex flex-col sm:flex-row gap-4 items-center justify-center"
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
                 viewport={{ once: true }}
               >
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`group relative w-full sm:flex-1 overflow-hidden font-bold rounded-xl py-4 px-8 text-lg shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 ${
-                    isLoading 
-                      ? 'bg-gray-600 cursor-not-allowed text-white'
-                      : 'bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse'
-                  }`}
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    {isLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        Adding to waitlist...
-                      </>
-                    ) : (
-                      <>
-                        Join Beta Waitlist
-                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                      </>
-                    )}
-                  </span>
-                  {!isLoading && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  )}
-                </button>
+                <CavosAuthModal
+                  trigger={
+                    <Button
+                      className="group relative w-full sm:flex-1 overflow-hidden font-bold rounded-xl py-4 px-8 text-lg shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse"
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        Join to Numo
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </Button>
+                  }
+                />
 
                 <div className="text-center sm:text-left">
                   <div className="text-sm text-gray-400">
-                    <span className="font-semibold text-green-400">2,847</span> already joined
+                    <span className="font-semibold text-green-400">
+                      {userCount !== null ? userCount.toLocaleString() : '...'}
+                    </span> already joined
                   </div>
                   <div className="flex items-center justify-center sm:justify-start gap-1 mt-1">
                     {[...Array(5)].map((_, i) => (
@@ -184,33 +112,7 @@ export function VaultCTA() {
                   </div>
                 </div>
               </motion.div>
-
-              {status && (
-                <motion.div 
-                  className={`flex items-center justify-center gap-3 border rounded-xl p-4 ${
-                    status.includes('Something went wrong') || status.includes('Please enter')
-                      ? 'bg-red-900/30 border-red-500/50 text-red-300'
-                      : 'bg-green-900/30 border-green-500/50 text-green-300'
-                  }`}
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <CheckCircle2 className={`w-6 h-6 animate-bounce-in ${
-                    status.includes('Something went wrong') || status.includes('Please enter')
-                      ? 'text-red-400'
-                      : 'text-green-400'
-                  }`} />
-                  <span className="font-medium text-lg">{status}</span>
-                </motion.div>
-              )}
-
-              <div className="text-center">
-                <p className="text-sm text-gray-400">
-                  By joining, you agree to receive updates about Numo. Unsubscribe anytime.
-                </p>
-              </div>
-            </form>
+            </div>
           </motion.div>
 
           {/* Benefits section */}
