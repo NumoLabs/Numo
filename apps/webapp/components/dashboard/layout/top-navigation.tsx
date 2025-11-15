@@ -53,8 +53,8 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
   const router = useRouter()
   const { signOut: cavosSignOut } = useCavosAuthContext()
 
-  const handleCavosSignOut = useCallback(() => {
-    cavosSignOut()
+  const handleCavosSignOut = useCallback(async () => {
+    await cavosSignOut()
     router.push('/')
   }, [cavosSignOut, router])
 

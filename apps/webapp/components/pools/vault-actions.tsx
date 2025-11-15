@@ -14,14 +14,12 @@ export function VaultActions({ vaultSlug }: VaultActionsProps) {
         <CardDescription>Manage your custom vault</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Link href={`/pools/deposit/${vaultSlug}`}>
-          <Button className="w-full">Deposit</Button>
-        </Link>
-        <Link href={`/pools/withdraw/${vaultSlug}`}>
-          <Button variant="outline" className="w-full">
-            Withdraw
-          </Button>
-        </Link>
+        <Button className="w-full">
+          Deposit
+        </Button>
+        <Button variant="outline" className="w-full">
+          Withdraw
+        </Button>
         <Link href={`/pools/edit/${vaultSlug}`}>
           <Button variant="outline" className="w-full">
             Edit Vault

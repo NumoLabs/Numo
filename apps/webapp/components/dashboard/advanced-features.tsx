@@ -1,10 +1,15 @@
+"use client"
+
 import Link from "next/link"
+import { useMemo } from "react"
 import { Target, BookOpen } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { getAdvancedFeatures } from "@/lib/dashboard-data"
+import { useAccount } from "@starknet-react/core"
+import { useVaultPools, usePoolYields, usePoolBalances } from "@/hooks/use-vault-queries"
 
 const iconMap = {
   Target,
@@ -21,11 +26,61 @@ function getButtonBgColor(color?: string) {
 }
 
 export function AdvancedFeatures() {
+  const { isConnected } = useAccount()
+  const { data: pools } = useVaultPools()
+  const yieldQueries = usePoolYields(pools ?? null)
+  const balanceQueries = usePoolBalances(pools ?? null)
+  
+  // Calculate active vaults count (pools with balance > 0)
+  const activeVaultsCount = useMemo(() => {
+    if (!balanceQueries || balanceQueries.length === 0) return 0
+    return balanceQueries.filter(query => {
+      const balance = query.data?.balance
+      return balance !== undefined && balance !== null && balance > BigInt(0)
+    }).length
+  }, [balanceQueries])
+  
+  // Calculate average APY
+  const averageReturn = useMemo(() => {
+    if (!yieldQueries || yieldQueries.length === 0) return null
+    const validYields = yieldQueries
+      .map(query => query.data?.yield)
+      .filter((apy): apy is number => typeof apy === 'number' && apy !== null && !isNaN(apy) && apy > 0)
+    
+    if (validYields.length === 0) return null
+    const sum = validYields.reduce((acc, apy) => acc + apy, 0)
+    return sum / validYields.length
+  }, [yieldQueries])
+  
   const features = getAdvancedFeatures()
+  
+  // Update vaults feature with real data
+  const updatedFeatures = useMemo(() => {
+    return features.map(feature => {
+      if (feature.title === "Vaults") {
+        return {
+          ...feature,
+          stats: [
+            { 
+              label: "Active Vaults", 
+              value: isConnected ? `${activeVaultsCount} active` : "0 active" 
+            },
+            { 
+              label: "Average Return", 
+              value: isConnected && averageReturn !== null 
+                ? `${averageReturn.toFixed(1)}%` 
+                : "0%"
+            },
+          ]
+        }
+      }
+      return feature
+    })
+  }, [features, activeVaultsCount, averageReturn, isConnected])
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {features.map((feature, index) => {
+      {updatedFeatures.map((feature, index) => {
         const IconComponent = iconMap[feature.icon as keyof typeof iconMap]
 
         return (
@@ -59,7 +114,7 @@ export function AdvancedFeatures() {
                   </div>
                 )}
                 <p className="text-sm text-white">
-                  {feature.title === "Pools"
+                  {feature.title === "Vaults"
                     ? "Manually select liquidity pools and assign specific percentages according to your investment strategy."
                     : "Step-by-step guides, concept explanations, and strategies to maximize your returns while minimizing risks."}
                 </p>

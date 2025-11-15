@@ -55,13 +55,13 @@ export function VaultCTA() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.2 }}
           >
-            <div className="inline-block rounded-lg bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 px-3 py-1 text-sm text-black font-bold shadow-bitcoin mb-6">
+            <div className="inline-block rounded-lg bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 px-2 sm:px-3 py-1 text-xs sm:text-sm text-black font-bold shadow-bitcoin mb-4 md:mb-6">
               Limited Beta Access
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-white via-orange-300 to-yellow-400 bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 md:mb-6 bg-gradient-to-r from-white via-orange-300 to-yellow-400 bg-clip-text text-transparent px-2">
               Join the Future of BTC DeFi
             </h2>
-            <p className="text-xl text-gray-300 leading-relaxed max-w-xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed max-w-xl mx-auto px-2">
               Be among the first to experience modular Bitcoin finance on Starknet. Get exclusive early access to our
               beta platform.
             </p>
@@ -77,9 +77,9 @@ export function VaultCTA() {
             {/* Animated border */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 rounded-3xl blur-sm opacity-60"></div>
 
-            <div className="relative bg-black/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-orange-500/30 p-4 md:p-6 flex flex-col gap-6">
+            <div className="relative bg-black/95 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border border-orange-500/30 p-4 sm:p-5 md:p-6 flex flex-col gap-4 md:gap-6">
               <motion.div 
-                className="flex flex-col sm:flex-row gap-4 items-center justify-center"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center"
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
@@ -99,17 +99,17 @@ export function VaultCTA() {
                   }
                 />
 
-                <div className="text-center sm:text-left">
-                  <div className="text-sm text-gray-400">
+                <div className="text-center sm:text-left w-full sm:w-auto">
+                  <div className="text-xs sm:text-sm text-gray-400">
                     <span className="font-semibold text-green-400">
                       {userCount !== null ? userCount.toLocaleString() : '...'}
                     </span> already joined
                   </div>
                   <div className="flex items-center justify-center sm:justify-start gap-1 mt-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-yellow-400 text-yellow-400" />
                     ))}
-                    <span className="text-xs text-gray-400 ml-1">Trusted by users</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400 ml-1">Trusted by users</span>
                   </div>
                 </div>
               </motion.div>
