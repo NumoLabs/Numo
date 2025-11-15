@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 import { 
   ArrowLeft, 
   Briefcase, 
@@ -26,6 +27,81 @@ import { VesuVaultPosition } from '@/components/vaults/position-card';
 
 interface VaultDetailContentProps {
   vaultId: string;
+}
+
+type RiskProfile = 'Low' | 'Medium' | 'High';
+
+// Calculate vault risk based on pools
+function calculateVaultRisk(pools: PoolProps[], vesuPoolsData: VesuPool[] | null): RiskProfile {
+  if (pools.length === 0) return 'Medium';
+
+  let riskScore = 0;
+  let lendingPoolsCount = 0;
+  let dexPoolsCount = 0;
+
+  pools.forEach((pool) => {
+    // Get pool name from Vesu API data
+    const poolName = vesuPoolsData 
+      ? (vesuPoolsData.find(p => p.id.toLowerCase() === pool.pool_id.toLowerCase())?.name || '').toLowerCase()
+      : pool.pool_id.toLowerCase();
+    
+    // Identify pool type
+    if (poolName.includes('vesu') || poolName.includes('lending')) {
+      lendingPoolsCount++;
+      riskScore += 1; // Lending pools are lower risk
+    } else if (poolName.includes('ekubo') || poolName.includes('dex') || poolName.includes('liquidity')) {
+      dexPoolsCount++;
+      riskScore += 3; // DEX/liquidity pools are higher risk
+    } else {
+      riskScore += 2; // Unknown pools = medium risk
+    }
+  });
+
+  // Diversification factor (more pools = lower risk)
+  if (pools.length >= 3) {
+    riskScore -= 2; // Well diversified
+  } else if (pools.length === 2) {
+    riskScore -= 1; // Somewhat diversified
+  }
+
+  // If mostly lending pools, reduce risk
+  const lendingRatio = lendingPoolsCount / pools.length;
+  if (lendingRatio >= 0.7) {
+    riskScore -= 2; // Mostly safe lending pools
+  } else if (lendingRatio >= 0.5) {
+    riskScore -= 1; // Balanced
+  }
+
+  // If mostly DEX pools, increase risk
+  const dexRatio = dexPoolsCount / pools.length;
+  if (dexRatio >= 0.7) {
+    riskScore += 2; // Mostly risky DEX pools
+  } else if (dexRatio >= 0.5) {
+    riskScore += 1; // Balanced towards risk
+  }
+
+  // Normalize risk score to Low/Medium/High
+  if (riskScore <= 2) {
+    return 'Low';
+  } else if (riskScore <= 5) {
+    return 'Medium';
+  } else {
+    return 'High';
+  }
+}
+
+// Get risk badge styling
+function getRiskBadgeStyle(risk: RiskProfile): string {
+  switch (risk) {
+    case 'Low':
+      return 'bg-black/50 text-white border-white/20';
+    case 'Medium':
+      return 'bg-black/50 text-white border-white/20';
+    case 'High':
+      return 'bg-black/50 text-white border-white/20';
+    default:
+      return 'bg-black/50 text-white border-white/20';
+  }
 }
 
 export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
@@ -558,11 +634,24 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                 transition={{ duration: 0.4, delay: 0.6 }}
               >
                 <Card className="hover:shadow-md transition-all duration-300">
-                  <CardHeader>
+                  <CardHeader className="relative">
                     <CardTitle className="flex items-center gap-2">
                       <Briefcase className="h-5 w-5 text-bitcoin-orange" />
                       Vault Information
                     </CardTitle>
+                    {(() => {
+                      const vaultRisk = calculateVaultRisk(pools, vesuPoolsData);
+                      return (
+                        <Badge 
+                          className={cn(
+                            "absolute top-4 right-4 text-[10px] sm:text-xs whitespace-nowrap flex-shrink-0", 
+                            getRiskBadgeStyle(vaultRisk)
+                          )}
+                        >
+                          {vaultRisk} Risk
+                        </Badge>
+                      );
+                    })()}
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
