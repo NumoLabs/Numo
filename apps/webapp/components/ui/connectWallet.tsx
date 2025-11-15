@@ -5,7 +5,7 @@ import { useCavosAuthContext } from '@/components/cavos-auth-provider'
 import { CavosAuthModal } from './cavos-auth-modal'
 import { User, LogOut, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function WalletConnector() {
   const { 
@@ -15,6 +15,7 @@ export default function WalletConnector() {
     isLoading
   } = useCavosAuthContext()
   const pathname = usePathname()
+  const router = useRouter()
   
   // Local auth state as fallback to force immediate re-render on mobile
   const checkLocalStorageAuth = useCallback(() => {
@@ -44,10 +45,11 @@ export default function WalletConnector() {
   
   // Sync local state with context state whenever context changes
   useEffect(() => {
-    if (isInitialized && isCavosAuthenticated !== localAuthState) {
+    if (isInitialized) {
+      // Always sync with context state when initialized
       setLocalAuthState(isCavosAuthenticated)
     }
-  }, [isCavosAuthenticated, isInitialized, localAuthState])
+  }, [isCavosAuthenticated, isInitialized])
   
   // Listen for auth update events and sync with localStorage
   useEffect(() => {
@@ -113,11 +115,11 @@ export default function WalletConnector() {
     }
   }, [checkLocalStorageAuth, isInitialized, isCavosAuthenticated])
   
-  // Use localAuthState if context is not yet updated (for immediate feedback on mobile)
-  // Otherwise use context state (more reliable)
+  // Use context state as source of truth when initialized
+  // Use localAuthState only as fallback when not initialized
   const effectiveIsAuthenticated = isInitialized 
-    ? (localAuthState || isCavosAuthenticated)
-    : isCavosAuthenticated
+    ? isCavosAuthenticated
+    : localAuthState
 
   const handleCavosSuccess = useCallback(() => {
     // Authentication successful callback
@@ -125,10 +127,14 @@ export default function WalletConnector() {
     setLocalAuthState(true)
   }, [])
 
-  const handleCavosSignOut = useCallback(() => {
-    cavosSignOut()
-    // Update local state immediately
+  const handleCavosSignOut = useCallback(async () => {
+    // Update local state immediately before sign out
     setLocalAuthState(false)
+    await cavosSignOut()
+    // Ensure local state is cleared
+    setLocalAuthState(false)
+    // Redirect to landing page after sign out
+    router.push('/')
   }, [cavosSignOut])
 
   // Check if we're on the dashboard or a dashboard-related page
@@ -172,22 +178,34 @@ export default function WalletConnector() {
   }
 
   // Show authenticated state
+  // When on dashboard, don't show anything (Sign Out is in the profile dropdown)
   if (isOnDashboard) {
     return null
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <Link href="/dashboard">
+    <div className="flex items-center gap-2 sm:gap-4">
+      {/* Dashboard button - only visible on mobile */}
+      <Link href="/dashboard" className="sm:hidden">
+        <Button
+          variant="default"
+          className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg shadow-orange-500/50 hover:shadow-xl hover:shadow-orange-400/60 focus-visible:shadow-xl transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 text-xs"
+        >
+          <User className="mr-1 h-3 w-3" />
+          Dashboard
+        </Button>
+      </Link>
+      {/* Sign Out button - only visible on desktop */}
+      <div className="hidden sm:block">
         <Button
           onClick={handleCavosSignOut}
           variant="ghost"
-          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-sm focus-visible:shadow-sm"
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-sm focus-visible:shadow-sm text-sm"
         >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
         </Button>
-      </Link>
+      </div>
     </div>
   )
 }

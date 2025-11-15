@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { PieChart, BarChart3, Activity, RefreshCw, Settings, Eye, LineChart, TrendingUp } from "lucide-react"
+import { PieChart, BarChart3, Activity, Eye, LineChart, TrendingUp } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -39,24 +39,6 @@ export function DashboardTabs() {
             Transactions
           </TabsTrigger>
         </TabsList>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-md"
-          >
-            <RefreshCw className="h-4 w-4 transition-transform duration-300 hover:rotate-180" />
-            Refresh
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-md"
-          >
-            <Settings className="h-4 w-4 transition-transform duration-300 hover:rotate-90" />
-            Configure
-          </Button>
-        </div>
       </div>
 
       <TabsContent value="overview" className="space-y-6">

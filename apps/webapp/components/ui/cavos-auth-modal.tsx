@@ -484,9 +484,9 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         )}
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-[90%] sm:max-w-md w-[90%] sm:w-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className="text-center text-base sm:text-lg">
             {view === 'signup' && 'Create Account'}
             {view === 'signin' && 'Sign In'}
             {view === 'forgot-password' && 'Reset Password'}
@@ -496,7 +496,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         
         {/* Forgot Password - Email Sent Success */}
         {view === 'forgot-password' && resetEmailSent ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <Alert className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
               <AlertDescription className="text-green-800 dark:text-green-200">
                 <div className="flex items-center gap-2">
@@ -527,7 +527,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
             </Button>
           </div>
         ) : view === 'forgot-password' ? (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
+          <form onSubmit={handleForgotPassword} className="space-y-3 sm:space-y-4">
             {(localError || error) && (
               <Alert variant="destructive" className="max-h-40 overflow-y-auto">
                 <AlertDescription className="text-sm break-words whitespace-normal leading-relaxed">
@@ -580,7 +580,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
             </Button>
           </form>
         ) : view === 'reset-password' ? (
-          <form onSubmit={handlePasswordResetConfirm} className="space-y-4">
+          <form onSubmit={handlePasswordResetConfirm} className="space-y-3 sm:space-y-4">
             {(localError || error) && (
               <Alert variant="destructive" className="max-h-40 overflow-y-auto">
                 <AlertDescription className="text-sm break-words whitespace-normal leading-relaxed">
@@ -676,7 +676,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
           </form>
         ) : (
           <>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               {(localError || error) && (
                 <Alert variant="destructive" className="max-h-40 overflow-y-auto">
                   <AlertDescription className="text-sm break-words whitespace-normal leading-relaxed">
