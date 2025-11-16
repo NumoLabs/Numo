@@ -46,7 +46,7 @@ function isTokenExpiringSoon(token: string | null, thresholdMinutes: number = 5)
 
   const decoded = decodeJWT(token)
   if (!decoded) {
-    return true // If we can't decode, assume it's expired/expiring
+    return false
   }
 
   const currentTime = Math.floor(Date.now() / 1000) // Current time in seconds
@@ -548,6 +548,10 @@ export function useCavosAuth() {
 
       // Reset invalid flag on successful refresh
       refreshTokenInvalidRef.current = false
+      
+      if (result.refresh_token) {
+        lastRefreshTokenRef.current = result.refresh_token
+      }
 
       return result
     } catch (error: any) {
@@ -582,6 +586,7 @@ export function useCavosAuth() {
   const isRefreshingRef = useRef(false) // Prevent multiple simultaneous refreshes
   const refreshTokenInvalidRef = useRef(false) // Track if refresh token is invalid/expired
   const lastRefreshTokenRef = useRef<string | null>(null) // Track last refresh token to detect new logins
+  const lastRefreshAttemptRef = useRef<number | null>(null) // Track last refresh attempt time to prevent too frequent refreshes
   const refreshTokenFnRef = useRef(refreshToken)
   const signOutFnRef = useRef(signOut)
 
@@ -632,7 +637,6 @@ export function useCavosAuth() {
         return
       }
 
-      // Get tokens from state or localStorage (fallback)
       const token = authState.accessToken || 
         (typeof window !== 'undefined' ? localStorage.getItem('cavos_access_token') : null)
       
@@ -650,6 +654,7 @@ export function useCavosAuth() {
         const expirationTime = refreshTokenDecoded.exp
         const timeUntilExpiration = expirationTime - currentTime
         
+
         if (timeUntilExpiration < -30) {
           refreshTokenInvalidRef.current = true
           if (refreshTokenRef.current) {
@@ -663,12 +668,36 @@ export function useCavosAuth() {
 
       const tokenExpiringSoon = isTokenExpiringSoon(token, 5)
       
+      if (process.env.NODE_ENV === 'development') {
+        const tokenDecoded = decodeJWT(token)
+        if (tokenDecoded) {
+          const currentTime = Math.floor(Date.now() / 1000)
+          const timeUntilExpiration = tokenDecoded.exp - currentTime
+          const minutesUntilExpiration = Math.floor(timeUntilExpiration / 60)
+          if (minutesUntilExpiration < 10) {
+            console.log('[useCavosAuth] Token status:', {
+              expiresIn: `${minutesUntilExpiration} minutes`,
+              expiringSoon: tokenExpiringSoon,
+              willRefresh: tokenExpiringSoon && !refreshTokenInvalidRef.current,
+              lastRefreshAttempt: lastRefreshAttemptRef.current ? `${Math.floor((Date.now() - lastRefreshAttemptRef.current) / 1000)}s ago` : 'never'
+            })
+          }
+        }
+      }
+      
       if (tokenExpiringSoon) {
         if (refreshTokenInvalidRef.current) {
           return // Exit early if already marked as invalid
         }
 
+        const now = Date.now()
+        if (lastRefreshAttemptRef.current && (now - lastRefreshAttemptRef.current) < 60 * 1000) {
+          return
+        }
+
         isRefreshingRef.current = true
+        lastRefreshAttemptRef.current = now
+        
         try {
           // Use ref to get latest function version without causing re-runs
           const refreshResult = await refreshTokenFnRef.current()
@@ -681,10 +710,22 @@ export function useCavosAuth() {
           // Reset invalid flag on successful refresh
           refreshTokenInvalidRef.current = false
           
+          if (refreshResult.refresh_token) {
+            lastRefreshTokenRef.current = refreshResult.refresh_token
+          }
+          
+          // Reset last refresh attempt time on success (allows next refresh when needed)
+          lastRefreshAttemptRef.current = null
+          
+          // Log successful refresh in development
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[useCavosAuth] Token refreshed successfully')
+          }
+          
           // Dispatch event to notify components of token refresh
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('cavos-token-refreshed', {
-              detail: { accessToken: refreshResult.access_token }
+              detail: { accessToken: refreshResult.access_token, refreshToken: refreshResult.refresh_token }
             }))
           }
         } catch (error: any) {
