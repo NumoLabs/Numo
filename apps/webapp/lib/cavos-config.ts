@@ -57,10 +57,8 @@ export const createCavosAuth = () => {
   return new CavosAuth(config.defaultNetwork, config.appId)
 }
 
-// Authentication flow helper using local API route
 export const authenticateUser = async (email: string, password: string, action: 'signup' | 'signin' = 'signup') => {
   try {
-    // Try the requested action first
     const response = await fetch('/api/cavos/auth', {
       method: 'POST',
       headers: {
