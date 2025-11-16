@@ -5,12 +5,12 @@ import { Progress } from "@/components/ui/progress"
 
 export function ProgressIndicator() {
   return (
-    <Card className="mb-8">
+    <Card className="relative overflow-hidden transition-all duration-300 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 hover:shadow-lg hover:shadow-bitcoin-orange/10 mb-8 mt-8">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Your Learning Progress</h3>
           <Badge variant="secondary" className="gap-1">
-            <Star className="h-4 w-4" />
+            <Star className="h-4 w-4 text-bitcoin-gold" />
             Beginner
           </Badge>
         </div>

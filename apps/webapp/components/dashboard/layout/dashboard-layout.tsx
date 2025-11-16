@@ -7,7 +7,6 @@ import { Sidebar } from "./sidebar"
 import { TopNavigation } from "./top-navigation"
 import { DashboardHero } from "@/components/dashboard/dashboard-hero"
 import { DashboardContent } from "@/components/dashboard/dashboard-content"
-import { HistoryContent } from "@/components/history/history-content"
 // Pools pages hidden from frontend but logic preserved
 // import { PoolsContent } from "@/components/pools/pools-content"
 // import { CreateVaultContent } from "@/components/pools/create-vault-content"
@@ -30,9 +29,6 @@ export function DashboardLayout() {
   const renderContent = () => {
     if (pathname === "/") {
       return null // Let the home page handle its own layout
-    }
-    if (pathname === "/history") {
-      return <HistoryContent />
     }
     if (pathname === "/bonds") {
       return <BondsContent />
