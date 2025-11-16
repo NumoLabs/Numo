@@ -391,9 +391,9 @@ export function VaultHero() {
                 {/* User profile */}
                 <div className="flex justify-between items-center px-5 py-3">
                   <div className="flex items-center space-x-2">
-                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
                       <Image
-                        src="/user-avatar.jpg"
+                        src="/numo-logo.png"
                         alt="User Avatar"
                         width={40}
                         height={40}
