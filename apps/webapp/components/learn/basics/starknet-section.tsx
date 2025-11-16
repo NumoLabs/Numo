@@ -1,4 +1,4 @@
-import { Award, Zap, Coins, Shield, BarChart3, Lock } from "lucide-react"
+import { Award, Zap, Coins, Shield, Lock } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 

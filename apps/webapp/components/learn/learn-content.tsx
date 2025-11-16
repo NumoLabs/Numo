@@ -1,6 +1,4 @@
 import { HeroSection } from "./hero-section"
-import { ProgressIndicator } from "./progress-indicator"
-import { LearningPath } from "./learning-path"
 import { ContentTabs } from "./content-tabs"
 
 export function LearnContent() {
