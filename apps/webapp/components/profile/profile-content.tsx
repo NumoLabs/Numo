@@ -78,6 +78,7 @@ export function ProfileContent() {
         // If 401, try to refresh token and retry
         if (response.status === 401) {
           try {
+            // Only attempt refresh if not already marked as invalid
             const refreshResult = await refreshToken();
             
             // Get new token after refresh (from result or localStorage)
@@ -99,8 +100,14 @@ export function ProfileContent() {
             } else {
               throw new Error('Failed to get new token after refresh');
             }
-          } catch (refreshError) {
-            throw new Error('Your session has expired. Please sign in again.');
+          } catch (refreshError: any) {
+            // If refresh token is expired (401), signOut will be called automatically
+            // Just throw a user-friendly error
+            const errorMessage = refreshError?.message || ''
+            if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
+              throw new Error('Your session has expired. Please sign in again.');
+            }
+            throw refreshError;
           }
         }
         

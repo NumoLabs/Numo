@@ -84,7 +84,7 @@ const UserAvatar = memo(() => {
         // If 401, try to refresh token and retry
         if (response.status === 401) {
           try {
-            console.log('[UserAvatar] Token expired, attempting to refresh...');
+            // Only attempt refresh if not already marked as invalid
             const refreshResult = await refreshToken();
             
             // Get new token after refresh
@@ -101,8 +101,15 @@ const UserAvatar = memo(() => {
                 },
               });
             }
-          } catch (refreshError) {
-            console.error('[UserAvatar] Token refresh failed:', refreshError);
+          } catch (refreshError: any) {
+            // If refresh token is expired (401), signOut will be called automatically
+            // Just silently fail for avatar loading
+            const errorMessage = refreshError?.message || ''
+            if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
+              // Session expired - signOut will be called automatically, just return
+              return;
+            }
+            // For other errors, log and return
             return;
           }
         }
@@ -241,7 +248,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
         // If 401, try to refresh token and retry
         if (response.status === 401) {
           try {
-            console.log('[UserAvatar] Token expired, attempting to refresh...');
+            // Only attempt refresh if not already marked as invalid
             const refreshResult = await refreshToken();
             
             // Get new token after refresh
@@ -258,8 +265,15 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
                 },
               });
             }
-          } catch (refreshError) {
-            console.error('[UserAvatar] Token refresh failed:', refreshError);
+          } catch (refreshError: any) {
+            // If refresh token is expired (401), signOut will be called automatically
+            // Just silently fail for avatar loading
+            const errorMessage = refreshError?.message || ''
+            if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
+              // Session expired - signOut will be called automatically, just return
+              return;
+            }
+            // For other errors, log and return
             return;
           }
         }
