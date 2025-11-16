@@ -136,23 +136,36 @@ export default function PerformanceChart() {
       const actualAdvantage = dataPoint?.advantageActual ?? advantageEntry?.value
       
       return (
-        <div className="bg-black text-white p-4 border border-gray-600 rounded-lg shadow-lg">
-          <p className="font-semibold mb-2">{`Day ${label}`}</p>
-          {vaultEntry && actualVaultBalance !== undefined && (
-            <p style={{ color: vaultEntry.color }} className="text-sm mb-1">
-              {`BTC Vault: ${actualVaultBalance.toFixed(6)} BTC`}
-            </p>
-          )}
-          {hodlEntry && hodlEntry.value !== undefined && (
-            <p style={{ color: hodlEntry.color }} className="text-sm mb-1">
-              {`HODL: ${hodlEntry.value.toFixed(6)} BTC`}
-            </p>
-          )}
-          {advantageEntry && actualAdvantage !== undefined && (
-            <p style={{ color: advantageEntry.color }} className="text-sm font-semibold mt-2 pt-2 border-t border-gray-600">
-              {`Advantage: +${actualAdvantage.toFixed(6)} BTC (${((actualAdvantage / 1) * 100).toFixed(2)}%)`}
-            </p>
-          )}
+        <div className="bg-gradient-to-br from-gray-900 to-black text-white p-4 border border-orange-500/30 rounded-lg shadow-2xl backdrop-blur-sm">
+          <p className="font-bold mb-3 text-orange-300">{`Day ${label}`}</p>
+          <div className="space-y-2">
+            {vaultEntry && actualVaultBalance !== undefined && (
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500"></div>
+                <p className="text-sm font-semibold">
+                  <span className="text-orange-300">BTC Vault:</span> <span className="text-white">{actualVaultBalance.toFixed(6)} BTC</span>
+                </p>
+              </div>
+            )}
+            {hodlEntry && hodlEntry.value !== undefined && (
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gray-500 border-2 border-dashed border-gray-400"></div>
+                <p className="text-sm font-semibold">
+                  <span className="text-gray-300">HODL:</span> <span className="text-white">{hodlEntry.value.toFixed(6)} BTC</span>
+                </p>
+              </div>
+            )}
+            {advantageEntry && actualAdvantage !== undefined && (
+              <div className="mt-3 pt-3 border-t border-orange-500/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <p className="text-sm font-bold text-green-400">
+                    Advantage: <span className="text-white">+{actualAdvantage.toFixed(6)} BTC</span> <span className="text-green-300">({((actualAdvantage / 1) * 100).toFixed(2)}%)</span>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )
     }
@@ -226,37 +239,52 @@ export default function PerformanceChart() {
           </div>
         ) : (
           <>
-            <div className="h-80 w-full">
+            <div className="h-80 w-full flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data} margin={{ left: 60, right: 20, top: 10, bottom: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <LineChart data={data} margin={{ left: 50, right: 30, top: 20, bottom: 50 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
                   <XAxis 
                     dataKey="day" 
-                    stroke="#666" 
-                    fontSize={12} 
+                    stroke="#9ca3af" 
+                    fontSize={12}
+                    tick={{ fill: '#d1d5db' }}
                     tickFormatter={(value) => `${value}d`}
-                    label={{ value: 'Days', position: 'outside', offset: 10, style: { textAnchor: 'middle' } }}
-                    height={60}
+                    label={{ value: 'Days', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fill: '#d1d5db', fontSize: '12px' } }}
+                    height={50}
                   />
                   <YAxis 
-                    stroke="#666" 
-                    fontSize={12} 
+                    stroke="#9ca3af" 
+                    fontSize={12}
+                    tick={{ fill: '#d1d5db' }}
                     tickFormatter={(value) => `${value.toFixed(2)}`}
-                    label={{ value: 'Balance (BTC)', angle: -90, position: 'left', offset: -10, style: { textAnchor: 'middle' } }}
-                    width={80}
+                    label={{ value: 'Balance (BTC)', angle: -90, position: 'insideLeft', offset: 10, style: { textAnchor: 'middle', fill: '#d1d5db', fontSize: '12px' } }}
+                    width={60}
                     domain={yAxisDomain}
                     ticks={yAxisTicks}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend />
+                  <Legend 
+                    wrapperStyle={{ paddingTop: '10px' }}
+                    iconType="line"
+                    formatter={(value) => <span className="text-gray-300 text-sm">{value}</span>}
+                    align="center"
+                    verticalAlign="top"
+                  />
+                  <defs>
+                    <linearGradient id="vaultGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#f59e0b" />
+                      <stop offset="50%" stopColor="#fbbf24" />
+                      <stop offset="100%" stopColor="#f59e0b" />
+                    </linearGradient>
+                  </defs>
                   <Line 
                     type="natural" 
                     dataKey="vaultBalance" 
-                    stroke="#f59e0b" 
+                    stroke="url(#vaultGradient)" 
                     strokeWidth={3} 
                     name="BTC Vault" 
                     dot={false}
-                    animationDuration={500}
+                    animationDuration={800}
                     isAnimationActive={true}
                   />
                   <Line
@@ -267,18 +295,18 @@ export default function PerformanceChart() {
                     name="HODL"
                     dot={false}
                     strokeDasharray="5 5"
-                    animationDuration={500}
+                    animationDuration={800}
                     isAnimationActive={true}
                   />
                   <Line
                     type="natural"
                     dataKey="advantage"
                     stroke="#10b981"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     name="Vault Advantage"
                     dot={false}
-                    strokeDasharray="3 3"
-                    animationDuration={500}
+                    strokeDasharray="4 4"
+                    animationDuration={800}
                     isAnimationActive={true}
                   />
                 </LineChart>

@@ -43,6 +43,11 @@ interface SidebarProps {
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const pathname = usePathname()
+  
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.location.href = '/'
+  }
 
   return (
     <>
@@ -51,7 +56,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-xl flex flex-col">
           <div className="flex h-16 items-center justify-between px-6 border-b border-gray-800 shrink-0">
-            <Link href="/" className="flex items-center group">
+            <button onClick={handleLogoClick} className="flex items-center group cursor-pointer">
               <Image
                 src="/numo-logo.png"
                 alt="Numo Logo"
@@ -62,7 +67,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
               <span className="ml-0 text-xl font-bold text-white">
                 umo
               </span>
-            </Link>
+            </button>
             <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -142,7 +147,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black border-r border-gray-800/50 shadow-xl">
           <div className="flex h-16 shrink-0 items-center px-6 border-b border-gray-800/50">
-            <Link href="/" className="flex items-center group">
+            <button onClick={handleLogoClick} className="flex items-center group cursor-pointer">
               <Image
                 src="/numo-logo.png"
                 alt="Numo Logo"
@@ -151,7 +156,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 className="h-11 w-11 transition-transform duration-300 group-hover:scale-110 animate-logo-bounce brightness-0 invert"
               />
               <span className="ml-0 text-2xl font-bold text-white">umo</span>
-            </Link>
+            </button>
           </div>
           <nav className="flex flex-1 flex-col px-4">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">

@@ -133,7 +133,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
               </motion.span>
             </Link>
           </motion.div>
-          <nav className="hidden md:flex items-center gap-7 ml-12">
+          <nav className="hidden md:flex items-center gap-7 ml-16">
             <Link
               href="#stats"
               className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
@@ -145,6 +145,12 @@ export function Header({ variant = "auto" }: HeaderProps) {
               className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
             >
               Features
+            </Link>
+            <Link
+              href="#waitlist"
+              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
+            >
+              Join
             </Link>
             {shouldShowDashboard ? (
               <Button
