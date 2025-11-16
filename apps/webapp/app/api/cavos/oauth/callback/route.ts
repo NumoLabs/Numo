@@ -394,19 +394,21 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Save user to Supabase database
       if (result.user && result.user.id && result.user.email) {
         try {
-          // Ensure wallet is included if available from result (it's at the top level)
           const userToSave = {
             ...result.user,
             wallet: result.wallet
           }
-          await saveCavosUser(userToSave)
+          const savedUserId = await saveCavosUser(userToSave)
+          if (!savedUserId) {
+            console.error('Failed to save OAuth user to Supabase:', {
+              userId: result.user.id,
+              email: result.user.email
+            })
+          }
         } catch (error) {
-          // Log error but don't fail authentication
           console.error('Failed to save OAuth user to Supabase:', error)
-          // Authentication still succeeds even if DB save fails
         }
       }
 
