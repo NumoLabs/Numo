@@ -29,13 +29,13 @@ export function BondsHero({
               <Lock className="h-8 w-8" />
               <Badge className="bg-white/20 text-white border-white/30">BTC Bonds</Badge>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-normal">
               Boost your yield by
-              <span className="block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent pb-1">
                 locking your BTC
               </span>
             </h1>
-            <p className="text-xl text-orange-100 mb-6">
+            <p className="text-lg md:text-xl text-orange-100 mb-6 leading-relaxed">
               Lock your WBTC for a fixed period and earn higher rewards. Choose your preferred lock duration and let
               your BTC work harder.
             </p>
