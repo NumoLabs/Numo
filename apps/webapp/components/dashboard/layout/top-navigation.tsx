@@ -1,6 +1,6 @@
 "use client"
 
-import { Menu, Bell, Search, User, Settings, LogOut } from "lucide-react"
+import { Menu, Bell, Search, User, LogOut } from "lucide-react"
 import { memo, useMemo, useCallback, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import WalletConnector from "@/components/ui/connectWallet"
 import { useCavosAuthContext } from "@/components/cavos-auth-provider"
 
 interface TopNavigationProps {
@@ -59,7 +58,7 @@ const UserAvatar = memo(() => {
             return; // Use cached data, skip fetch
           }
         }
-      } catch (error) {
+      } catch {
         // Ignore cache errors, proceed to fetch
       }
 
@@ -101,10 +100,10 @@ const UserAvatar = memo(() => {
                 },
               });
             }
-          } catch (refreshError: any) {
+          } catch (refreshError: unknown) {
             // If refresh token is expired (401), signOut will be called automatically
             // Just silently fail for avatar loading
-            const errorMessage = refreshError?.message || ''
+            const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError || '')
             if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
               // Session expired - signOut will be called automatically, just return
               return;
@@ -130,12 +129,12 @@ const UserAvatar = memo(() => {
               ...profileData,
               timestamp: Date.now(),
             }));
-          } catch (cacheError) {
+          } catch {
             // Ignore cache write errors
           }
         }
-      } catch (error) {
-        console.error('Error loading profile for avatar:', error);
+      } catch {
+        // Error already logged, just continue
       }
     };
 
@@ -148,7 +147,7 @@ const UserAvatar = memo(() => {
         const cacheKey = getProfileCacheKey(authUser.id);
         try {
           sessionStorage.removeItem(cacheKey);
-        } catch (error) {
+        } catch {
           // Ignore cache errors
         }
       }
@@ -223,7 +222,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
             return; // Use cached data, skip fetch
           }
         }
-      } catch (error) {
+      } catch {
         // Ignore cache errors, proceed to fetch
       }
 
@@ -265,10 +264,10 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
                 },
               });
             }
-          } catch (refreshError: any) {
+          } catch (refreshError: unknown) {
             // If refresh token is expired (401), signOut will be called automatically
             // Just silently fail for avatar loading
-            const errorMessage = refreshError?.message || ''
+            const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError || '')
             if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
               // Session expired - signOut will be called automatically, just return
               return;
@@ -294,12 +293,12 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
               ...profileData,
               timestamp: Date.now(),
             }));
-          } catch (cacheError) {
+          } catch {
             // Ignore cache write errors
           }
         }
-      } catch (error) {
-        console.error('Error loading profile:', error);
+      } catch {
+        // Error already logged, just continue
       }
     };
 
@@ -312,7 +311,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
         const cacheKey = getProfileCacheKey(authUser.id);
         try {
           sessionStorage.removeItem(cacheKey);
-        } catch (error) {
+        } catch {
           // Ignore cache errors
         }
       }

@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(filePath, buffer, {
         contentType: file.type,
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       if (errorMessage.includes('already exists') || 
           errorMessage.includes('duplicate')) {
         // Try again with upsert
-        const { data: upsertData, error: upsertError } = await supabase.storage
+        const { error: upsertError } = await supabase.storage
           .from(bucketName)
           .upload(filePath, buffer, {
             contentType: file.type,

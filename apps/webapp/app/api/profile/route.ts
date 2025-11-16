@@ -22,7 +22,8 @@ async function getUserIdFromToken(request: NextRequest): Promise<string | null> 
     }
     if (cavosVerification?.valid === false) {
     }
-  } catch (apiError) {
+  } catch {
+    // Ignore API verification errors, try local JWT decode
   }
   
   try {
@@ -42,7 +43,7 @@ async function getUserIdFromToken(request: NextRequest): Promise<string | null> 
       payload = JSON.parse(
         Buffer.from(paddedPayload, 'base64').toString('utf-8')
       );
-    } catch (decodeError) {
+    } catch {
       return null;
     }
     
@@ -89,7 +90,7 @@ async function getUserIdFromToken(request: NextRequest): Promise<string | null> 
     
     const finalUserId = String(userId);
     return finalUserId;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(userProfile);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch user profile' },
       { status: 500 }
@@ -175,7 +176,7 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(updatedProfile);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update user profile' },
       { status: 500 }

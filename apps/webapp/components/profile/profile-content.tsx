@@ -100,10 +100,10 @@ export function ProfileContent() {
             } else {
               throw new Error('Failed to get new token after refresh');
             }
-          } catch (refreshError: any) {
+          } catch (refreshError: unknown) {
             // If refresh token is expired (401), signOut will be called automatically
             // Just throw a user-friendly error
-            const errorMessage = refreshError?.message || ''
+            const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError || '')
             if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
               throw new Error('Your session has expired. Please sign in again.');
             }
@@ -225,7 +225,7 @@ export function ProfileContent() {
           } else {
             throw new Error('Failed to get new token after refresh');
           }
-        } catch (refreshError) {
+        } catch {
           throw new Error('Your session has expired. Please sign in again.');
         }
       }
