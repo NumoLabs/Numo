@@ -572,21 +572,20 @@ export function useCavosAuth() {
 
       if (isRefreshTokenExpired) {
         refreshTokenInvalidRef.current = true
-      } else {
-        signOut()
+        // Don't call signOut here - let the calling code handle it
+        // This prevents premature session closure
       }
+      // Don't call signOut for other errors either - let them be handled by the calling code
       
       // Re-throw for the calling code to handle
       throw error
     }
   }, [authState, storeAuthData, signOut])
 
-  // Auto-refresh token before it expires
-  const refreshTokenRef = useRef<NodeJS.Timeout | null>(null)
+  // Track refresh state
   const isRefreshingRef = useRef(false) // Prevent multiple simultaneous refreshes
   const refreshTokenInvalidRef = useRef(false) // Track if refresh token is invalid/expired
   const lastRefreshTokenRef = useRef<string | null>(null) // Track last refresh token to detect new logins
-  const lastRefreshAttemptRef = useRef<number | null>(null) // Track last refresh attempt time to prevent too frequent refreshes
   const refreshTokenFnRef = useRef(refreshToken)
   const signOutFnRef = useRef(signOut)
 
@@ -596,14 +595,10 @@ export function useCavosAuth() {
     signOutFnRef.current = signOut
   }, [refreshToken, signOut])
 
+  // Simple effect to track refresh token changes and reset invalid flag
+  // No automatic refresh - refresh only happens when needed (on 401 errors from API calls)
   useEffect(() => {
-    // Clear any existing interval first
-    if (refreshTokenRef.current) {
-      clearInterval(refreshTokenRef.current)
-      refreshTokenRef.current = null
-    }
-
-    // Only set up auto-refresh if user is authenticated
+    // Only set up tracking if user is authenticated
     if (!authState.isAuthenticated || !authState.accessToken || !authState.refreshToken) {
       // Reset invalid flag when user is not authenticated (sign out occurred)
       refreshTokenInvalidRef.current = false
@@ -613,182 +608,9 @@ export function useCavosAuth() {
 
     const isNewRefreshToken = authState.refreshToken !== lastRefreshTokenRef.current
     if (isNewRefreshToken) {
+      // Reset invalid flag when we get a new refresh token (new login or successful refresh)
       refreshTokenInvalidRef.current = false
       lastRefreshTokenRef.current = authState.refreshToken
-    }
-
-    if (refreshTokenInvalidRef.current) {
-      return
-    }
-
-    // Check immediately if token is expiring soon
-    const checkAndRefresh = async () => {
-      // FIRST: Check if refresh token is already invalid (prevents any attempts)
-      if (refreshTokenInvalidRef.current) {
-        // If invalid, clear interval immediately
-        if (refreshTokenRef.current) {
-          clearInterval(refreshTokenRef.current)
-          refreshTokenRef.current = null
-        }
-        return
-      }
-
-      if (isRefreshingRef.current) {
-        return
-      }
-
-      const token = authState.accessToken || 
-        (typeof window !== 'undefined' ? localStorage.getItem('cavos_access_token') : null)
-      
-      const refreshTokenValue = authState.refreshToken || 
-        (typeof window !== 'undefined' ? localStorage.getItem('cavos_refresh_token') : null)
-
-      // Verify both tokens exist
-      if (!token || !refreshTokenValue) {
-        return
-      }
-
-      const refreshTokenDecoded = decodeJWT(refreshTokenValue)
-      if (refreshTokenDecoded) {
-        const currentTime = Math.floor(Date.now() / 1000)
-        const expirationTime = refreshTokenDecoded.exp
-        const timeUntilExpiration = expirationTime - currentTime
-        
-
-        if (timeUntilExpiration < -30) {
-          refreshTokenInvalidRef.current = true
-          if (refreshTokenRef.current) {
-            clearInterval(refreshTokenRef.current)
-            refreshTokenRef.current = null
-          }
-          signOutFnRef.current()
-          return
-        }
-      }
-
-      const tokenExpiringSoon = isTokenExpiringSoon(token, 5)
-      
-      if (process.env.NODE_ENV === 'development') {
-        const tokenDecoded = decodeJWT(token)
-        if (tokenDecoded) {
-          const currentTime = Math.floor(Date.now() / 1000)
-          const timeUntilExpiration = tokenDecoded.exp - currentTime
-          const minutesUntilExpiration = Math.floor(timeUntilExpiration / 60)
-          if (minutesUntilExpiration < 10) {
-            console.log('[useCavosAuth] Token status:', {
-              expiresIn: `${minutesUntilExpiration} minutes`,
-              expiringSoon: tokenExpiringSoon,
-              willRefresh: tokenExpiringSoon && !refreshTokenInvalidRef.current,
-              lastRefreshAttempt: lastRefreshAttemptRef.current ? `${Math.floor((Date.now() - lastRefreshAttemptRef.current) / 1000)}s ago` : 'never'
-            })
-          }
-        }
-      }
-      
-      if (tokenExpiringSoon) {
-        if (refreshTokenInvalidRef.current) {
-          return // Exit early if already marked as invalid
-        }
-
-        const now = Date.now()
-        if (lastRefreshAttemptRef.current && (now - lastRefreshAttemptRef.current) < 60 * 1000) {
-          return
-        }
-
-        isRefreshingRef.current = true
-        lastRefreshAttemptRef.current = now
-        
-        try {
-          // Use ref to get latest function version without causing re-runs
-          const refreshResult = await refreshTokenFnRef.current()
-          
-          // Verify refresh was successful before updating state
-          if (!refreshResult?.access_token) {
-            throw new Error('Invalid refresh response: missing access_token')
-          }
-          
-          // Reset invalid flag on successful refresh
-          refreshTokenInvalidRef.current = false
-          
-          if (refreshResult.refresh_token) {
-            lastRefreshTokenRef.current = refreshResult.refresh_token
-          }
-          
-          // Reset last refresh attempt time on success (allows next refresh when needed)
-          lastRefreshAttemptRef.current = null
-          
-          // Log successful refresh in development
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[useCavosAuth] Token refreshed successfully')
-          }
-          
-          // Dispatch event to notify components of token refresh
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('cavos-token-refreshed', {
-              detail: { accessToken: refreshResult.access_token, refreshToken: refreshResult.refresh_token }
-            }))
-          }
-        } catch (error: any) {
-          // Check if error is due to invalid/expired refresh token
-          const errorMessage = error?.message || ''
-          const errorString = JSON.stringify(error || {})
-          
-          // Check for 401 or "Invalid or expired refresh token" errors
-          const isRefreshTokenExpired = 
-            error?.status === 401 ||
-            error?.response?.status === 401 ||
-            errorMessage.includes('401') ||
-            errorMessage.includes('Invalid or expired refresh token') ||
-            errorString.includes('Invalid or expired refresh token') ||
-            errorString.includes('"error":"Invalid or expired refresh token"') ||
-            errorMessage.toLowerCase().includes('refresh token') ||
-            errorMessage.toLowerCase().includes('unauthorized')
-
-          if (isRefreshTokenExpired) {
-            refreshTokenInvalidRef.current = true
-            
-            if (refreshTokenRef.current) {
-              clearInterval(refreshTokenRef.current)
-              refreshTokenRef.current = null
-            }
-            
-            // Reset refreshing flag so cleanup can proceed
-            isRefreshingRef.current = false
-            
-            setTimeout(() => {
-              signOutFnRef.current()
-            }, 0)
-            
-            // Don't continue execution after this point
-            return
-          } else {
-            // For other errors, log but don't stop auto-refresh
-            console.error('[useCavosAuth] Auto-refresh failed (non-fatal):', error)
-          }
-        } finally {
-          // Only reset if we didn't already return early due to expired refresh token
-          if (!refreshTokenInvalidRef.current) {
-            isRefreshingRef.current = false
-          }
-        }
-      }
-    }
-
-    // Set up interval to check every 2 minutes (120000ms)
-    refreshTokenRef.current = setInterval(checkAndRefresh, 2 * 60 * 1000)
-    
-    if (!refreshTokenInvalidRef.current) {
-      if (!isNewRefreshToken) {
-        checkAndRefresh()
-      }
-    }
-
-    return () => {
-      if (refreshTokenRef.current) {
-        clearInterval(refreshTokenRef.current)
-        refreshTokenRef.current = null
-      }
-      isRefreshingRef.current = false
     }
   }, [authState.isAuthenticated, authState.accessToken, authState.refreshToken])
 
