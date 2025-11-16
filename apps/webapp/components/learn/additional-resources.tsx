@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { BookOpen, ExternalLink, BarChart3, TrendingUp } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -7,20 +8,13 @@ export function AdditionalResources() {
     {
       title: "Starknet Documentation",
       description: "Complete guide to the Starknet ecosystem",
-      href: "https://docs.starknet.io/documentation/",
+      href: "https://docs.starknet.io/",
       icon: ExternalLink,
-      bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
-      iconColor: "text-bitcoin-orange",
-      external: true,
-    },
-    {
-      title: "Advanced Concepts",
-      description: "Advanced DeFi strategies and techniques",
-      href: "/learn/advanced",
-      icon: BookOpen,
-      bgColor: "bg-orange-100 dark:bg-orange-900/30",
+      bgColor: "bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50",
       iconColor: "text-bitcoin-gold",
-      external: false,
+      external: true,
+      useImage: true,
+      imageSrc: "/primary logo.png",
     },
   ]
 
@@ -29,23 +23,23 @@ export function AdditionalResources() {
       title: "Impermanent Loss Calculator",
       description: "Estimate potential losses in AMM pools",
       icon: BarChart3,
-      bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
-      iconColor: "text-bitcoin-orange",
+      bgColor: "bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50",
+      iconColor: "text-bitcoin-gold",
     },
     {
       title: "APY Monitor",
       description: "Track returns in real-time",
       icon: TrendingUp,
-      bgColor: "bg-orange-100 dark:bg-orange-900/30",
+      bgColor: "bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50",
       iconColor: "text-bitcoin-gold",
     },
   ]
 
   return (
-    <Card className="mt-8">
+    <Card className="relative overflow-hidden transition-all duration-300 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 hover:shadow-lg hover:shadow-bitcoin-orange/10 mt-8">
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
-          <BookOpen className="h-6 w-6 text-bitcoin-orange" />
+          <BookOpen className="h-6 w-6 text-bitcoin-gold" />
           Additional Resources
         </CardTitle>
         <CardDescription>Continue your DeFi education</CardDescription>
@@ -57,9 +51,19 @@ export function AdditionalResources() {
             <div className="space-y-3">
               {officialDocs.map((doc) => (
                 <Link key={doc.title} href={doc.href} target={doc.external ? "_blank" : "_self"} className="block">
-                  <div className="flex items-start gap-3 p-4 rounded-lg border hover:bg-accent transition-colors h-full">
-                    <div className={`h-10 w-10 rounded-lg ${doc.bgColor} flex items-center justify-center flex-shrink-0`}>
-                      <doc.icon className={`h-5 w-5 ${doc.iconColor}`} />
+                  <div className="flex items-start gap-3 p-4 rounded-lg border-2 border-bitcoin-gold/30 hover:border-bitcoin-gold/50 hover:shadow-lg hover:shadow-bitcoin-orange/10 transition-all duration-300 h-full">
+                    <div className={`h-10 w-10 rounded-lg ${doc.bgColor} flex items-center justify-center flex-shrink-0 overflow-hidden mt-1.5`}>
+                      {doc.useImage && doc.imageSrc ? (
+                        <Image 
+                          src={doc.imageSrc} 
+                          alt={doc.title} 
+                          width={20} 
+                          height={20} 
+                          className="object-contain"
+                        />
+                      ) : (
+                        <doc.icon className={`h-5 w-5 ${doc.iconColor}`} />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
                       <p className="font-medium break-words mb-1">{doc.title}</p>
@@ -74,7 +78,7 @@ export function AdditionalResources() {
             <h4 className="font-semibold text-lg">Useful Tools</h4>
             <div className="space-y-3">
               {tools.map((tool) => (
-                <div key={tool.title} className="flex items-start gap-3 p-4 rounded-lg border hover:bg-accent transition-colors h-full">
+                <div key={tool.title} className="flex items-start gap-3 p-4 rounded-lg border border-border/50 hover:border-bitcoin-orange/30 hover:shadow-lg hover:shadow-bitcoin-orange/10 transition-all duration-300 h-full">
                   <div className={`h-10 w-10 rounded-lg ${tool.bgColor} flex items-center justify-center flex-shrink-0`}>
                     <tool.icon className={`h-5 w-5 ${tool.iconColor}`} />
                   </div>

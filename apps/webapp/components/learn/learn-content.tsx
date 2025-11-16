@@ -7,8 +7,6 @@ export function LearnContent() {
   return (
     <div className="max-w-6xl mx-auto">
       <HeroSection />
-      <ProgressIndicator />
-      <LearningPath />
       <ContentTabs />
     </div>
   )
