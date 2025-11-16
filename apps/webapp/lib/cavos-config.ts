@@ -306,6 +306,46 @@ export const refreshUserToken = async (refreshToken: string) => {
   }
 }
 
+export const recoverUserSession = async (accessToken: string) => {
+  try {
+    const response = await fetch('/api/cavos/session/recover', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        access_token: accessToken,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Session recovery failed' }))
+      const error = new Error(errorData.error || errorData.message || 'Session recovery failed') as ErrorWithStatus
+      error.status = response.status
+      if (errorData.code) {
+        error.code = errorData.code
+      }
+      throw error
+    }
+
+    const result = await response.json()
+    return result
+  } catch (error: unknown) {
+    const errorObj = error as { status?: number; message?: string; code?: string }
+    const isExpiredTokenError = 
+      errorObj?.status === 401 ||
+      errorObj?.message?.includes('401') ||
+      errorObj?.message?.includes('expired') ||
+      errorObj?.message?.toLowerCase().includes('unauthorized')
+    
+    if (!isExpiredTokenError) {
+      console.error('Session recovery failed:', error)
+    }
+    
+    throw error
+  }
+}
+
 // Transaction execution helper 
 export const executeUserTransaction = async (
   walletAddress: string,
