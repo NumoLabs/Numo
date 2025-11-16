@@ -21,6 +21,7 @@ import { LearnContent } from "@/components/learn/learn-content"
 // import { PoolsVaultContent } from "@/components/pools-vault/pools-vault-content"
 import { VaultsContent } from "@/components/vaults/vaults-content"
 import { VaultDetailContent } from "@/components/vaults/vault-detail-content"
+import { ProfileContent } from "@/components/profile/profile-content"
 
 export function DashboardLayout() {
   const pathname = usePathname()
@@ -55,6 +56,9 @@ export function DashboardLayout() {
         return <VaultDetailContent vaultId={extractedVaultId} />;
       }
       return null;
+    }
+    if (pathname === "/profile") {
+      return <ProfileContent />;
     }
     return (
       <>

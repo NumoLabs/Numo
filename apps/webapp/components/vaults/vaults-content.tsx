@@ -214,17 +214,12 @@ export function VaultsContent() {
           <div className="relative">
             <div className="absolute -left-4 -top-4 w-32 h-32 bg-bitcoin-orange/10 rounded-full blur-2xl" />
             <div className="relative">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-bitcoin-orange/20 to-bitcoin-gold/20 border border-bitcoin-orange/30 flex items-center justify-center backdrop-blur-sm">
-                  <Briefcase className="h-6 w-6 text-bitcoin-orange" />
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                  <span className="bg-gradient-to-r from-bitcoin-orange via-bitcoin-gold to-bitcoin-orange bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease_infinite]">
-                    Vaults
-                  </span>
+              <div className="flex items-center gap-3 -mt-6">
+                <h1 className="text-4xl md:text-3x1 font-bold tracking-tight">
+                  Vaults
                 </h1>
               </div>
-              <p className="text-gray-400 mt-2 text-lg ml-16">
+              <p className="text-gray-400 mt-2 text-lg ml-2">
                 Connect your wallet to explore and interact with yield farming vaults
               </p>
             </div>

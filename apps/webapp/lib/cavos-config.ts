@@ -284,8 +284,26 @@ export const refreshUserToken = async (refreshToken: string) => {
   try {
     const result = await cavosAuth.refreshToken(refreshToken, config.defaultNetwork)
     return result
-  } catch (error) {
-    console.error('Token refresh failed:', error)
+  } catch (error: unknown) {
+    // Check if error is due to expired/invalid refresh token (401)
+    // Don't log these errors here as they're handled gracefully in the hook
+    const errorObj = error as { status?: number; response?: { status?: number }; message?: string }
+    const isExpiredTokenError = 
+      errorObj?.status === 401 ||
+      errorObj?.response?.status === 401 ||
+      (errorObj?.message && (
+        errorObj.message.includes('401') ||
+        errorObj.message.includes('Invalid or expired refresh token') ||
+        errorObj.message.toLowerCase().includes('unauthorized')
+      )) ||
+      (typeof error === 'string' && error.includes('401')) ||
+      (typeof error === 'object' && JSON.stringify(error).includes('Invalid or expired refresh token'))
+    
+    if (!isExpiredTokenError) {
+      // Only log non-401 errors (network issues, etc.)
+      console.error('Token refresh failed:', error)
+    }
+    
     throw error
   }
 }

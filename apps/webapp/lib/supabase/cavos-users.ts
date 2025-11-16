@@ -31,7 +31,7 @@ interface UpsertCavosUserParams {
   email: string
   orgId?: number
   orgName?: string
-  displayName?: string
+  username?: string
   avatarUrl?: string
   metadata?: Record<string, unknown>
 }
@@ -57,9 +57,8 @@ interface UserWithPrimaryWallet {
   email_verified: boolean
   organization_id: number | null
   status: UserStatus
-  display_name: string | null
+  username: string | null
   avatar_url: string | null
-  phone: string | null
   last_login_at: string | null
   created_at: string
   updated_at: string
@@ -84,7 +83,7 @@ export async function upsertCavosUser(params: UpsertCavosUserParams): Promise<st
       p_email: params.email,
       p_org_id: params.orgId || null,
       p_org_name: params.orgName || null,
-      p_display_name: params.displayName || null,
+      p_username: params.username || null,
       p_avatar_url: params.avatarUrl || null,
       p_metadata: params.metadata || null
     })
@@ -159,7 +158,7 @@ export async function getOrCreateCavosUser(
       p_org_name: params.orgName || null,
       p_wallet_address: params.walletAddress || null,
       p_wallet_network: params.walletNetwork || 'mainnet',
-      p_display_name: params.displayName || null,
+      p_username: params.username || null,
       p_avatar_url: params.avatarUrl || null,
       p_metadata: params.metadata || null
     })
@@ -371,6 +370,55 @@ export async function revokeAllUserSessions(userId: string): Promise<number> {
   } catch (error) {
     console.error('Exception revoking user sessions:', error)
     return 0
+  }
+}
+
+/**
+ * Update user profile information
+ */
+export async function updateUserProfile(
+  cavosUserId: string,
+  updates: {
+    username?: string | null;
+    avatar_url?: string | null;
+  }
+): Promise<UserWithPrimaryWallet | null> {
+  if (!supabase) {
+    console.error('Supabase client not initialized. Check your environment variables.')
+    return null
+  }
+
+  try {
+    // First, get the user's internal ID
+    const user = await getUserWithPrimaryWallet(cavosUserId)
+    if (!user) {
+      console.error('User not found:', cavosUserId)
+      return null
+    }
+
+    // Update the user profile
+    const { error } = await supabase
+      .from('users')
+      .update({
+        username: updates.username ?? null,
+        avatar_url: updates.avatar_url ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating user profile:', error)
+      return null
+    }
+
+    // Fetch updated user with primary wallet
+    const updatedUser = await getUserWithPrimaryWallet(cavosUserId)
+    return updatedUser
+  } catch (error) {
+    console.error('Exception updating user profile:', error)
+    return null
   }
 }
 
