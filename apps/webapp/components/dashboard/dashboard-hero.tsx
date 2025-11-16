@@ -4,11 +4,9 @@ import {
   Upload,
   Download,
   Wallet,
-  Activity,
   Bitcoin,
   TrendingUp,
   Star,
-  Clock,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -50,10 +48,6 @@ export function DashboardHero() {
                 <CheckCircle2 className="h-3 w-3" />
                 Active Vault
               </Badge>
-              <Badge className="bg-[#0f1114] text-white border-2 border-orange-500 gap-1">
-                <Activity className="h-3 w-3" />
-                Auto-Rebalancing
-              </Badge>
             </div>
           </div>
           <div className="flex gap-3">
@@ -76,7 +70,7 @@ export function DashboardHero() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-[#0f1114] border-2 border-orange-500 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-300">Total Balance</p>
@@ -108,16 +102,6 @@ export function DashboardHero() {
             </div>
             <p className="text-2xl font-bold">5.8%</p>
             <p className="text-xs text-gray-400">+0.3% vs previous</p>
-          </div>
-          <div className="bg-[#0f1114] border-2 border-orange-500 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-300">Next Rebalance</p>
-                              <div className="h-8 w-8 rounded-full bg-[#0f1114] border-2 border-yellow-500 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-white" />
-                </div>
-            </div>
-            <p className="text-2xl font-bold">12h 34m</p>
-            <p className="text-xs text-gray-400">Or when APY changes</p>
           </div>
         </div>
       </div>

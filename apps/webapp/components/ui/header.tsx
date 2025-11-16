@@ -219,15 +219,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
                       Dashboard
                     </Link>
                     <Link
-                      href="/history"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/history" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      History
-                    </Link>
-                    <Link
                       href="/bonds"
                       className={cn(
                         "hover:text-foreground",

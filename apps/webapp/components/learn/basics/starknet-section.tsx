@@ -40,7 +40,7 @@ export function StarknetSection() {
     },
     {
       name: "Vesu",
-      description: "Decentralized lending and vault platform with automated strategies.",
+      description: "Decentralized lending and vault platform with rebalancing strategies.",
       icon: Lock,
       bgColor: "bg-orange-100 dark:bg-orange-900/30",
       iconColor: "text-orange-600",

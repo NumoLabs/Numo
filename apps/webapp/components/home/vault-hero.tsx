@@ -274,7 +274,7 @@ export function VaultHero() {
                 className="max-w-[600px] text-gray-300 md:text-xl animate-slide-up-fade-in"
                 style={{ animationDelay: "0.2s" }}
               >
-                Grow your BTC with automated vaults, fixed-term bonds, strategy marketplace, forecasting tools, and DeFi
+                Grow your BTC with rebalancing vaults, fixed-term bonds, strategy marketplace, forecasting tools, and DeFi
                 learning—all in one open platform.
               </p>
             </div>

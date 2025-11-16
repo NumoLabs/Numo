@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Numo',
-  description: 'Grow your BTC safely, automatically, and transparently with auto-rebalancing vaults, fixed-term bonds, strategy sharing, and forecasting tools on Starknet.',
+  description: 'Grow your BTC safely and transparently with rebalancing vaults, fixed-term bonds, strategy sharing, and forecasting tools on Starknet.',
   icons: {
     icon: '/numo-logo.png',
   },
