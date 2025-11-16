@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { LayoutDashboard, History, Coins, TrendingUp, BookOpen, X, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
+import { LayoutDashboard, Coins, TrendingUp, BookOpen, X, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -11,7 +11,6 @@ const navigation = [
     section: "Core",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, current: true },
-      { name: "History", href: "/history", icon: History, current: false },
     ],
   },
   {
