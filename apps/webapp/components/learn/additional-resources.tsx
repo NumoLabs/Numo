@@ -16,6 +16,17 @@ export function AdditionalResources() {
       useImage: true,
       imageSrc: "/primary logo.png",
     },
+    {
+      title: "Numo Documentation",
+      description: "Complete guide to Numo platform and features",
+      href: "/docs",
+      icon: BookOpen,
+      bgColor: "bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50",
+      iconColor: "text-bitcoin-gold",
+      external: false,
+      useImage: true,
+      imageSrc: "/numo-logo-blanco.png",
+    },
   ]
 
   const tools = [

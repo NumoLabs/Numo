@@ -78,7 +78,7 @@ export default function InsightsDashboard() {
       {/* Key Insights - Only show if we have real data */}
       {!isLoading && !error && apy && forecastMetrics && (
         <>
-          <Card className="bg-black border border-white shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="mt-8 bg-black border border-white shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-black/50 rounded-t-lg border-b border-white/20">
               <CardTitle className="flex items-center gap-2 text-white">
                 <Target className="h-5 w-5 text-white" />
@@ -86,7 +86,7 @@ export default function InsightsDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
                 <div className="p-4 bg-white/10 rounded-lg border border-white/30 shadow-md hover:shadow-lg transition-all duration-200">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-white">Current Vault APY</h3>
@@ -162,7 +162,7 @@ export default function InsightsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                <div className="space-y-3">
+                <div className="space-y-3 mt-5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded bg-bitcoin-gold"></div>
@@ -220,7 +220,7 @@ export default function InsightsDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
                   <div className="text-center p-4 bg-white/10 rounded-lg border border-white/30 shadow-md hover:shadow-lg transition-all duration-200">
                     <Target className="h-8 w-8 text-bitcoin-gold mx-auto mb-3" />
                     <h3 className="font-semibold text-white mb-2">Your Balance</h3>

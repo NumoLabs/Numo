@@ -1,4 +1,4 @@
-import { Award, Zap, Coins, Shield, Lock } from "lucide-react"
+import { Award, Zap, Coins, Shield } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
@@ -33,16 +33,6 @@ export function StarknetSection() {
     },
   ]
 
-  const protocols = [
-    {
-      name: "Vesu",
-      description: "Decentralized lending and vault platform with rebalancing strategies.",
-      icon: Lock,
-      bgColor: "bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50",
-      iconColor: "text-bitcoin-gold",
-    },
-  ]
-
   return (
     <Card className="relative overflow-hidden transition-all duration-300 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 hover:shadow-lg hover:shadow-bitcoin-orange/10">
       <CardHeader>
@@ -68,28 +58,6 @@ export function StarknetSection() {
         </div>
 
         <Separator className="my-6" />
-
-        <div className="bg-muted/50 rounded-lg p-6">
-          <h4 className="font-semibold text-foreground mb-4">
-            Featured DeFi Protocols on Starknet
-          </h4>
-          <div className="grid md:grid-cols-2 gap-4">
-            {protocols.map((protocol) => (
-              <div
-                key={protocol.name}
-                className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-bitcoin-gold/30 hover:border-bitcoin-gold/50 transition-all duration-300"
-              >
-                <div className={`h-12 w-12 rounded-lg ${protocol.bgColor} flex items-center justify-center`}>
-                  <protocol.icon className={`h-6 w-6 ${protocol.iconColor}`} />
-                </div>
-                <div>
-                  <h5 className="font-medium text-foreground">{protocol.name}</h5>
-                  <p className="text-sm text-muted-foreground">{protocol.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </CardContent>
     </Card>
   )
