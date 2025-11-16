@@ -147,7 +147,7 @@ export function ForecastContent() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                   <div>
                     <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Forecasting Overview</h2>
-                    <p className="text-lg text-gray-600">
+                    <p className="text-lg text-gray-300">
                       Explore BTC forecasting tools to compare strategies, simulate potential gains, and analyze performance insights.
                     </p>
                   </div>
@@ -187,7 +187,7 @@ export function ForecastContent() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                   <div>
                     <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Yield Simulator</h2>
-                    <p className="text-lg text-gray-600">
+                    <p className="text-lg text-gray-300">
                       Calculate and compare potential returns across different BTC strategies
                     </p>
                   </div>
@@ -208,7 +208,7 @@ export function ForecastContent() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                   <div>
                     <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Performance Charts</h2>
-                    <p className="text-lg text-gray-600">Compare how different strategies have performed over time</p>
+                    <p className="text-lg text-gray-300">Compare how different strategies have performed over time</p>
                   </div>
                   <PerformanceChart />
                 </div>
@@ -227,7 +227,7 @@ export function ForecastContent() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                   <div>
                     <h2 className="text-3xl font-bold text-bitcoin-orange mb-4">Analytics & Insights</h2>
-                    <p className="text-lg text-gray-600">Deep dive into performance metrics and optimization recommendations</p>
+                    <p className="text-lg text-gray-300">Deep dive into performance metrics and optimization recommendations</p>
                   </div>
                   <InsightsDashboard />
                 </div>

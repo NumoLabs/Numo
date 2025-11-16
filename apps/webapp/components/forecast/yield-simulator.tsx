@@ -92,7 +92,7 @@ export default function YieldSimulator() {
 
           {/* APY Display */}
           {apy !== null && !isLoading && (
-            <div className="p-3 bg-white/10 rounded-lg border border-white/30">
+            <div className="p-3 bg-white/10 rounded-lg border border-white/30 mt-5">
               <div className="text-sm text-white/70">Current Vault APY</div>
               <div className="text-2xl font-bold text-bitcoin-gold">{apy.toFixed(2)}%</div>
               <div className="text-xs text-white/60 mt-1">
@@ -195,7 +195,7 @@ export default function YieldSimulator() {
               <p>Unable to load vault APY. Please ensure the vault is configured.</p>
             </div>
           ) : forecast ? (
-            <div className="space-y-4">
+            <div className="space-y-4 mt-5">
               <div className="text-sm text-white/70 mb-4">
                 Projections for {formatBTC(forecast.amount)} BTC over {forecast.days} days
                 <br />

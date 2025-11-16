@@ -115,6 +115,106 @@ export async function upsertCavosWallet(params: UpsertCavosWalletParams): Promis
     })
 
     if (error) {
+      // Handle duplicate key error (21000) by falling back to direct database operations
+      if (error.code === '21000' || error.message?.includes('ON CONFLICT DO UPDATE command cannot affect row a second time')) {
+        // Fallback: Check if wallet exists first, then update or insert directly
+        try {
+          const { data: existingWallet, error: fetchError } = await supabase
+            .from('wallets')
+            .select('id')
+            .eq('user_id', params.userId)
+            .eq('address', params.address)
+            .maybeSingle()
+
+          if (fetchError && fetchError.code !== 'PGRST116') {
+            console.error('Error checking for existing wallet:', fetchError)
+            return null
+          }
+
+          if (existingWallet) {
+            // Update existing wallet
+            const { data: updatedWallet, error: updateError } = await supabase
+              .from('wallets')
+              .update({
+                is_primary: params.isPrimary,
+                network: params.network || 'mainnet',
+                cavos_wallet_id: params.cavosWalletId || null,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existingWallet.id)
+              .select('id')
+              .single()
+
+            if (updateError) {
+              console.error('Error updating wallet:', updateError)
+              return null
+            }
+
+            return updatedWallet.id
+          } else {
+            // Insert new wallet
+            const { data: newWallet, error: insertError } = await supabase
+              .from('wallets')
+              .insert({
+                user_id: params.userId,
+                address: params.address,
+                network: params.network || 'mainnet',
+                is_primary: params.isPrimary,
+                cavos_wallet_id: params.cavosWalletId || null,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .select('id')
+              .single()
+
+            if (insertError) {
+              // Handle race condition: if another request inserted it, fetch it
+              if (insertError.code === '23505') {
+                const { data: raceConditionWallet, error: raceError } = await supabase
+                  .from('wallets')
+                  .select('id')
+                  .eq('user_id', params.userId)
+                  .eq('address', params.address)
+                  .single()
+
+                if (raceError || !raceConditionWallet) {
+                  console.error('Error fetching wallet after race condition:', raceError)
+                  return null
+                }
+
+                // Update it
+                const { data: updatedWallet, error: updateError } = await supabase
+                  .from('wallets')
+                  .update({
+                    is_primary: params.isPrimary,
+                    network: params.network || 'mainnet',
+                    cavos_wallet_id: params.cavosWalletId || null,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', raceConditionWallet.id)
+                  .select('id')
+                  .single()
+
+                if (updateError) {
+                  console.error('Error updating wallet after race condition:', updateError)
+                  return null
+                }
+
+                return updatedWallet.id
+              }
+
+              console.error('Error inserting wallet:', insertError)
+              return null
+            }
+
+            return newWallet.id
+          }
+        } catch (fallbackError) {
+          console.error('Exception in wallet upsert fallback:', fallbackError)
+          return null
+        }
+      }
+
       console.error('Error upserting Cavos wallet:', error)
       return null
     }
