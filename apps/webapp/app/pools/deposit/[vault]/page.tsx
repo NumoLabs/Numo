@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { CavosAuthGuard } from "@/components/auth"
+import { WalletAuthGuard } from "@/components/auth"
 
 export default function DepositVaultPage() {
   const router = useRouter()
@@ -13,12 +13,12 @@ export default function DepositVaultPage() {
   }, [router])
 
   return (
-    <CavosAuthGuard>
+    <WalletAuthGuard>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">Redirecting...</p>
         </div>
       </div>
-    </CavosAuthGuard>
+    </WalletAuthGuard>
   )
 }

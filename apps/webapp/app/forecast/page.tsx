@@ -1,10 +1,10 @@
 import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout"
-import { CavosAuthGuard } from "@/components/auth"
+import { WalletAuthGuard } from "@/components/auth"
 
 export default function ForecastPage() {
   return (
-    <CavosAuthGuard>
+    <WalletAuthGuard>
       <DashboardLayout />
-    </CavosAuthGuard>
+    </WalletAuthGuard>
   )
 }

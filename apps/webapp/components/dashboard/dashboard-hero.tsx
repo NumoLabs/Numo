@@ -1,8 +1,6 @@
 "use client"
 
 import {
-  Upload,
-  Download,
   Wallet,
   Bitcoin,
   TrendingUp,
@@ -11,7 +9,6 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 
@@ -49,23 +46,6 @@ export function DashboardHero() {
                 Active Vault
               </Badge>
             </div>
-          </div>
-          <div className="flex gap-3">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2"
-            >
-              <Upload className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
-              Deposit
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-black gap-2 transform transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 group bg-[#0f1114]"
-            >
-              <Download className="h-5 w-5 transition-transform duration-300 group-hover:-rotate-12" />
-              Withdraw
-            </Button>
           </div>
         </div>
 

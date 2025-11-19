@@ -449,3 +449,32 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================================
+   STARKNETKIT MODAL DARK THEME FIX
+   ============================================================================ */
+
+#starknetkit-modal-container {
+  color-scheme: dark !important;
+}
+
+/* Apply dark theme CSS variables that StarknetKit uses */
+#starknetkit-modal-container,
+#starknetkit-modal-container * {
+  /* StarknetKit dark theme variables */
+  --color-surface-default: rgba(23, 23, 23) !important;
+  --color-surface-default-web: rgba(0, 0, 0) !important;
+  --color-surface-elevated: rgba(36, 36, 36) !important;
+  --color-surface-elevated-web: rgba(36, 36, 36) !important;
+  --color-text-primary: rgba(255, 255, 255) !important;
+  --color-text-secondary: rgba(191, 191, 191) !important;
+  --color-text-secondary-web: rgba(191, 191, 191) !important;
+  --color-text-subtle: rgba(140, 140, 140) !important;
+  --color-text-adaptive: rgba(249, 249, 249) !important;
+  --color-icon-default: rgba(255, 255, 255) !important;
+  --color-icon-secondary: rgba(140, 140, 140) !important;
+  --color-stroke-default: rgba(89, 89, 89) !important;
+  --color-stroke-default-web: rgba(64, 64, 64) !important;
+  --color-button-secondary: rgba(255, 255, 255, 0.12) !important;
+  --color-button-secondary-hover: rgba(255, 255, 255, 0.18) !important;
+}
