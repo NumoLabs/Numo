@@ -351,7 +351,7 @@ export function ProfileContent() {
                     avatarPreview || 
                     (isEditing ? (formData.avatarUrl || profile?.avatar_url || '') : (profile?.avatar_url || formData.avatarUrl || ''))
                   } 
-                  alt={username}
+                  alt={username} 
                   className="object-cover"
                 />
                 <AvatarFallback className="text-2xl bg-gradient-to-br from-bitcoin-orange to-bitcoin-gold">
@@ -446,13 +446,13 @@ export function ProfileContent() {
                   <Label htmlFor="wallet">Wallet Address</Label>
                   <div className="relative flex items-center gap-2">
                     <Wallet className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
-                    <Input
-                      id="wallet"
-                      type="text"
+                  <Input
+                    id="wallet"
+                    type="text"
                       value={address}
-                      disabled
+                    disabled
                       className="pl-10 pr-12 bg-muted/50 cursor-not-allowed font-mono text-sm"
-                    />
+                  />
                     <Button
                       type="button"
                       variant="ghost"

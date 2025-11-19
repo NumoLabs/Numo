@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useWalletStatus } from "./use-wallet"
 
@@ -10,8 +10,22 @@ export function useWalletAuth() {
   const router = useRouter()
   const pathname = usePathname()
   const { isConnected, address } = useWalletStatus()
+  const [isInitializing, setIsInitializing] = useState(true)
+
+  // Give auto-reconnect time to work (2.5 seconds)
+  useEffect(() => {
+    const initTimeout = setTimeout(() => {
+      setIsInitializing(false)
+    }, 2500)
+
+    return () => clearTimeout(initTimeout)
+  }, [])
 
   useEffect(() => {
+    // Wait for initialization to complete before checking
+    if (isInitializing) {
+      return
+    }
     // Define routes that require wallet connection
     const protectedRoutes = [
       "/dashboard",
@@ -40,14 +54,14 @@ export function useWalletAuth() {
 
     // Redirect if on protected route without authentication (but not on public routes)
     if (isProtectedRoute && !isPublicRoute && !isAuthenticated) {
-      // Small delay to prevent flash and ensure clean redirect
+      // Short delay since we already waited during initialization
       const timeoutId = setTimeout(() => {
         router.push("/")
       }, 100)
       
       return () => clearTimeout(timeoutId)
     }
-  }, [isConnected, address, pathname, router])
+  }, [isConnected, address, pathname, router, isInitializing])
 
   return {
     address,

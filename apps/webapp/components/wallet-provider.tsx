@@ -65,7 +65,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
       return
     }
 
-    if (!isConnected && !address) {
+    if (!isInitialMount.current && !isConnected && !address) {
       try {
         localStorage.removeItem(WALLET_STORAGE_KEY)
         localStorage.removeItem('starknet_last_connector')
@@ -91,7 +91,12 @@ export function WalletProvider({ children }: WalletProviderProps) {
       }
     }
     
-    isInitialMount.current = false
+    // Mark initial mount as complete after a short delay to allow auto-reconnect
+    const timeoutId = setTimeout(() => {
+      isInitialMount.current = false
+    }, 2000) // Give auto-reconnect 2 seconds to work
+    
+    return () => clearTimeout(timeoutId)
   }, [isConnected, address])
 
   useEffect(() => {
@@ -126,21 +131,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, [disconnectStatus])
 
-  // Clear any stored connection data on mount to force modal selection
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    // Only run once on initial mount
-    if (isInitialMount.current === false) return
-    
-    try {
-      localStorage.removeItem('starknet_last_connector')
-      // Also clear any starknetkit storage
-      localStorage.removeItem('walletStarknetkitLatest')
-    } catch (error) {
-      // Ignore localStorage errors
-      console.warn('Error clearing localStorage:', error)
-    }
-  }, []) // Only run once on mount
 
   const handleDisconnect = useCallback(async () => {
     if (typeof window !== 'undefined') {

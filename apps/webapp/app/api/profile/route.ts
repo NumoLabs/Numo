@@ -8,12 +8,12 @@ async function getWalletFromHeader(request: NextRequest): Promise<{ address: str
   if (!walletAddress || walletAddress.trim().length === 0) {
     return null;
   }
-
+  
   // Validate wallet address format (basic validation)
   if (!/^0x[0-9a-fA-F]{63,64}$/.test(walletAddress.trim())) {
     return null;
   }
-
+  
   // Validate network
   const validNetworks: NetworkType[] = ['mainnet', 'sepolia', 'goerli', 'devnet'];
   if (!validNetworks.includes(walletNetwork)) {
@@ -63,11 +63,11 @@ export async function GET(request: NextRequest) {
       // Fetch the newly created profile
       userProfile = await getUserByWallet(wallet.address, wallet.network);
 
-      if (!userProfile) {
-        return NextResponse.json(
+    if (!userProfile) {
+      return NextResponse.json(
           { error: 'User profile not found after creation' },
-          { status: 404 }
-        );
+        { status: 404 }
+      );
       }
     }
 

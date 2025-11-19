@@ -10,10 +10,83 @@ import {
   EyeOff,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { useWBTCBalance } from "@/hooks/use-wbtc-balance"
+import { useVaultForecastStats } from "@/hooks/use-vault-forecast-stats"
 
 export function DashboardHero() {
   const [showBalance, setShowBalance] = useState(true)
+  const { balance, balanceUSD, isLoading: wbtcLoading } = useWBTCBalance()
+  const { apy, userPosition, isLoading: vaultStatsLoading } = useVaultForecastStats()
+  
+  // Combined loading state - show loading if either is loading
+  const isLoading = wbtcLoading || vaultStatsLoading
+
+  // Format balance display
+  const formatBalance = (value: number): string => {
+    if (value === 0) return "0.00000000"
+    if (value < 0.00000001) return value.toFixed(8)
+    if (value < 0.01) return value.toFixed(8).replace(/\.?0+$/, '')
+    return value.toFixed(8).replace(/\.?0+$/, '')
+  }
+
+  const formatUSD = (value: number): string => {
+    if (value === 0) return "$0.00"
+    if (value < 1) return `$${value.toFixed(4)}`
+    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  }
+
+  const displayBalance = showBalance ? formatBalance(balance) : "••••••••"
+  const displayUSD = showBalance ? formatUSD(balanceUSD) : "≈ $••••••••"
+
+  const performance = useMemo(() => {
+    if (!userPosition || !apy || userPosition.assets === BigInt(0)) {
+      return null
+    }
+
+    // Get current balance in vault
+    const currentBalance = Number(userPosition.assets) / 1e8
+
+    const estimatedDaysActive = 30 // Estimate 30 days of activity
+    const dailyAPY = apy / 365
+    const estimatedGainPercent = dailyAPY * estimatedDaysActive
+
+    const estimatedInitial = currentBalance / (1 + estimatedGainPercent / 100)
+    const estimatedGainBTC = currentBalance - estimatedInitial
+    const estimatedGainPercentActual = (estimatedGainBTC / estimatedInitial) * 100
+
+    return {
+      gainBTC: estimatedGainBTC,
+      gainPercent: estimatedGainPercentActual,
+    }
+  }, [userPosition, apy])
+
+  // Format performance display
+  const formatPerformance = (value: number): string => {
+    if (value === 0) return "0.00000000"
+    const sign = value >= 0 ? "+" : ""
+    if (Math.abs(value) < 0.00000001) return `${sign}0.00000000`
+    if (Math.abs(value) < 0.01) return `${sign}${Math.abs(value).toFixed(8)}`
+    return `${sign}${Math.abs(value).toFixed(8).replace(/\.?0+$/, '')}`
+  }
+
+  const formatPercent = (value: number): string => {
+    if (value === 0) return "0.00%"
+    const sign = value >= 0 ? "+" : ""
+    return `${sign}${Math.abs(value).toFixed(2)}%`
+  }
+
+  const displayPerformanceBTC = performance
+    ? (showBalance ? formatPerformance(performance.gainBTC) : "••••••••")
+    : (showBalance ? "0.00000000" : "••••••••")
+  const displayPerformancePercent = performance
+    ? (showBalance ? formatPercent(performance.gainPercent) : "••••••")
+    : (showBalance ? "0.00%" : "••••••")
+
+  // Format APY display
+  const displayAPY = apy
+    ? (showBalance ? `${apy.toFixed(2)}%` : "•••••")
+    : (showBalance ? "0.00%" : "•••••")
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-[#0f1114] p-8 md:p-12 text-white mb-8 shadow-2xl animate-border-gradient">
@@ -60,28 +133,40 @@ export function DashboardHero() {
                 </div>
               </div>
             </div>
-            <p className="text-2xl font-bold">{showBalance ? "1.245 BTC" : "••••••••"}</p>
-            <p className="text-xs text-gray-400">{showBalance ? "≈ $78,435.67 USD" : "≈ $••••••••"}</p>
+            <p className="text-2xl font-bold">
+              {isLoading ? '...' : `${displayBalance} wBTC`}
+            </p>
+            <p className="text-xs text-gray-400">
+              {isLoading ? '...' : displayUSD}
+            </p>
           </div>
           <div className="bg-[#0f1114] border-2 border-orange-500 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-300">Performance</p>
-                              <div className="h-8 w-8 rounded-full bg-[#0f1114] border-2 border-yellow-500 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-white" />
-                </div>
+              <div className="h-8 w-8 rounded-full bg-[#0f1114] border-2 border-yellow-500 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-white" />
+              </div>
             </div>
-            <p className="text-2xl font-bold">+0.078 BTC</p>
-            <p className="text-xs text-gray-400">+6.3% since start</p>
+            <p className="text-2xl font-bold">
+              {(isLoading || !performance) ? '...' : `${displayPerformanceBTC} wBTC`}
+            </p>
+            <p className="text-xs text-gray-400">
+              {(isLoading || !performance) ? '...' : `${displayPerformancePercent} since start`}
+            </p>
           </div>
           <div className="bg-[#0f1114] border-2 border-orange-500 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-300">Current APY</p>
-                              <div className="h-8 w-8 rounded-full bg-[#0f1114] border-2 border-yellow-500 flex items-center justify-center">
-                  <Star className="h-5 w-5 text-white" />
-                </div>
+              <div className="h-8 w-8 rounded-full bg-[#0f1114] border-2 border-yellow-500 flex items-center justify-center">
+                <Star className="h-5 w-5 text-white" />
+              </div>
             </div>
-            <p className="text-2xl font-bold">5.8%</p>
-            <p className="text-xs text-gray-400">+0.3% vs previous</p>
+            <p className="text-2xl font-bold">
+              {isLoading || !apy ? '...' : displayAPY}
+            </p>
+            <p className="text-xs text-gray-400">
+              Average across all pools
+            </p>
           </div>
         </div>
       </div>

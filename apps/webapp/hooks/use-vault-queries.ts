@@ -99,11 +99,24 @@ export function useUserVaultPosition() {
     queryKey: vaultQueryKeys.userPosition(address),
     queryFn: async () => {
       if (!isConnected || !address) return null;
-      const position = await getUserPosition();
-      return position;
+      try {
+        const position = await getUserPosition();
+        return position || null;
+      } catch (error) {
+        console.error('useUserVaultPosition: Error fetching position', error);
+        // Return zero position on error instead of throwing
+        return {
+          shares: BigInt(0),
+          assets: BigInt(0),
+          formatted: '0',
+          usdValue: 0
+        };
+      }
     },
     enabled: isConnected && !!address,
     staleTime: 1 * 60 * 1000, // 1 minute
+    retry: 2, // Retry up to 2 times on failure
+    retryDelay: 1000, // Wait 1 second between retries
   });
 }
 

@@ -158,6 +158,12 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
   const { isConnected, address } = useWalletStatus();
   const { disconnect } = useWallet();
   const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Only render DropdownMenu after mount to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -290,6 +296,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
 
           <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-700" />
 
+          {mounted ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gradient-to-r hover:from-cyan-500 hover:to-blue-500 hover:ring-2 hover:ring-cyan-500/50 transition-all duration-200">
@@ -300,9 +307,9 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{username}</p>
-                  {walletDisplay && (
-                    <p className="text-xs leading-none text-muted-foreground font-mono">{walletDisplay}</p>
-                  )}
+                    {walletDisplay && (
+                      <p className="text-xs leading-none text-muted-foreground font-mono">{walletDisplay}</p>
+                    )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -312,14 +319,19 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={handleDisconnect} 
+                  onClick={handleDisconnect} 
                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:text-red-600 dark:hover:text-red-400 dark:hover:bg-red-950/50 cursor-pointer focus:text-red-500 focus:bg-red-50 dark:focus:text-red-500 dark:focus:bg-red-950/50"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Disconnect Wallet
+                  Disconnect Wallet
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          ) : (
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gradient-to-r hover:from-cyan-500 hover:to-blue-500 hover:ring-2 hover:ring-cyan-500/50 transition-all duration-200">
+              <UserAvatar />
+            </Button>
+          )}
         </div>
       </div>
     </div>

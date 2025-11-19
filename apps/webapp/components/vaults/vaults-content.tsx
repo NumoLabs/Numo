@@ -305,27 +305,23 @@ export function VaultsContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {isLoading || vaults.length === 0 ? (
-                  <span className="inline-block w-24 h-6 bg-muted rounded animate-pulse" />
-                ) : (
-                  (() => {
-                    // Handle zero or very small values
-                    if (totalTVL === 0) {
-                      return '0.0000 wBTC';
-                    }
-                    
-                    // Show more decimal places for very small values
-                    if (totalTVL > 0 && totalTVL < 0.0001) {
-                      return `${totalTVL.toFixed(8)} wBTC`;
-                    }
-                    
-                    // Format with 4 decimal places for normal values
-                    return `${totalTVL.toFixed(4)} wBTC`;
-                  })()
-                )}
+                {isLoading || vaults.length === 0 ? '...' : (() => {
+                  // Handle zero or very small values
+                  if (totalTVL === 0) {
+                    return '0.0000 wBTC';
+                  }
+                  
+                  // Show more decimal places for very small values
+                  if (totalTVL > 0 && totalTVL < 0.0001) {
+                    return `${totalTVL.toFixed(8)} wBTC`;
+                  }
+                  
+                  // Format with 4 decimal places for normal values
+                  return `${totalTVL.toFixed(4)} wBTC`;
+                })()}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Total value locked {vaults.length > 1 ? `across ${vaults.length} vaults` : ''}
+                {isLoading || vaults.length === 0 ? '...' : `Total value locked ${vaults.length > 1 ? `across ${vaults.length} vaults` : ''}`}
               </p>
             </CardContent>
           </Card>
@@ -346,13 +342,11 @@ export function VaultsContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {isLoading ? (
-                  <span className="inline-block w-16 h-6 bg-muted rounded animate-pulse" />
-                ) : (
-                  `${avgApy.toFixed(2)}%`
-                )}
+                {isLoading ? '...' : `${avgApy.toFixed(2)}%`}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Average yield</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isLoading ? '...' : 'Average yield'}
+              </p>
             </CardContent>
           </Card>
         </motion.div>

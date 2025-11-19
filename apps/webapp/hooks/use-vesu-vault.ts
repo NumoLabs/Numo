@@ -331,12 +331,43 @@ export function useVesuVault() {
   // Get user's position value in assets
   const getUserPosition = useCallback(async (userAddress?: string) => {
     const targetAddress = userAddress || address;
-    if (!isConnected || !targetAddress || !contract) return;
+    if (!isConnected || !targetAddress || !contract) {
+      console.warn('getUserPosition: Missing required params', { isConnected, targetAddress, contract: !!contract });
+      return {
+        shares: BigInt(0),
+        assets: BigInt(0),
+        formatted: '0',
+        usdValue: 0
+      };
+    }
 
     try {
+      // Validate contract is properly initialized
+      if (!contract.address || !contract.provider) {
+        console.warn('getUserPosition: Contract not properly initialized');
+        return {
+          shares: BigInt(0),
+          assets: BigInt(0),
+          formatted: '0',
+          usdValue: 0
+        };
+      }
+
       const shares = await contract.call('balanceOf', [targetAddress], { blockIdentifier: 'latest' });
       
-      if (!shares || BigInt(shares.toString()) === BigInt(0)) {
+      if (!shares || shares === null || shares === undefined) {
+        console.warn('getUserPosition: No shares returned');
+        return {
+          shares: BigInt(0),
+          assets: BigInt(0),
+          formatted: '0',
+          usdValue: 0
+        };
+      }
+
+      const sharesBigInt = BigInt(shares.toString());
+      
+      if (sharesBigInt === BigInt(0)) {
         return {
           shares: BigInt(0),
           assets: BigInt(0),
@@ -348,27 +379,32 @@ export function useVesuVault() {
       // Try convert_to_assets first
       let assets: bigint;
       try {
-        const assetsResult = await contract.call('convert_to_assets', [shares], { blockIdentifier: 'latest' });
+        const assetsResult = await contract.call('convert_to_assets', [sharesBigInt], { blockIdentifier: 'latest' });
         assets = BigInt(assetsResult.toString());
       } catch (convertErr: any) {
         // If convert_to_assets fails, try preview_redeem
         try {
-          const assetsResult = await contract.call('preview_redeem', [shares], { blockIdentifier: 'latest' });
+          const assetsResult = await contract.call('preview_redeem', [sharesBigInt], { blockIdentifier: 'latest' });
           assets = BigInt(assetsResult.toString());
         } catch (previewErr) {
           // If both fail, calculate manually using total_assets and total_supply
-          const totalAssets = await contract.call('total_assets', [], { blockIdentifier: 'latest' });
-          const totalSupply = await contract.call('total_supply', [], { blockIdentifier: 'latest' });
-          
-          const totalAssetsBigInt = BigInt(totalAssets.toString());
-          const totalSupplyBigInt = BigInt(totalSupply.toString());
-          const sharesBigInt = BigInt(shares.toString());
-          
-          // Calculate: user_assets = (user_shares * total_assets) / total_supply
-          if (totalSupplyBigInt === BigInt(0)) {
-            assets = BigInt(0);
-          } else {
-            assets = (sharesBigInt * totalAssetsBigInt) / totalSupplyBigInt;
+          try {
+            const totalAssets = await contract.call('total_assets', [], { blockIdentifier: 'latest' });
+            const totalSupply = await contract.call('total_supply', [], { blockIdentifier: 'latest' });
+            
+            const totalAssetsBigInt = BigInt(totalAssets.toString());
+            const totalSupplyBigInt = BigInt(totalSupply.toString());
+            
+            // Calculate: user_assets = (user_shares * total_assets) / total_supply
+            if (totalSupplyBigInt === BigInt(0)) {
+              assets = BigInt(0);
+            } else {
+              assets = (sharesBigInt * totalAssetsBigInt) / totalSupplyBigInt;
+            }
+          } catch (calcErr) {
+            console.error('Failed to calculate assets from total_assets/total_supply:', calcErr);
+            // Fallback: use shares as assets (1:1 ratio) - not ideal but better than failing
+            assets = sharesBigInt;
           }
         }
       }
@@ -381,14 +417,20 @@ export function useVesuVault() {
       const usdValue = assetsNumber * wbtcPriceUSD;
       
       return {
-        shares: BigInt(shares.toString()),
+        shares: sharesBigInt,
         assets: assets,
         formatted: formattedAssets,
         usdValue: usdValue
       };
     } catch (err) {
       console.error('Failed to get user position:', err);
-      throw err;
+      // Return zero position instead of throwing to avoid breaking the UI
+      return {
+        shares: BigInt(0),
+        assets: BigInt(0),
+        formatted: '0',
+        usdValue: 0
+      };
     }
   }, [isConnected, address, contract]);
 

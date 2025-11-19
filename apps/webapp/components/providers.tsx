@@ -8,9 +8,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryProvider>
       <StarknetProvider>
-        <WalletProvider>
-          {children}
-        </WalletProvider>
+          <WalletProvider>
+            {children}
+          </WalletProvider>
       </StarknetProvider>
     </QueryProvider>
   );
