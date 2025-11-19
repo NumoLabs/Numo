@@ -133,7 +133,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
               </motion.span>
             </Link>
           </motion.div>
-          <nav className="hidden md:flex items-center gap-7 ml-12">
+          <nav className="hidden md:flex items-center gap-7 ml-16">
             <Link
               href="#stats"
               className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
@@ -150,7 +150,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
               href="#waitlist"
               className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-1 after:w-0 hover:after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
             >
-              Waitlist
+              Join
             </Link>
             {shouldShowDashboard ? (
               <Button
@@ -217,42 +217,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
                       )}
                     >
                       Dashboard
-                    </Link>
-                    <Link
-                      href="/deposit"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/deposit" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Deposit
-                    </Link>
-                    <Link
-                      href="/withdraw"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Withdraw
-                    </Link>
-                    <Link
-                      href="/history"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/history" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      History
-                    </Link>
-                    <Link
-                      href="/pools"
-                      className={cn(
-                        "hover:text-foreground transition-colors",
-                        pathname === "/pools" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Pools
                     </Link>
                     <Link
                       href="/bonds"
@@ -327,24 +291,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
               Dashboard
             </Link>
             <Link
-              href="/deposit"
-              className={cn(
-                "text-sm font-medium",
-                pathname === "/deposit" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Deposit
-            </Link>
-            <Link
-              href="/withdraw"
-              className={cn(
-                "text-sm font-medium",
-                pathname === "/withdraw" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Withdraw
-            </Link>
-            <Link
               href="/history"
               className={cn(
                 "text-sm font-medium",
@@ -352,15 +298,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
               )}
             >
               History
-            </Link>
-            <Link
-              href="/pools"
-              className={cn(
-                "text-sm font-medium",
-                pathname === "/pools" ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Pools
             </Link>
             <Link
               href="/bonds"

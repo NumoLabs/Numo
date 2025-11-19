@@ -45,13 +45,8 @@ function decodeSelector(selector: string): string {
 
 // Helper function to convert decimal amount to wei
 function parseAmountToWei(amount: string, decimals: number = 8): bigint {
-  console.log('=== parseAmountToWei Debug ===');
-  console.log('Input amount:', amount);
-  console.log('Input decimals:', decimals);
-  
   // Handle scientific notation and very small numbers
   const amountFloat = parseFloat(amount);
-  console.log('Parsed float:', amountFloat);
   
   if (isNaN(amountFloat) || amountFloat < 0) {
     throw new Error('Invalid amount');
@@ -59,51 +54,34 @@ function parseAmountToWei(amount: string, decimals: number = 8): bigint {
   
   // For very small numbers, use a different approach
   if (amountFloat < 1) {
-    console.log('Very small number detected, using precision-safe conversion');
     // Convert to string with enough precision
     const amountStr = amountFloat.toFixed(decimals);
-    console.log('Amount string (fixed):', amountStr);
-    
     const [integerPart, decimalPart = ''] = amountStr.split('.');
-    console.log('Integer part:', integerPart);
-    console.log('Decimal part:', decimalPart);
     
     // Remove trailing zeros and pad to required decimals
     const trimmedDecimal = decimalPart.replace(/0+$/, '');
     const paddedDecimal = trimmedDecimal.padEnd(decimals, '0').slice(0, decimals);
-    console.log('Trimmed decimal:', trimmedDecimal);
-    console.log('Padded decimal:', paddedDecimal);
     
     // Combine integer and decimal parts
     const fullAmountStr = integerPart + paddedDecimal;
-    console.log('Full amount string:', fullAmountStr);
     
     // Convert to BigInt
     const result = BigInt(fullAmountStr);
-    console.log('Final result:', result.toString());
-    
     return result;
   }
   
   // Use string-based calculation to avoid floating point precision issues
   const amountStr = amountFloat.toString();
-  console.log('Amount string:', amountStr);
-  
   const [integerPart, decimalPart = ''] = amountStr.split('.');
-  console.log('Integer part:', integerPart);
-  console.log('Decimal part:', decimalPart);
   
   // Pad decimal part to required decimals
   const paddedDecimal = decimalPart.padEnd(decimals, '0').slice(0, decimals);
-  console.log('Padded decimal:', paddedDecimal);
-  
+
   // Combine integer and decimal parts
   const fullAmountStr = integerPart + paddedDecimal;
-  console.log('Full amount string:', fullAmountStr);
   
   // Convert to BigInt
   const result = BigInt(fullAmountStr);
-  console.log('Final result:', result.toString());
   
   // Validate that the result doesn't exceed StarkNet's 64-digit limit
   const hexStr = result.toString(16);
@@ -116,36 +94,22 @@ function parseAmountToWei(amount: string, decimals: number = 8): bigint {
 
 // Helper function to format wei to decimal
 function formatWeiToDecimal(wei: bigint, decimals: number = 8): string {
-  console.log('=== formatWeiToDecimal Debug ===');
-  console.log('Input wei:', wei.toString());
-  console.log('Input decimals:', decimals);
-  
   const divisor = BigInt(10 ** decimals);
   const quotient = wei / divisor;
   const remainder = wei % divisor;
   
-  console.log('Divisor:', divisor.toString());
-  console.log('Quotient:', quotient.toString());
-  console.log('Remainder:', remainder.toString());
-  
   if (remainder === BigInt(0)) {
-    console.log('No remainder, returning:', quotient.toString());
     return quotient.toString();
   }
   
   const remainderStr = remainder.toString().padStart(decimals, '0');
   const trimmedRemainder = remainderStr.replace(/0+$/, '');
   
-  console.log('Remainder string:', remainderStr);
-  console.log('Trimmed remainder:', trimmedRemainder);
-  
   if (trimmedRemainder === '') {
-    console.log('Trimmed remainder is empty, returning:', quotient.toString());
     return quotient.toString();
   }
   
   const result = `${quotient}.${trimmedRemainder}`;
-  console.log('Final result:', result);
   return result;
 }
 
@@ -174,7 +138,6 @@ export function useVesuVault() {
   // Create contract instance with minimal ABI to avoid Cairo version issues
   const contract = useMemo(() => {
     try {
-      console.log('Creating contract instance with minimal ABI...');
       // Use minimal ABI to avoid Cairo version detection issues
       const minimalAbi = [
         {
@@ -270,7 +233,6 @@ export function useVesuVault() {
         }
       ];
       const contractInstance = new Contract(minimalAbi, VESU_VAULT_ADDRESS, provider);
-      console.log('Contract instance created successfully with minimal ABI');
       return contractInstance;
     } catch (error) {
       console.error('Failed to create contract instance:', error);
@@ -293,32 +255,22 @@ export function useVesuVault() {
       
       try {
         totalAssets = await contract.call('total_assets', [], { blockIdentifier: 'latest' }) as bigint;
-        console.log('Total assets loaded:', totalAssets);
       } catch (err) {
-        console.warn('total_assets not available, using default:', err);
+        // total_assets not available, using default
       }
       
       try {
         const assetResult = await contract.call('asset', [], { blockIdentifier: 'latest' });
         assetAddressResult = typeof assetResult === 'string' ? assetResult : assetResult.toString();
-        console.log('Asset address loaded:', assetAddressResult);
       } catch (err) {
-        console.warn('asset not available, using wBTC address:', err);
+        // asset not available, using wBTC address
       }
 
       // Skip optional methods that may not be implemented
       const settings = null;
       const allowedPools: any[] = [];
-      
-      console.log('Skipping optional methods (get_settings, get_allowed_pools) to avoid ENTRYPOINT_NOT_FOUND errors');
 
       const assetAddress = assetAddressResult;
-
-      console.log('=== Contract Configuration Debug ===');
-      console.log('Total assets:', totalAssets);
-      console.log('Asset address:', assetAddress);
-      console.log('Settings:', settings);
-      console.log('Allowed pools:', allowedPools);
 
       setVaultData({
         totalAssets: totalAssets as bigint,
@@ -353,9 +305,6 @@ export function useVesuVault() {
       const balance = await wbtcContract.call('balanceOf', [targetAddress], { blockIdentifier: 'latest' });
       const formattedBalance = formatWeiToDecimal(balance as bigint, 8);
       
-      console.log('wBTC Balance (raw):', balance);
-      console.log('wBTC Balance (formatted):', formattedBalance, 'wBTC');
-      
       setWbtcBalance(balance as bigint);
       return { balance: balance as bigint, formatted: formattedBalance };
     } catch (err) {
@@ -371,7 +320,6 @@ export function useVesuVault() {
 
     try {
       const shares = await contract.call('balanceOf', [targetAddress], { blockIdentifier: 'latest' });
-      console.log('Vault Shares (raw):', shares);
       
       return shares as bigint;
     } catch (err) {
@@ -386,11 +334,7 @@ export function useVesuVault() {
     if (!isConnected || !targetAddress || !contract) return;
 
     try {
-      console.log('=== getUserPosition Debug ===');
-      console.log('Target address:', targetAddress);
-      
       const shares = await contract.call('balanceOf', [targetAddress], { blockIdentifier: 'latest' });
-      console.log('Raw shares:', shares);
       
       if (!shares || BigInt(shares.toString()) === BigInt(0)) {
         return {
@@ -406,17 +350,13 @@ export function useVesuVault() {
       try {
         const assetsResult = await contract.call('convert_to_assets', [shares], { blockIdentifier: 'latest' });
         assets = BigInt(assetsResult.toString());
-        console.log('Raw assets from convert_to_assets:', assets);
       } catch (convertErr: any) {
         // If convert_to_assets fails, try preview_redeem
-        console.log('convert_to_assets failed, trying preview_redeem...');
         try {
           const assetsResult = await contract.call('preview_redeem', [shares], { blockIdentifier: 'latest' });
           assets = BigInt(assetsResult.toString());
-          console.log('Raw assets from preview_redeem:', assets);
         } catch (previewErr) {
           // If both fail, calculate manually using total_assets and total_supply
-          console.log('Both convert_to_assets and preview_redeem failed, calculating manually...');
           const totalAssets = await contract.call('total_assets', [], { blockIdentifier: 'latest' });
           const totalSupply = await contract.call('total_supply', [], { blockIdentifier: 'latest' });
           
@@ -430,26 +370,15 @@ export function useVesuVault() {
           } else {
             assets = (sharesBigInt * totalAssetsBigInt) / totalSupplyBigInt;
           }
-          console.log('Calculated assets manually:', assets);
         }
       }
       
       const formattedAssets = formatWeiToDecimal(assets, 8);
-      console.log('Formatted assets:', formattedAssets);
       
       // Calculate USD value (assuming wBTC price around $100,000)
       const wbtcPriceUSD = 100000; // This should come from an oracle
       const assetsNumber = parseFloat(formattedAssets);
       const usdValue = assetsNumber * wbtcPriceUSD;
-      
-      console.log('wBTC price (USD):', wbtcPriceUSD);
-      console.log('Assets number:', assetsNumber);
-      console.log('USD value:', usdValue);
-      
-      console.log('User Shares:', shares);
-      console.log('User Assets Value:', assets);
-      console.log('User Position (formatted):', formattedAssets, 'wBTC');
-      console.log('User Position (USD):', `$${usdValue.toFixed(2)}`);
       
       return {
         shares: BigInt(shares.toString()),
@@ -470,11 +399,7 @@ export function useVesuVault() {
     try {
       const amountInWei = parseAmountToWei(amount, 8);
       
-      console.log('Amount in wei:', amountInWei.toString());
-      console.log('Asset address:', vaultData.assetAddress);
-      
       const result = await contract.call('preview_deposit', [amountInWei.toString()], { blockIdentifier: 'latest' });
-      console.log('Preview deposit result:', result);
       
       return result as bigint;
     } catch (err) {
@@ -495,11 +420,6 @@ export function useVesuVault() {
       setError(null);
 
       const amountInWei = parseAmountToWei(amount, 8);
-      console.log('=== Withdraw Debug ===');
-      console.log('Original amount string:', amount);
-      console.log('Amount in wei:', amountInWei.toString());
-      console.log('Account address:', account.address);
-      console.log('Receiver address:', receiver || account.address);
 
       // Check if amount is 0
       if (amountInWei === BigInt(0)) {
@@ -522,9 +442,6 @@ export function useVesuVault() {
       }];
 
       // Execute withdraw transaction
-      console.log('Calling withdraw...');
-      console.log('Withdraw calls:', JSON.stringify(calls, null, 2));
-      
       let tx;
       try {
         tx = await account.execute(calls);
@@ -620,12 +537,10 @@ export function useVesuVault() {
         throw new Error(detailedError);
       }
       
-      console.log('Withdraw transaction:', tx.transaction_hash);
       
       // Wait for transaction confirmation
       try {
         await provider.waitForTransaction(tx.transaction_hash);
-        console.log('Withdraw confirmed!');
       } catch (waitError: any) {
         console.error('Transaction wait failed:', waitError);
         // Transaction was sent but confirmation failed - still consider it successful if we have a hash

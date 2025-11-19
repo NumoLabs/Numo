@@ -1,10 +1,11 @@
-import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout"
+import { DashboardLayout } from "@/components/dashboard/layout"
 import { CavosAuthGuard } from "@/components/auth"
 
-export default function PoolsPage() {
+export default function ProfilePage() {
   return (
     <CavosAuthGuard>
       <DashboardLayout />
     </CavosAuthGuard>
   )
 }
+

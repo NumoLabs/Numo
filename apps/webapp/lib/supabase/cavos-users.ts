@@ -5,15 +5,10 @@ import type { CavosUser } from '@/types/cavos'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-// Validate environment variables
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error(
-    'Missing Supabase environment variables. ' +
-    'Please ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in your .env file.'
-  )
+  console.error('Missing Supabase environment variables')
 }
 
-// Use service role key for server-side operations to bypass RLS
 const supabase = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
@@ -31,7 +26,7 @@ interface UpsertCavosUserParams {
   email: string
   orgId?: number
   orgName?: string
-  displayName?: string
+  username?: string
   avatarUrl?: string
   metadata?: Record<string, unknown>
 }
@@ -57,9 +52,8 @@ interface UserWithPrimaryWallet {
   email_verified: boolean
   organization_id: number | null
   status: UserStatus
-  display_name: string | null
+  username: string | null
   avatar_url: string | null
-  phone: string | null
   last_login_at: string | null
   created_at: string
   updated_at: string
@@ -84,7 +78,7 @@ export async function upsertCavosUser(params: UpsertCavosUserParams): Promise<st
       p_email: params.email,
       p_org_id: params.orgId || null,
       p_org_name: params.orgName || null,
-      p_display_name: params.displayName || null,
+      p_username: params.username || null,
       p_avatar_url: params.avatarUrl || null,
       p_metadata: params.metadata || null
     })
@@ -121,6 +115,106 @@ export async function upsertCavosWallet(params: UpsertCavosWalletParams): Promis
     })
 
     if (error) {
+      // Handle duplicate key error (21000) by falling back to direct database operations
+      if (error.code === '21000' || error.message?.includes('ON CONFLICT DO UPDATE command cannot affect row a second time')) {
+        // Fallback: Check if wallet exists first, then update or insert directly
+        try {
+          const { data: existingWallet, error: fetchError } = await supabase
+            .from('wallets')
+            .select('id')
+            .eq('user_id', params.userId)
+            .eq('address', params.address)
+            .maybeSingle()
+
+          if (fetchError && fetchError.code !== 'PGRST116') {
+            console.error('Error checking for existing wallet:', fetchError)
+            return null
+          }
+
+          if (existingWallet) {
+            // Update existing wallet
+            const { data: updatedWallet, error: updateError } = await supabase
+              .from('wallets')
+              .update({
+                is_primary: params.isPrimary,
+                network: params.network || 'mainnet',
+                cavos_wallet_id: params.cavosWalletId || null,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existingWallet.id)
+              .select('id')
+              .single()
+
+            if (updateError) {
+              console.error('Error updating wallet:', updateError)
+              return null
+            }
+
+            return updatedWallet.id
+          } else {
+            // Insert new wallet
+            const { data: newWallet, error: insertError } = await supabase
+              .from('wallets')
+              .insert({
+                user_id: params.userId,
+                address: params.address,
+                network: params.network || 'mainnet',
+                is_primary: params.isPrimary,
+                cavos_wallet_id: params.cavosWalletId || null,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .select('id')
+              .single()
+
+            if (insertError) {
+              // Handle race condition: if another request inserted it, fetch it
+              if (insertError.code === '23505') {
+                const { data: raceConditionWallet, error: raceError } = await supabase
+                  .from('wallets')
+                  .select('id')
+                  .eq('user_id', params.userId)
+                  .eq('address', params.address)
+                  .single()
+
+                if (raceError || !raceConditionWallet) {
+                  console.error('Error fetching wallet after race condition:', raceError)
+                  return null
+                }
+
+                // Update it
+                const { data: updatedWallet, error: updateError } = await supabase
+                  .from('wallets')
+                  .update({
+                    is_primary: params.isPrimary,
+                    network: params.network || 'mainnet',
+                    cavos_wallet_id: params.cavosWalletId || null,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', raceConditionWallet.id)
+                  .select('id')
+                  .single()
+
+                if (updateError) {
+                  console.error('Error updating wallet after race condition:', updateError)
+                  return null
+                }
+
+                return updatedWallet.id
+              }
+
+              console.error('Error inserting wallet:', insertError)
+              return null
+            }
+
+            return newWallet.id
+          }
+        } catch (fallbackError) {
+          console.error('Exception in wallet upsert fallback:', fallbackError)
+          return null
+        }
+      }
+
       console.error('Error upserting Cavos wallet:', error)
       return null
     }
@@ -147,25 +241,31 @@ export async function getOrCreateCavosUser(
   is_new_user: boolean
 } | null> {
   if (!supabase) {
-    console.error('Supabase client not initialized. Check your environment variables.')
+    console.error('Supabase client not initialized')
     return null
   }
 
   try {
-    const { data, error } = await supabase.rpc('get_or_create_cavos_user', {
+    const rpcParams: Record<string, unknown> = {
       p_cavos_user_id: params.cavosUserId,
       p_email: params.email,
       p_org_id: params.orgId || null,
       p_org_name: params.orgName || null,
       p_wallet_address: params.walletAddress || null,
       p_wallet_network: params.walletNetwork || 'mainnet',
-      p_display_name: params.displayName || null,
+      p_username: params.username || null,
       p_avatar_url: params.avatarUrl || null,
       p_metadata: params.metadata || null
-    })
+    }
+    
+    if (params.username && params.username.trim().length > 0) {
+      rpcParams.p_display_name = params.username
+    }
+    
+    const { data, error } = await supabase.rpc('get_or_create_cavos_user', rpcParams)
 
     if (error) {
-      console.error('Error getting/creating Cavos user:', error)
+      console.error('Error calling get_or_create_cavos_user RPC:', error)
       return null
     }
 
@@ -175,7 +275,7 @@ export async function getOrCreateCavosUser(
 
     return data[0]
   } catch (error) {
-    console.error('Exception getting/creating Cavos user:', error)
+    console.error('Exception calling get_or_create_cavos_user RPC:', error)
     return null
   }
 }
@@ -186,7 +286,7 @@ export async function getOrCreateCavosUser(
  */
 export async function saveCavosUser(user: CavosUser): Promise<string | null> {
   if (!supabase) {
-    console.error('Supabase client not initialized. Check your environment variables.')
+    console.error('Supabase client not initialized')
     return null
   }
 
@@ -196,17 +296,136 @@ export async function saveCavosUser(user: CavosUser): Promise<string | null> {
       return null
     }
 
-    const result = await getOrCreateCavosUser({
-      cavosUserId: user.id,
-      email: user.email,
-      orgId: user.organization?.org_id,
-      orgName: user.organization?.org_name,
-      walletAddress: user.wallet?.address,
-      walletNetwork: (user.wallet?.network as NetworkType) || 'mainnet',
-      metadata: {}
-    })
+    let organizationId: number | null = null
+    if (user.organization?.org_id) {
+      const { data: existingOrg, error: orgFetchError } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('cavos_org_id', user.organization.org_id)
+        .maybeSingle()
 
-    return result?.user_id || null
+      if (orgFetchError && orgFetchError.code !== 'PGRST116') {
+        console.error('Error checking for organization:', orgFetchError)
+      } else if (existingOrg) {
+        organizationId = existingOrg.id
+      } else {
+        const { data: newOrg, error: orgInsertError } = await supabase
+          .from('organizations')
+          .insert({
+            cavos_org_id: user.organization.org_id,
+            name: user.organization.org_name || `Organization ${user.organization.org_id}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select('id')
+          .single()
+
+        if (orgInsertError) {
+          console.warn('Could not create organization, continuing without it:', orgInsertError)
+        } else {
+          organizationId = newOrg.id
+        }
+      }
+    }
+    
+    const { data: existingUser, error: fetchError } = await supabase
+      .from('users')
+      .select('id, cavos_user_id, email')
+      .eq('cavos_user_id', user.id)
+      .maybeSingle()
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error checking for existing user:', fetchError)
+      return null
+    }
+
+    let userId: string | null = null
+
+    if (existingUser) {
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update({
+          email: user.email,
+          organization_id: organizationId,
+          last_login_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingUser.id)
+        .select('id')
+        .single()
+
+      if (updateError) {
+        console.error('Error updating user:', updateError)
+        return null
+      }
+
+      userId = updatedUser.id
+    } else {
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert({
+          cavos_user_id: user.id,
+          email: user.email,
+          email_verified: false,
+          organization_id: organizationId,
+          status: 'active' as UserStatus,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select('id')
+        .single()
+
+      if (insertError) {
+        if (insertError.code === '23505' && insertError.message?.includes('cavos_user_id')) {
+          const { data: raceConditionUser, error: raceError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('cavos_user_id', user.id)
+            .single()
+
+          if (raceError || !raceConditionUser) {
+            console.error('Error fetching user after race condition:', raceError)
+            return null
+          }
+
+          const { data: updatedUser, error: updateError } = await supabase
+            .from('users')
+            .update({
+              email: user.email,
+              organization_id: organizationId,
+              last_login_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', raceConditionUser.id)
+            .select('id')
+            .single()
+
+          if (updateError) {
+            console.error('Error updating user after race condition:', updateError)
+            return null
+          }
+
+          userId = updatedUser.id
+        } else {
+          console.error('Error inserting user:', insertError)
+          return null
+        }
+      } else {
+        userId = newUser.id
+      }
+    }
+
+    if (user.wallet?.address && userId) {
+      await upsertCavosWallet({
+        userId: userId,
+        address: user.wallet.address,
+        network: (user.wallet.network as NetworkType) || 'mainnet',
+        isPrimary: true,
+        cavosWalletId: user.wallet.id ? Number(user.wallet.id) : undefined
+      })
+    }
+
+    return userId
   } catch (error) {
     console.error('Exception saving Cavos user:', error)
     return null
@@ -371,6 +590,55 @@ export async function revokeAllUserSessions(userId: string): Promise<number> {
   } catch (error) {
     console.error('Exception revoking user sessions:', error)
     return 0
+  }
+}
+
+/**
+ * Update user profile information
+ */
+export async function updateUserProfile(
+  cavosUserId: string,
+  updates: {
+    username?: string | null;
+    avatar_url?: string | null;
+  }
+): Promise<UserWithPrimaryWallet | null> {
+  if (!supabase) {
+    console.error('Supabase client not initialized. Check your environment variables.')
+    return null
+  }
+
+  try {
+    // First, get the user's internal ID
+    const user = await getUserWithPrimaryWallet(cavosUserId)
+    if (!user) {
+      console.error('User not found:', cavosUserId)
+      return null
+    }
+
+    // Update the user profile
+    const { error } = await supabase
+      .from('users')
+      .update({
+        username: updates.username ?? null,
+        avatar_url: updates.avatar_url ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating user profile:', error)
+      return null
+    }
+
+    // Fetch updated user with primary wallet
+    const updatedUser = await getUserWithPrimaryWallet(cavosUserId)
+    return updatedUser
+  } catch (error) {
+    console.error('Exception updating user profile:', error)
+    return null
   }
 }
 

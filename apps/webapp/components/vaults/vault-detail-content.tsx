@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 import { 
   ArrowLeft, 
   Briefcase, 
@@ -26,6 +27,81 @@ import { VesuVaultPosition } from '@/components/vaults/position-card';
 
 interface VaultDetailContentProps {
   vaultId: string;
+}
+
+type RiskProfile = 'Low' | 'Medium' | 'High';
+
+// Calculate vault risk based on pools
+function calculateVaultRisk(pools: PoolProps[], vesuPoolsData: VesuPool[] | null): RiskProfile {
+  if (pools.length === 0) return 'Medium';
+
+  let riskScore = 0;
+  let lendingPoolsCount = 0;
+  let dexPoolsCount = 0;
+
+  pools.forEach((pool) => {
+    // Get pool name from Vesu API data
+    const poolName = vesuPoolsData 
+      ? (vesuPoolsData.find(p => p.id.toLowerCase() === pool.pool_id.toLowerCase())?.name || '').toLowerCase()
+      : pool.pool_id.toLowerCase();
+    
+    // Identify pool type
+    if (poolName.includes('vesu') || poolName.includes('lending')) {
+      lendingPoolsCount++;
+      riskScore += 1; // Lending pools are lower risk
+    } else if (poolName.includes('ekubo') || poolName.includes('dex') || poolName.includes('liquidity')) {
+      dexPoolsCount++;
+      riskScore += 3; // DEX/liquidity pools are higher risk
+    } else {
+      riskScore += 2; // Unknown pools = medium risk
+    }
+  });
+
+  // Diversification factor (more pools = lower risk)
+  if (pools.length >= 3) {
+    riskScore -= 2; // Well diversified
+  } else if (pools.length === 2) {
+    riskScore -= 1; // Somewhat diversified
+  }
+
+  // If mostly lending pools, reduce risk
+  const lendingRatio = lendingPoolsCount / pools.length;
+  if (lendingRatio >= 0.7) {
+    riskScore -= 2; // Mostly safe lending pools
+  } else if (lendingRatio >= 0.5) {
+    riskScore -= 1; // Balanced
+  }
+
+  // If mostly DEX pools, increase risk
+  const dexRatio = dexPoolsCount / pools.length;
+  if (dexRatio >= 0.7) {
+    riskScore += 2; // Mostly risky DEX pools
+  } else if (dexRatio >= 0.5) {
+    riskScore += 1; // Balanced towards risk
+  }
+
+  // Normalize risk score to Low/Medium/High
+  if (riskScore <= 2) {
+    return 'Low';
+  } else if (riskScore <= 5) {
+    return 'Medium';
+  } else {
+    return 'High';
+  }
+}
+
+// Get risk badge styling
+function getRiskBadgeStyle(risk: RiskProfile): string {
+  switch (risk) {
+    case 'Low':
+      return 'bg-black/50 text-white border-white/20';
+    case 'Medium':
+      return 'bg-black/50 text-white border-white/20';
+    case 'High':
+      return 'bg-black/50 text-white border-white/20';
+    default:
+      return 'bg-black/50 text-white border-white/20';
+  }
 }
 
 export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
@@ -229,12 +305,6 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
       });
       
       if (!vesuPool) {
-        console.warn(`[APY Breakdown] Pool ${pool.pool_id} not found in vesuPoolsData`);
-        console.warn(`[APY Breakdown] Available pools:`, vesuPoolsData.map((p: VesuPool) => ({
-          name: p.name,
-          id: p.id,
-          address: p.address,
-        })));
         breakdowns[pool.pool_id] = null;
         continue;
       }
@@ -325,32 +395,12 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
         const lendingApr = wbtcAsset.apy || 0;
         const rewardsApr = wbtcAsset.defiSpringApy || 0;
         
-        console.log(`[APY Breakdown] Found WBTC asset in pool ${pool.pool_id} (${vesuPool.name}):`, {
-          symbol: wbtcAsset.symbol,
-          address: wbtcAsset.address,
-          apy: wbtcAsset.apy,
-          defiSpringApy: wbtcAsset.defiSpringApy,
-          totalApy: (wbtcAsset.apy || 0) + (wbtcAsset.defiSpringApy || 0),
-        });
-        
-        console.log(`[APY Breakdown] All assets in pool ${pool.pool_id} (${vesuPool.name}):`, vesuPool.assets.map((a: ProcessedAsset) => ({
-          symbol: a.symbol,
-          address: a.address?.slice(0, 20) + '...',
-          apy: a.apy,
-          defiSpringApy: a.defiSpringApy,
-          totalApy: (a.apy || 0) + (a.defiSpringApy || 0),
-        })));
         
         breakdowns[pool.pool_id] = {
           lendingApr,
           rewardsApr,
         };
       } else {
-        console.warn(`[APY Breakdown] WBTC asset not found in pool ${pool.pool_id} (${vesuPool?.name})`);
-        console.warn(`[APY Breakdown] Available assets:`, vesuPool?.assets?.map((a: ProcessedAsset) => ({
-          symbol: a.symbol,
-          address: a.address,
-        })));
         breakdowns[pool.pool_id] = null;
       }
     }
@@ -522,7 +572,8 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
         className="space-y-6"
       >
         {/* Pill Nav */}
-        <div className="relative inline-flex items-center gap-1 p-1.5 bg-muted/50 rounded-full border border-border/50 backdrop-blur-sm">
+        <div className="relative w-full overflow-x-auto">
+          <div className="relative inline-flex items-center gap-1 p-1 sm:p-1.5 bg-muted/50 rounded-full border border-border/50 backdrop-blur-sm min-w-max sm:min-w-0">
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id;
             return (
@@ -533,7 +584,7 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                 }}
                 onClick={() => handleTabChange(tab.id)}
                 className={`
-                  relative z-10 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap
+                    relative z-10 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap flex-shrink-0
                   ${isActive 
                     ? 'text-bitcoin-orange' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -547,7 +598,7 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
           {/* Active indicator pill */}
           {indicatorStyle.width > 0 && (
             <motion.div
-              className="absolute top-1.5 bottom-1.5 bg-background border border-bitcoin-orange/30 rounded-full shadow-lg shadow-bitcoin-orange/10 z-0"
+                className="absolute top-1 sm:top-1.5 bottom-1 sm:bottom-1.5 bg-background border border-bitcoin-orange/30 rounded-full shadow-lg shadow-bitcoin-orange/10 z-0"
               initial={false}
               animate={{
                 left: indicatorStyle.left,
@@ -560,6 +611,7 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
               }}
             />
           )}
+          </div>
         </div>
 
         {/* Tab Content */}
@@ -582,11 +634,24 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                 transition={{ duration: 0.4, delay: 0.6 }}
               >
                 <Card className="hover:shadow-md transition-all duration-300">
-                  <CardHeader>
+                  <CardHeader className="relative">
                     <CardTitle className="flex items-center gap-2">
                       <Briefcase className="h-5 w-5 text-bitcoin-orange" />
                       Vault Information
                     </CardTitle>
+                    {(() => {
+                      const vaultRisk = calculateVaultRisk(pools, vesuPoolsData);
+                      return (
+                        <Badge 
+                          className={cn(
+                            "absolute top-4 right-4 text-[10px] sm:text-xs whitespace-nowrap flex-shrink-0", 
+                            getRiskBadgeStyle(vaultRisk)
+                          )}
+                        >
+                          {vaultRisk} Risk
+                        </Badge>
+                      );
+                    })()}
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>

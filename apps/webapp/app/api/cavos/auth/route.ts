@@ -28,10 +28,8 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      // Use the direct SDK authentication function
       const result = await authenticateUserDirect(email, password)
       
-      // Extract data from the nested structure
       const userData: CavosNormalizedResponse = {
         user: {
           id: result.data.user_id,
@@ -45,18 +43,21 @@ export async function POST(request: NextRequest) {
         timestamp: result.data.authData.timestamp
       }
 
-      // Save user to Supabase database
-      // Wait for save to complete (adds ~50-200ms latency but ensures data is persisted)
       const cavosUser = {
         ...userData.user,
         wallet: userData.wallet
       }
+      
       try {
-        await saveCavosUser(cavosUser)
+        const savedUserId = await saveCavosUser(cavosUser)
+        if (!savedUserId) {
+          console.error('Failed to save user to Supabase:', {
+            userId: userData.user.id,
+            email: userData.user.email
+          })
+        }
       } catch (error) {
-        // Log error but don't fail authentication
-        console.error('Failed to save user to Supabase:', error)
-        // Authentication still succeeds even if DB save fails
+        console.error('Exception saving user to Supabase:', error)
       }
 
       return NextResponse.json(userData)

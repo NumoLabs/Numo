@@ -24,7 +24,7 @@ export function LearningPathCard({
   isDisabled = false,
 }: LearningPathCardProps) {
   return (
-    <Card className={`relative overflow-hidden ${isActive ? "border-2 border-bitcoin-gold dark:border-bitcoin-gold" : ""}`}>
+    <Card className={`relative overflow-hidden transition-all duration-300 ${isActive ? "border-2 border-bitcoin-gold dark:border-bitcoin-gold" : "border border-border/50 hover:border-bitcoin-orange/30 hover:shadow-lg hover:shadow-bitcoin-orange/10"}`}>
       {isActive && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-bitcoin-orange to-bitcoin-gold" />}
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">

@@ -1,15 +1,60 @@
 "use client"
 
-import { useState, useCallback, useEffect } from 'react'
-import { authenticateUser, refreshUserToken, executeTransaction, requestPasswordReset, confirmPasswordReset, getGoogleOAuthUrl, getAppleOAuthUrl, handleOAuthCallback } from '@/lib/cavos-config'
-import type { PasswordResetResponse, PasswordResetConfirmResponse } from '@/types/cavos'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { authenticateUser, refreshUserToken, recoverUserSession, executeTransaction, requestPasswordReset, confirmPasswordReset, getGoogleOAuthUrl, getAppleOAuthUrl, handleOAuthCallback } from '@/lib/cavos-config'
+import type { PasswordResetResponse, PasswordResetConfirmResponse, CavosUser } from '@/types/cavos'
 
-interface CavosUser {
-  id: string
-  email: string
-  wallet: {
-    address: string
+/**
+ * Decode JWT token to extract expiration time
+ * @param token - JWT token string
+ * @returns Object with expiration time in seconds, or null if invalid
+ */
+function decodeJWT(token: string): { exp: number } | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) {
+      return null
+    }
+
+    const base64Payload = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const paddedPayload = base64Payload + '='.repeat((4 - base64Payload.length % 4) % 4)
+    
+    // Use atob for browser compatibility (instead of Buffer)
+    const decodedPayload = atob(paddedPayload)
+    const payload = JSON.parse(decodedPayload)
+
+    if (!payload.exp || typeof payload.exp !== 'number') {
+      return null
+    }
+
+    return { exp: payload.exp }
+  } catch (error) {
+    return null
   }
+}
+
+/**
+ * Check if token is expiring soon (within threshold minutes)
+ * @param token - JWT token string
+ * @param thresholdMinutes - Minutes before expiration to consider "soon" (default: 5)
+ * @returns true if token expires within threshold, false otherwise
+ */
+function isTokenExpiringSoon(token: string | null, thresholdMinutes: number = 5): boolean {
+  if (!token) {
+    return false
+  }
+
+  const decoded = decodeJWT(token)
+  if (!decoded) {
+    return false
+  }
+
+  const currentTime = Math.floor(Date.now() / 1000) // Current time in seconds
+  const expirationTime = decoded.exp
+  const timeUntilExpiration = expirationTime - currentTime
+  const thresholdSeconds = thresholdMinutes * 60
+
+  return timeUntilExpiration > 0 && timeUntilExpiration <= thresholdSeconds
 }
 
 interface AuthState {
@@ -33,9 +78,141 @@ export function useCavosAuth() {
     isInitialized: false
   })
 
+  // Clear auth data from localStorage
+  const clearAuthData = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('cavos_access_token')
+        localStorage.removeItem('cavos_refresh_token')
+        localStorage.removeItem('cavos_user')
+      } catch (error) {
+        console.error('Error clearing auth data:', error)
+      }
+    }
+  }, [])
+
+  // Store auth data in localStorage
+  const storeAuthData = useCallback((user: CavosUser, accessToken: string, refreshToken: string) => {
+    // Only run on client side
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    try {
+      // Validate user object before storing - more flexible validation
+      if (!user || typeof user !== 'object') {
+        throw new Error('Invalid user object: not an object')
+      }
+      
+      // Check if user has email property (direct or nested)
+      const userEmail = user.email || (user as any)?.user?.email || (user as any)?.data?.email
+      if (!userEmail) {
+        throw new Error('Invalid user object: missing email')
+      }
+      
+      // Create a normalized user object
+      const normalizedUser = {
+        id: user.id || (user as any)?.user?.id || (user as any)?.data?.id,
+        email: userEmail,
+        wallet: user.wallet || (user as any)?.user?.wallet || (user as any)?.data?.wallet
+      }
+      
+      localStorage.setItem('cavos_access_token', accessToken)
+      localStorage.setItem('cavos_refresh_token', refreshToken)
+      localStorage.setItem('cavos_user', JSON.stringify(normalizedUser))
+    } catch (error) {
+      console.error('Error storing auth data:', error)
+      // Clear any partial data
+      clearAuthData()
+      throw error
+    }
+  }, [clearAuthData])
+
+  // Handle OAuth callback
+  const handleOAuthCallbackHandler = useCallback(async (callbackResult: string) => {
+    setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
+
+    try {
+      const result = await handleOAuthCallback(callbackResult)
+      
+      // Handle the normalized response structure
+      const user = result.user
+      const accessToken = result.access_token
+      const refreshToken = result.refresh_token
+      
+      // Check if OAuth returned user but requires password (partial authentication)
+      if ((result as any).requires_password && (result as any).oauth_authenticated) {
+        // OAuth user authenticated but needs to complete with password
+        setAuthState(prev => ({
+          ...prev,
+          user: user,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: 'OAuth authentication successful. Please enter your password to complete login.',
+          isInitialized: true
+        }))
+        
+        return { ...result, requires_password: true }
+      }
+      
+      const newAuthState = {
+        user: user,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+        isInitialized: true
+      }
+      
+      storeAuthData(user, accessToken, refreshToken)
+      
+      // Update state after localStorage is set
+      setAuthState(newAuthState)
+      
+      // Reset refresh token invalid flag on successful OAuth login
+      if (refreshTokenInvalidRef.current) {
+        refreshTokenInvalidRef.current = false
+      }
+      
+      // Dispatch custom event to notify other components immediately
+      // This helps components that listen to events to update
+      if (typeof window !== 'undefined') {
+        // Use setTimeout(0) to ensure localStorage write completes
+        setTimeout(() => {
+          // Dispatch event synchronously to ensure components react immediately
+          const event = new CustomEvent('cavos-auth-update', { 
+            detail: { isAuthenticated: true, user, accessToken, refreshToken } 
+          })
+          window.dispatchEvent(event)
+          console.log('[useCavosAuth] Dispatched cavos-auth-update event')
+          
+          // Also dispatch a storage event to trigger storage listeners
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'cavos_access_token',
+            newValue: accessToken,
+            storageArea: localStorage
+          }))
+        }, 0)
+      }
+
+      return result
+    } catch (error: any) {
+      const errorMessage = error?.message || 'OAuth callback failed'
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage
+      }))
+      throw error
+    }
+  }, [storeAuthData])
+
   // Initialize auth state from localStorage on mount
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       // Only run on client side
       if (typeof window === 'undefined') {
         setAuthState(prev => ({
@@ -46,6 +223,105 @@ export function useCavosAuth() {
       }
 
       try {
+        // Function to check for and process OAuth callback
+        const checkAndProcessCallback = async (): Promise<boolean> => {
+          // Check for OAuth callback result in URL params first (most reliable)
+          const urlParams = new URLSearchParams(window.location.search)
+          const urlOAuthCallback = urlParams.get('oauth_callback')
+          
+          // Check for OAuth callback result in sessionStorage (more reliable than localStorage on mobile)
+          let sessionCallbackResult = null
+          let localStorageCallbackResult = null
+          try {
+            sessionCallbackResult = sessionStorage.getItem('oauth_callback_result')
+            localStorageCallbackResult = localStorage.getItem('oauth_callback_result')
+          } catch (storageError) {
+            console.warn('Error reading from storage:', storageError)
+          }
+          
+          // Priority: URL params > sessionStorage > localStorage
+          const oauthCallbackResult = urlOAuthCallback || sessionCallbackResult || localStorageCallbackResult
+          
+          if (oauthCallbackResult) {
+            console.log('Processing OAuth callback result...')
+            console.log('Source:', urlOAuthCallback ? 'URL' : sessionCallbackResult ? 'sessionStorage' : 'localStorage')
+            
+            // Remove from all storages immediately to prevent duplicate processing
+            try {
+              if (urlOAuthCallback) {
+                // Clear from URL
+                const newUrl = window.location.pathname
+                window.history.replaceState({}, '', newUrl)
+              }
+              sessionStorage.removeItem('oauth_callback_result')
+              localStorage.removeItem('oauth_callback_result')
+            } catch (clearError) {
+              console.error('Error clearing callback result from storage:', clearError)
+            }
+            
+            // Process the callback
+            try {
+              await handleOAuthCallbackHandler(oauthCallbackResult)
+              return true // Successfully processed
+            } catch (callbackError) {
+              console.error('Error processing OAuth callback:', callbackError)
+              const errorMessage = callbackError instanceof Error ? callbackError.message : 'Failed to process OAuth callback'
+              setAuthState(prev => ({
+                ...prev,
+                error: errorMessage,
+                isInitialized: true,
+                isLoading: false
+              }))
+              return true // Processed (even if error)
+            }
+          }
+          
+          return false // No callback found
+        }
+        
+        // Try to process callback immediately
+        const processed = await checkAndProcessCallback()
+        if (processed) {
+          // Check if we're on mobile and callback was processed successfully
+          // Force a page reload on mobile to ensure all components re-initialize with correct auth state
+          const isMobile = typeof window !== 'undefined' && (
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+            (window.innerWidth <= 768)
+          )
+          
+          // If callback was processed successfully and we're on mobile, reload the page
+          // to ensure all components (especially WalletConnector) re-initialize with correct state
+          if (isMobile && typeof window !== 'undefined') {
+            // Wait a brief moment for localStorage to be fully written
+            setTimeout(() => {
+              console.log('[useCavosAuth] Mobile OAuth callback processed, reloading page to ensure state sync...')
+              window.location.reload()
+            }, 100)
+            return
+          }
+          
+          return // Callback was processed
+        }
+        
+        // Check for error in URL params (mobile redirect with error)
+        const urlParams = new URLSearchParams(window.location.search)
+        const urlError = urlParams.get('error')
+        if (urlError) {
+          console.error('OAuth error from URL:', urlError)
+          
+          // Clear error from URL
+          const newUrl = window.location.pathname
+          window.history.replaceState({}, '', newUrl)
+          
+          setAuthState(prev => ({
+            ...prev,
+            error: decodeURIComponent(urlError),
+            isInitialized: true,
+            isLoading: false
+          }))
+          return
+        }
+        
         const storedAccessToken = localStorage.getItem('cavos_access_token')
         const storedRefreshToken = localStorage.getItem('cavos_refresh_token')
         const storedUser = localStorage.getItem('cavos_user')
@@ -99,6 +375,7 @@ export function useCavosAuth() {
           localStorage.removeItem('cavos_access_token')
           localStorage.removeItem('cavos_refresh_token')
           localStorage.removeItem('cavos_user')
+          localStorage.removeItem('oauth_callback_result')
         }
         
         // Mark as initialized but not authenticated
@@ -110,57 +387,7 @@ export function useCavosAuth() {
     }
 
     initializeAuth()
-  }, [])
-
-  // Store auth data in localStorage
-  const storeAuthData = useCallback((user: CavosUser, accessToken: string, refreshToken: string) => {
-    // Only run on client side
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    try {
-      // Validate user object before storing - more flexible validation
-      if (!user || typeof user !== 'object') {
-        throw new Error('Invalid user object: not an object')
-      }
-      
-      // Check if user has email property (direct or nested)
-      const userEmail = user.email || (user as any)?.user?.email || (user as any)?.data?.email
-      if (!userEmail) {
-        throw new Error('Invalid user object: missing email')
-      }
-      
-      // Create a normalized user object
-      const normalizedUser = {
-        id: user.id || (user as any)?.user?.id || (user as any)?.data?.id,
-        email: userEmail,
-        wallet: user.wallet || (user as any)?.user?.wallet || (user as any)?.data?.wallet
-      }
-      
-      localStorage.setItem('cavos_access_token', accessToken)
-      localStorage.setItem('cavos_refresh_token', refreshToken)
-      localStorage.setItem('cavos_user', JSON.stringify(normalizedUser))
-    } catch (error) {
-      console.error('Error storing auth data:', error)
-      // Clear any partial data
-      clearAuthData()
-      throw error
-    }
-  }, [])
-
-  // Clear auth data from localStorage
-  const clearAuthData = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem('cavos_access_token')
-        localStorage.removeItem('cavos_refresh_token')
-        localStorage.removeItem('cavos_user')
-      } catch (error) {
-        console.error('Error clearing auth data:', error)
-      }
-    }
-  }, [])
+  }, [handleOAuthCallbackHandler])
 
   // Reset auth state and clear localStorage
   const resetAuth = useCallback(() => {
@@ -174,6 +401,8 @@ export function useCavosAuth() {
       isInitialized: true
     })
     clearAuthData()
+    // Reset refresh token invalid flag on sign out
+    refreshTokenInvalidRef.current = false
   }, [clearAuthData])
 
   // Sign up or sign in user
@@ -203,6 +432,11 @@ export function useCavosAuth() {
       
       // Store in localStorage
       storeAuthData(user, accessToken, refreshToken)
+      
+      // Reset refresh token invalid flag on successful login
+      if (refreshTokenInvalidRef.current) {
+        refreshTokenInvalidRef.current = false
+      }
       
       // Dispatch custom event to notify other components
       if (typeof window !== 'undefined') {
@@ -280,24 +514,287 @@ export function useCavosAuth() {
       throw new Error('No refresh token available')
     }
 
+    // Don't check if refresh token is invalid locally - let the API decide
+    // This allows us to attempt refresh even if we previously thought it was invalid
+    // The API will tell us definitively if it's expired
+
+    // Prevent multiple simultaneous refresh attempts
+    if (isRefreshingRef.current) {
+      // If already refreshing, wait and check if it completed
+      // Try a few times before giving up
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+        if (!isRefreshingRef.current) {
+          // Refresh completed, get the new token from state or localStorage
+          const newToken = authState.accessToken || 
+            (typeof window !== 'undefined' ? localStorage.getItem('cavos_access_token') : null)
+          const newRefreshToken = authState.refreshToken || 
+            (typeof window !== 'undefined' ? localStorage.getItem('cavos_refresh_token') : null)
+          if (newToken && newRefreshToken) {
+            return { access_token: newToken, refresh_token: newRefreshToken }
+          }
+        }
+      }
+      // If still refreshing after waiting, throw error
+      throw new Error('Token refresh in progress')
+    }
+
+    isRefreshingRef.current = true
+
     try {
       const result = await refreshUserToken(authState.refreshToken)
       
+      // Verify response is valid
+      if (!result?.access_token) {
+        throw new Error('Invalid refresh response: missing access_token')
+      }
+      
+      // IMPORTANT: Always save the new refresh token - it may have rotated
+      // This ensures we always have a fresh refresh token
+      const newRefreshToken = result.refresh_token || authState.refreshToken
+      const newAccessToken = result.access_token
+
       const newAuthState = {
         ...authState,
-        accessToken: result.access_token,
-        refreshToken: result.refresh_token
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken  // Always use the new refresh token if provided
       }
 
       setAuthState(newAuthState)
-      storeAuthData(authState.user!, result.access_token, result.refresh_token)
+      // Always save both tokens - the refresh token might have rotated
+      storeAuthData(authState.user!, newAccessToken, newRefreshToken)
+
+      // Reset invalid flag on successful refresh
+      refreshTokenInvalidRef.current = false
+      // Reset refreshing flag on success
+      isRefreshingRef.current = false
+      
+      // Always update last refresh token ref
+      lastRefreshTokenRef.current = newRefreshToken
 
       return result
     } catch (error: any) {
-      signOut()
+      // Reset refreshing flag on error
+      isRefreshingRef.current = false
+      // Check if error is due to expired/invalid refresh token
+      const errorMessage = error?.message || ''
+      const errorString = JSON.stringify(error || {})
+      
+      const isRefreshTokenExpired = 
+        error?.name === 'RefreshTokenExpired' ||
+        error?.status === 401 ||
+        error?.response?.status === 401 ||
+        errorMessage.includes('401') ||
+        errorMessage.includes('Invalid or expired refresh token') ||
+        errorString.includes('Invalid or expired refresh token') ||
+        errorString.includes('"error":"Invalid or expired refresh token"') ||
+        errorMessage.toLowerCase().includes('refresh token') ||
+        errorMessage.toLowerCase().includes('unauthorized')
+
+      if (isRefreshTokenExpired) {
+        // Only mark as invalid if the API explicitly says it's expired
+        refreshTokenInvalidRef.current = true
+        // Reset refreshing flag when refresh token is expired
+        isRefreshingRef.current = false
+        // When refresh token is expired, we need to sign out
+        // But do it asynchronously to avoid blocking the error throw
+        setTimeout(() => {
+          signOut()
+        }, 0)
+      } else {
+        // For other errors (network issues, etc.), don't mark as invalid
+        // Just reset refreshing flag and let calling code handle it
+        isRefreshingRef.current = false
+      }
+      
+      // Re-throw for the calling code to handle
       throw error
     }
   }, [authState, storeAuthData, signOut])
+
+  // Track refresh state
+  const isRefreshingRef = useRef(false) // Prevent multiple simultaneous refreshes
+  const refreshTokenInvalidRef = useRef(false) // Track if refresh token is invalid/expired
+  const lastRefreshTokenRef = useRef<string | null>(null) // Track last refresh token to detect new logins
+  const refreshTokenFnRef = useRef(refreshToken)
+  const signOutFnRef = useRef(signOut)
+
+  // Keep refs updated with latest function versions
+  useEffect(() => {
+    refreshTokenFnRef.current = refreshToken
+    signOutFnRef.current = signOut
+  }, [refreshToken, signOut])
+
+  useEffect(() => {
+    if (!authState.isAuthenticated || !authState.accessToken || !authState.refreshToken) {
+      refreshTokenInvalidRef.current = false
+      lastRefreshTokenRef.current = null
+      return
+    }
+
+    const isNewRefreshToken = authState.refreshToken !== lastRefreshTokenRef.current
+    const isNewLogin = isNewRefreshToken && lastRefreshTokenRef.current === null
+    
+    if (isNewRefreshToken) {
+      refreshTokenInvalidRef.current = false
+      lastRefreshTokenRef.current = authState.refreshToken
+    }
+
+    if (isRefreshingRef.current || refreshTokenInvalidRef.current) {
+      return
+    }
+
+    const token = authState.accessToken
+    const decoded = decodeJWT(token)
+    
+    if (!decoded) {
+      return
+    }
+
+    // Get token issue time to detect if it's a fresh token
+    let tokenIssueTime: number | null = null
+    try {
+      const parts = token.split('.')
+      if (parts.length === 3) {
+        const base64Payload = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+        const paddedPayload = base64Payload + '='.repeat((4 - base64Payload.length % 4) % 4)
+        const decodedPayload = atob(paddedPayload)
+        const payload = JSON.parse(decodedPayload)
+        tokenIssueTime = payload.iat || decoded.exp - 3600 // Default to 1 hour before exp if no iat
+      }
+    } catch {
+      // If we can't decode, use current time
+      tokenIssueTime = Math.floor(Date.now() / 1000)
+    }
+
+    let lastRefreshTime = 0
+    const MIN_REFRESH_INTERVAL = 15 * 1000 // Minimum 15 seconds between refreshes to avoid spam
+    const REFRESH_PERCENTAGE = 0.4 // Refresh when 40% of token lifetime remains (60% used)
+    const MIN_TOKEN_AGE = 30 // Don't refresh tokens that are less than 30 seconds old (fresh from login)
+    const INITIAL_DELAY_AFTER_LOGIN = 30 * 1000 // Wait 30 seconds after new login before first check
+
+    // Check and refresh function
+    const checkAndRefresh = async () => {
+      if (isRefreshingRef.current || refreshTokenInvalidRef.current) {
+        return
+      }
+
+      const now = Date.now()
+      const timeSinceLastRefresh = now - lastRefreshTime
+
+      if (timeSinceLastRefresh < MIN_REFRESH_INTERVAL) {
+        return
+      }
+
+      const currentToken = authState.accessToken || 
+        (typeof window !== 'undefined' ? localStorage.getItem('cavos_access_token') : null)
+      
+      if (!currentToken) {
+        return
+      }
+
+      const tokenDecoded = decodeJWT(currentToken)
+      if (!tokenDecoded) {
+        return
+      }
+
+      const currentTime = Math.floor(Date.now() / 1000)
+      const expirationTime = tokenDecoded.exp
+      
+      // Calculate token lifetime and remaining time
+      const tokenLifetime = expirationTime - (tokenIssueTime || (expirationTime - 300)) // Default to 5 minutes if no iat
+      const timeUntilExpiration = expirationTime - currentTime
+      const remainingPercentage = tokenLifetime > 0 ? timeUntilExpiration / tokenLifetime : 0
+
+      if (tokenIssueTime) {
+        const tokenAge = currentTime - tokenIssueTime
+        if (tokenAge < MIN_TOKEN_AGE) {
+          return
+        }
+      }
+
+      if (timeUntilExpiration > 0 && remainingPercentage <= REFRESH_PERCENTAGE) {
+        if (!isRefreshingRef.current && !refreshTokenInvalidRef.current) {
+          lastRefreshTime = now
+          isRefreshingRef.current = true
+          
+          recoverUserSession(currentToken)
+            .then((result) => {
+              // Update auth state with recovered session
+              if (result && result.access_token && authState.user) {
+                const newRefreshToken = result.refresh_token || authState.refreshToken
+                const newAccessToken = result.access_token
+                
+                // Merge recovered user data with existing user data to preserve all fields
+                const recoveredUser: CavosUser = {
+                  ...authState.user,
+                  id: result.user?.id || authState.user.id,
+                  email: result.user?.email || authState.user.email,
+                  organization: result.user?.organization || authState.user.organization,
+                  wallet: result.wallet || authState.user.wallet || undefined
+                }
+                
+                const newAuthState = {
+                  ...authState,
+                  accessToken: newAccessToken,
+                  refreshToken: newRefreshToken,
+                  user: recoveredUser
+                }
+                
+                setAuthState(newAuthState)
+                storeAuthData(recoveredUser, newAccessToken, newRefreshToken)
+                
+                // Reset flags on successful recovery
+                refreshTokenInvalidRef.current = false
+                isRefreshingRef.current = false
+                lastRefreshTokenRef.current = newRefreshToken
+              } else {
+                isRefreshingRef.current = false
+              }
+            })
+            .catch((error) => {
+              isRefreshingRef.current = false
+              
+              // If recoverUserSession fails, fallback to regular refresh
+              if (authState.refreshToken) {
+                refreshToken().catch((refreshError) => {
+                  if (process.env.NODE_ENV === 'development') {
+                    const errorMessage = refreshError?.message || ''
+                    const isExpired = errorMessage.includes('401') || errorMessage.includes('expired')
+                    if (!isExpired) {
+                      console.log('[useCavosAuth] Session recovery and refresh failed:', refreshError)
+                    }
+                  }
+                })
+              }
+            })
+        }
+      }
+    }
+
+    const checkInterval = setInterval(checkAndRefresh, 15 * 1000)
+
+    if (isNewLogin) {
+      const initialDelay = setTimeout(() => {
+        checkAndRefresh()
+      }, INITIAL_DELAY_AFTER_LOGIN)
+      
+      return () => {
+        clearInterval(checkInterval)
+        clearTimeout(initialDelay)
+      }
+    } else {
+      checkAndRefresh()
+      const initialCheckTimeout = setTimeout(checkAndRefresh, 10 * 1000)
+      const secondCheckTimeout = setTimeout(checkAndRefresh, 20 * 1000)
+      
+      return () => {
+        clearInterval(checkInterval)
+        clearTimeout(initialCheckTimeout)
+        clearTimeout(secondCheckTimeout)
+      }
+    }
+  }, [authState.isAuthenticated, authState.accessToken, authState.refreshToken, refreshToken])
 
   // Execute transaction with automatic token refresh
   const executeCavosTransaction = useCallback(async (
@@ -429,67 +926,6 @@ export function useCavosAuth() {
       throw error
     }
   }, [])
-
-  // Handle OAuth callback
-  const handleOAuthCallbackHandler = useCallback(async (callbackResult: string) => {
-    setAuthState(prev => ({ ...prev, isLoading: true, error: null }))
-
-    try {
-      const result = await handleOAuthCallback(callbackResult)
-      
-      // Handle the normalized response structure
-      const user = result.user
-      const accessToken = result.access_token
-      const refreshToken = result.refresh_token
-      
-      // Check if OAuth returned user but requires password (partial authentication)
-      if ((result as any).requires_password && (result as any).oauth_authenticated) {
-        // OAuth user authenticated but needs to complete with password
-        setAuthState(prev => ({
-          ...prev,
-          user: user,
-          accessToken: null,
-          refreshToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: 'OAuth authentication successful. Please enter your password to complete login.',
-          isInitialized: true
-        }))
-        
-        return { ...result, requires_password: true }
-      }
-      
-      const newAuthState = {
-        user: user,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        isInitialized: true
-      }
-      
-      setAuthState(newAuthState)
-      storeAuthData(user, accessToken, refreshToken)
-      
-      // Dispatch custom event to notify other components
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('cavos-auth-update', { 
-          detail: { isAuthenticated: true, user } 
-        }))
-      }
-
-      return result
-    } catch (error: any) {
-      const errorMessage = error?.message || 'OAuth callback failed'
-      setAuthState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage
-      }))
-      throw error
-    }
-  }, [storeAuthData])
 
   return {
     // State

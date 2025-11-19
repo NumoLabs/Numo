@@ -1,35 +1,41 @@
-import Link from "next/link"
-import { ArrowLeft, Lock, TrendingUp, Shield, Clock } from "lucide-react"
+import { Lock, TrendingUp, Shield, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Loader2 } from "lucide-react"
 
-export function BondsHero() {
+interface BondsHeroProps {
+  totalTVL?: string
+  lockOptions?: number
+  minLock?: string
+  apy?: string | null
+  isLoading?: boolean
+}
+
+export function BondsHero({ 
+  totalTVL = '0.0000', 
+  lockOptions = 3, 
+  minLock = '7d',
+  apy = null,
+  isLoading = false 
+}: BondsHeroProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-bitcoin-gradient p-8 md:p-12 mb-8 text-white">
       <div className="absolute inset-0 bg-black/20"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-bitcoin-gold/20 to-bitcoin-orange/20 rounded-full blur-3xl"></div>
       <div className="relative z-10">
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/20">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </Link>
-        </div>
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Lock className="h-8 w-8" />
               <Badge className="bg-white/20 text-white border-white/30">BTC Bonds</Badge>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-normal">
               Boost your yield by
-              <span className="block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent pb-1">
                 locking your BTC
               </span>
             </h1>
-            <p className="text-xl text-orange-100 mb-6">
+            <p className="text-lg md:text-xl text-orange-100 mb-6 leading-relaxed">
               Lock your WBTC for a fixed period and earn higher rewards. Choose your preferred lock duration and let
               your BTC work harder.
             </p>
@@ -55,23 +61,39 @@ export function BondsHero() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <TrendingUp className="h-8 w-8 mx-auto mb-2 text-bitcoin-gold" />
-                    <p className="text-sm font-medium">Max APY</p>
-                    <p className="text-2xl font-bold">15.8%</p>
+                    <p className="text-sm font-medium">Total TVL</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-gold" />
+                    ) : (
+                      <p className="text-2xl font-bold">{totalTVL} wBTC</p>
+                    )}
                   </div>
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <Lock className="h-8 w-8 mx-auto mb-2 text-bitcoin-orange" />
                     <p className="text-sm font-medium">Lock Options</p>
-                    <p className="text-2xl font-bold">3</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-orange" />
+                    ) : (
+                      <p className="text-2xl font-bold">{lockOptions}</p>
+                    )}
                   </div>
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <Shield className="h-8 w-8 mx-auto mb-2 text-bitcoin-gold" />
-                    <p className="text-sm font-medium">Security</p>
-                    <p className="text-2xl font-bold">100%</p>
+                    <p className="text-sm font-medium">Max APY</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-gold" />
+                    ) : (
+                      <p className="text-2xl font-bold">{apy || 'N/A'}</p>
+                    )}
                   </div>
                   <div className="bg-white/20 rounded-lg p-4 text-center">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-bitcoin-orange" />
                     <p className="text-sm font-medium">Min Lock</p>
-                    <p className="text-2xl font-bold">7d</p>
+                    {isLoading ? (
+                      <Loader2 className="h-6 w-6 mx-auto mt-1 animate-spin text-bitcoin-orange" />
+                    ) : (
+                      <p className="text-2xl font-bold">{minLock}</p>
+                    )}
                   </div>
                 </div>
               </div>

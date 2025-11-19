@@ -364,7 +364,7 @@ export function getRebalanceHistory(): RebalanceEvent[] {
 export function getAdvancedFeatures(): AdvancedFeature[] {
   return [
     {
-      title: "Pools",
+      title: "Vaults",
       description: "Create and manage your own vaults with custom distributions between different pools.",
       icon: "Target",
       color: "indigo",
@@ -372,8 +372,8 @@ export function getAdvancedFeatures(): AdvancedFeature[] {
         { label: "Active Vaults", value: "2 active" },
         { label: "Average Return", value: "5.4%" },
       ],
-      buttonText: "Explore Pools",
-      buttonHref: "/pools",
+      buttonText: "Explore Vaults",
+      buttonHref: "/vaults",
       buttonVariant: "outline",
     },
     {
@@ -386,7 +386,7 @@ export function getAdvancedFeatures(): AdvancedFeature[] {
         { label: "Basic Concepts", value: "0/3 completed" },
       ],
       buttonText: "Start Learning",
-      buttonHref: "/learn/defi-basics",
+      buttonHref: "/learn",
       buttonVariant: "outline",
     },
   ]

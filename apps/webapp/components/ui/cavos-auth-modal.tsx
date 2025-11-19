@@ -80,6 +80,21 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       setIsSignUp(true)
     }
   }, [view])
+  
+  // Close modal automatically when user becomes authenticated (for mobile redirects)
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Close modal if it's open
+      if (isOpen) {
+        setIsOpen(false)
+      }
+      
+      // Call success callback if provided
+      if (onSuccess && user) {
+        onSuccess(user)
+      }
+    }
+  }, [isAuthenticated, isOpen, user, onSuccess])
 
   // Password validation
   const getPasswordValidation = (password: string) => {
@@ -364,18 +379,29 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       // Get Google OAuth URL
       const oauthUrl = await getGoogleOAuthUrl(redirectUri)
       
-      // Open OAuth URL in a popup window
+      // Detect if device is mobile
+      const isMobile = typeof window !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768
+      )
+      
       if (typeof window !== 'undefined') {
-        const width = 500
-        const height = 600
-        const left = (window.screen.width - width) / 2
-        const top = (window.screen.height - height) / 2
-        
-        window.open(
-          oauthUrl,
-          'Google Sign In',
-          `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
-        )
+        if (isMobile) {
+          // On mobile, redirect directly instead of popup (popups are blocked on mobile)
+          window.location.href = oauthUrl
+        } else {
+          // On desktop, open in popup window
+          const width = 500
+          const height = 600
+          const left = (window.screen.width - width) / 2
+          const top = (window.screen.height - height) / 2
+          
+          window.open(
+            oauthUrl,
+            'Google Sign In',
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+          )
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Google authentication failed'
@@ -388,6 +414,11 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       setLocalError(null)
       clearError()
       
+      // Store provider for callback page
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oauth_provider', 'apple')
+      }
+      
       // Get redirect URI (callback page URL)
       const redirectUri = typeof window !== 'undefined' 
         ? `${window.location.origin}/oauth/callback`
@@ -396,18 +427,29 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
       // Get Apple OAuth URL
       const oauthUrl = await getAppleOAuthUrl(redirectUri)
       
-      // Open OAuth URL in a popup window
+      // Detect if device is mobile
+      const isMobile = typeof window !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768
+      )
+      
       if (typeof window !== 'undefined') {
-        const width = 500
-        const height = 600
-        const left = (window.screen.width - width) / 2
-        const top = (window.screen.height - height) / 2
-        
-        window.open(
-          oauthUrl,
-          'Apple Sign In',
-          `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
-        )
+        if (isMobile) {
+          // On mobile, redirect directly instead of popup (popups are blocked on mobile)
+          window.location.href = oauthUrl
+        } else {
+          // On desktop, open in popup window
+          const width = 500
+          const height = 600
+          const left = (window.screen.width - width) / 2
+          const top = (window.screen.height - height) / 2
+          
+          window.open(
+            oauthUrl,
+            'Apple Sign In',
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+          )
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Apple authentication failed'
@@ -442,9 +484,9 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         )}
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-[90%] sm:max-w-md w-[90%] sm:w-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className="text-center text-base sm:text-lg">
             {view === 'signup' && 'Create Account'}
             {view === 'signin' && 'Sign In'}
             {view === 'forgot-password' && 'Reset Password'}
@@ -454,7 +496,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
         
         {/* Forgot Password - Email Sent Success */}
         {view === 'forgot-password' && resetEmailSent ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <Alert className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
               <AlertDescription className="text-green-800 dark:text-green-200">
                 <div className="flex items-center gap-2">
@@ -485,7 +527,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
             </Button>
           </div>
         ) : view === 'forgot-password' ? (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
+          <form onSubmit={handleForgotPassword} className="space-y-3 sm:space-y-4">
             {(localError || error) && (
               <Alert variant="destructive" className="max-h-40 overflow-y-auto">
                 <AlertDescription className="text-sm break-words whitespace-normal leading-relaxed">
@@ -538,7 +580,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
             </Button>
           </form>
         ) : view === 'reset-password' ? (
-          <form onSubmit={handlePasswordResetConfirm} className="space-y-4">
+          <form onSubmit={handlePasswordResetConfirm} className="space-y-3 sm:space-y-4">
             {(localError || error) && (
               <Alert variant="destructive" className="max-h-40 overflow-y-auto">
                 <AlertDescription className="text-sm break-words whitespace-normal leading-relaxed">
@@ -634,7 +676,7 @@ export function CavosAuthModal({ onSuccess, trigger }: CavosAuthModalProps) {
           </form>
         ) : (
           <>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               {(localError || error) && (
                 <Alert variant="destructive" className="max-h-40 overflow-y-auto">
                   <AlertDescription className="text-sm break-words whitespace-normal leading-relaxed">

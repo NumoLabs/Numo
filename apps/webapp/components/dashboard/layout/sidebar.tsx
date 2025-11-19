@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { LayoutDashboard, History, Target, Coins, TrendingUp, BookOpen, X, BarChart3, Users, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
+import { LayoutDashboard, Coins, TrendingUp, BookOpen, X, Briefcase, Github, Twitter, Linkedin } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -11,23 +11,22 @@ const navigation = [
     section: "Core",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, current: true },
-      { name: "History", href: "/history", icon: History, current: false },
     ],
   },
   {
     section: "Trading",
     items: [
       { name: "Vaults", href: "/vaults", icon: Briefcase, current: false },
-      { name: "Pools", href: "/pools", icon: Target, current: false },
       { name: "Bonds", href: "/bonds", icon: Coins, current: false },
-      { name: "Pools", href: "/pools-vault", icon: Users, current: false },
+      // Pools pages hidden from frontend but logic preserved
+      // { name: "Pools", href: "/pools", icon: Target, current: false },
+      // { name: "Pools", href: "/pools-vault", icon: Users, current: false },
     ],
   },
   {
     section: "Analytics",
     items: [
       { name: "Forecast", href: "/forecast", icon: TrendingUp, current: false },
-      { name: "Marketplace", href: "/marketplace", icon: BarChart3, current: false },
     ],
   },
   {
@@ -43,6 +42,11 @@ interface SidebarProps {
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const pathname = usePathname()
+  
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.location.href = '/'
+  }
 
   return (
     <>
@@ -51,7 +55,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-xl flex flex-col">
           <div className="flex h-16 items-center justify-between px-6 border-b border-gray-800 shrink-0">
-            <Link href="/" className="flex items-center group">
+            <button onClick={handleLogoClick} className="flex items-center group cursor-pointer">
               <Image
                 src="/numo-logo.png"
                 alt="Numo Logo"
@@ -62,7 +66,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
               <span className="ml-0 text-xl font-bold text-white">
                 umo
               </span>
-            </Link>
+            </button>
             <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -82,9 +86,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         className={cn(
                           "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                           pathname === item.href || 
-                          (item.href === "/vaults" && pathname.startsWith("/vaults")) ||
-                          (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                          (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                          (item.href === "/vaults" && pathname.startsWith("/vaults"))
                             ? "bg-gradient-to-r from-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange border-r-2 border-bitcoin-orange"
                             : "text-gray-300 hover:bg-gray-800 hover:text-white",
                         )}
@@ -92,9 +94,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         <item.icon
                           className={cn(
                             "mr-3 h-5 w-5 transition-colors",
-                            pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                            pathname === item.href
                               ? "text-bitcoin-orange"
                               : "text-gray-400 group-hover:text-gray-300",
                           )}
@@ -146,7 +146,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black border-r border-gray-800/50 shadow-xl">
           <div className="flex h-16 shrink-0 items-center px-6 border-b border-gray-800/50">
-            <Link href="/" className="flex items-center group">
+            <button onClick={handleLogoClick} className="flex items-center group cursor-pointer">
               <Image
                 src="/numo-logo.png"
                 alt="Numo Logo"
@@ -155,7 +155,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 className="h-11 w-11 transition-transform duration-300 group-hover:scale-110 animate-logo-bounce brightness-0 invert"
               />
               <span className="ml-0 text-2xl font-bold text-white">umo</span>
-            </Link>
+            </button>
           </div>
           <nav className="flex flex-1 flex-col px-4">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -171,9 +171,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           href={item.href}
                           className={cn(
                             "group flex gap-x-3 rounded-xl px-3 py-3 text-sm font-semibold leading-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-md",
-                            pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
+                            pathname === item.href
                               ? "bg-gradient-to-r from-bitcoin-orange/10 via-bitcoin-orange/10 to-bitcoin-gold/10 text-bitcoin-orange shadow-lg border border-bitcoin-orange/50"
                               : "text-gray-300 hover:bg-gradient-to-r hover:from-gray-800/80 hover:to-gray-700/80 hover:text-white",
                           )}
@@ -181,11 +179,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                           <item.icon
                             className={cn(
                               "h-5 w-5 shrink-0 transition-all duration-200",
-                                                          pathname === item.href || 
-                            (item.href === "/pools" && pathname.startsWith("/pools") && !pathname.startsWith("/pools-vault")) ||
-                            (item.href === "/pools-vault" && pathname.startsWith("/pools-vault"))
-                              ? "text-bitcoin-orange scale-110"
-                              : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
+                              pathname === item.href
+                                ? "text-bitcoin-orange scale-110"
+                                : "text-gray-400 group-hover:text-gray-300 group-hover:scale-105",
                             )}
                           />
                           {item.name}

@@ -44,24 +44,25 @@ export function RecentActivity() {
   return (
     <Card className="border-0 shadow-lg">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex-1 min-w-0">
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-green-500" />
-              Recent Activity
+              <Activity className="h-5 w-5 text-green-500 flex-shrink-0" />
+              <span className="truncate">Recent Activity</span>
             </CardTitle>
-            <CardDescription>Latest transactions and automatic rebalances</CardDescription>
+            <CardDescription className="truncate">Latest transactions and automatic rebalances</CardDescription>
           </div>
-          <Link href="/history">
-            <Button variant="outline" size="sm" className="gap-2">
+          <Link href="/history" className="flex-shrink-0">
+            <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
               <Eye className="h-4 w-4" />
-              View All
+              <span className="hidden sm:inline">View All</span>
+              <span className="sm:hidden">All</span>
             </Button>
           </Link>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {activities.map((activity, index) => {
             const IconComponent = iconMap[activity.icon as keyof typeof iconMap]
             const colors = colorMap[activity.color as keyof typeof colorMap]
@@ -69,21 +70,21 @@ export function RecentActivity() {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-4 p-4 rounded-lg ${colors.bg} border ${colors.border}`}
+                className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg ${colors.bg} border ${colors.border} overflow-hidden`}
               >
-                <div className={`h-10 w-10 rounded-full bg-${activity.color}-500 flex items-center justify-center`}>
+                <div className={`h-10 w-10 rounded-full bg-${activity.color}-500 flex items-center justify-center flex-shrink-0`}>
                   <IconComponent className="h-5 w-5 text-white" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-medium">{activity.title}</p>
-                    <Badge className={colors.badge}>{activity.badge}</Badge>
+                <div className="flex-1 min-w-0 w-full sm:w-auto">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                    <p className="font-medium text-sm sm:text-base break-words">{activity.title}</p>
+                    <Badge className={`${colors.badge} text-xs whitespace-nowrap flex-shrink-0 self-start sm:self-auto`}>{activity.badge}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">{activity.description}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground break-words">{activity.description}</p>
                 </div>
-                <div className="text-right">
-                  <p className={`font-semibold ${colors.text}`}>{activity.value}</p>
-                  <p className="text-sm text-muted-foreground">{activity.subValue}</p>
+                <div className="text-left sm:text-right w-full sm:w-auto flex-shrink-0 sm:ml-auto">
+                  <p className={`font-semibold text-sm sm:text-base ${colors.text} break-words`}>{activity.value}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground break-words">{activity.subValue}</p>
                 </div>
               </div>
             )

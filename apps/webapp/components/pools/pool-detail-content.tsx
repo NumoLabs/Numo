@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, ExternalLink } from "lucide-react"
+import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -12,30 +12,147 @@ import { PoolDetailChart } from "@/components/pools/pool-detail-chart"
 import { PoolDetails, PoolPerformance, PoolStatistics } from "@/components/pools/pool-details"
 import { PoolRisks } from "@/components/pools/pool-risks"
 import { AddToVaultActions } from "@/components/pools/vault-actions"
-import { getPoolBySlug, type Pool } from "@/lib/pools-data"
-import { useEffect, useState } from "react"
+import { useVesuPoolsData } from "@/hooks/use-vault-queries"
+import { fetchTopPools } from "@/app/api/ekuboApi"
+import { useEffect, useState, useMemo } from "react"
+import type { VesuPool } from "@/types/VesuPools"
+import type { EkuboPoolsDisplay } from "@/types/EkuboPoolsDisplay"
+
+interface Pool {
+  id: string
+  name: string
+  description: string
+  apy: string
+  tvl: string
+  protocol: string
+  risk: string
+  tokens: string[]
+  url?: string
+  details?: string
+  risks?: string[]
+  benefits?: string[]
+  poolType: 'vesu' | 'ekubo'
+  originalData: VesuPool | EkuboPoolsDisplay
+}
 
 export function PoolDetailContent() {
   const params = useParams()
   const [pool, setPool] = useState<Pool | null>(null)
   const [loading, setLoading] = useState(true)
+  const [ekuboPools, setEkuboPools] = useState<EkuboPoolsDisplay[]>([])
+  
+  const { data: vesuPools, isLoading: isLoadingVesu } = useVesuPoolsData()
 
+  // Fetch Ekubo pools
   useEffect(() => {
-    const loadPool = async () => {
-      if (params.pool) {
-        const poolData = await getPoolBySlug(params.pool as string)
-        setPool(poolData || null)
-        setLoading(false)
+    const loadEkuboPools = async () => {
+      try {
+        const pools = await fetchTopPools()
+        setEkuboPools(pools)
+      } catch (error) {
+        console.error('Error loading Ekubo pools:', error)
+        setEkuboPools([])
       }
     }
-    loadPool()
-  }, [params.pool])
+    loadEkuboPools()
+  }, [])
+
+  // Combine pools and find the requested one
+  const allPools = useMemo<Pool[]>(() => {
+    const pools: Pool[] = []
+
+    // Add Vesu pools
+    if (Array.isArray(vesuPools)) {
+      vesuPools.forEach((p: VesuPool) => {
+        if (!p.assets || p.assets.length === 0) return
+
+        const bestAsset = p.assets.reduce((best, current) => {
+          const currentApy = (current.apy || 0) + (current.defiSpringApy || 0)
+          const bestApy = (best.apy || 0) + (best.defiSpringApy || 0)
+          return currentApy > bestApy ? current : best
+        }, p.assets[0])
+
+        const totalApy = ((bestAsset.apy || 0) + (bestAsset.defiSpringApy || 0)).toFixed(2)
+        const tokens = p.assets.map(a => a.symbol).filter(Boolean)
+
+        pools.push({
+          id: `vesu-${p.id}`,
+          name: p.name,
+          description: `Lending pool on Vesu Finance with ${tokens.join(', ')} support`,
+          apy: `${totalApy}%`,
+          tvl: "N/A",
+          protocol: "Vesu",
+          risk: bestAsset.currentUtilization && bestAsset.currentUtilization > 80 ? "Medium" : "Low",
+          tokens,
+          url: "https://vesu.xyz",
+          details: `Decentralized lending pool where you can lend your tokens and earn interest. Loans are backed by collateralized guarantees.`,
+          risks: [
+            "Smart contract risk of the Vesu platform",
+            "Liquidity risk in case of high withdrawal demand",
+            "Risk of interest rate changes",
+          ],
+          benefits: [
+            "Stable returns through loan interest",
+            "Lower volatility compared to liquidity pools",
+            "Backed by collateralized guarantees",
+          ],
+          poolType: 'vesu',
+          originalData: p
+        })
+      })
+    }
+
+    // Add Ekubo pools
+    ekuboPools.forEach((p: EkuboPoolsDisplay) => {
+      const token0Symbol = p.token0?.symbol || 'Unknown'
+      const token1Symbol = p.token1?.symbol || 'Unknown'
+      // Pool type doesn't have apy property, use N/A
+      const apy = "N/A"
+      const tvl = p.totalTvl ? `$${(p.totalTvl / 1e6).toFixed(1)}M` : "N/A"
+
+      pools.push({
+        id: `ekubo-${token0Symbol}-${token1Symbol}`,
+        name: `Ekubo ${token0Symbol}/${token1Symbol}`,
+        description: `${token0Symbol}/${token1Symbol} liquidity pool on Ekubo DEX`,
+        apy,
+        tvl,
+        protocol: "Ekubo",
+        risk: "Medium",
+        tokens: [token0Symbol, token1Symbol],
+        url: "https://ekubo.org",
+        details: `This pool allows users to provide liquidity for the ${token0Symbol}/${token1Symbol} pair on Ekubo DEX. Liquidity providers earn trading fees generated when users swap between these tokens.`,
+        risks: [
+          "Impermanent loss risk if token prices change significantly",
+          "Smart contract risk associated with the Ekubo platform",
+          "Liquidity risk if trading volume decreases",
+        ],
+        benefits: [
+          "Trading fees generated from swap activity",
+          "Token exposure while maintaining diversification",
+          "Potential participation in Ekubo incentive programs",
+        ],
+        poolType: 'ekubo',
+        originalData: p
+      })
+    })
+
+    return pools
+  }, [vesuPools, ekuboPools])
+
+  useEffect(() => {
+    if (params.pool && !isLoadingVesu && ekuboPools.length >= 0) {
+      const poolId = params.pool as string
+      const foundPool = allPools.find(p => p.id === poolId || p.id.endsWith(poolId))
+      setPool(foundPool || null)
+      setLoading(false)
+    }
+  }, [params.pool, allPools, isLoadingVesu, ekuboPools])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Loading pool details...</p>
         </div>
       </div>

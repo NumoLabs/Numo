@@ -57,10 +57,8 @@ export const createCavosAuth = () => {
   return new CavosAuth(config.defaultNetwork, config.appId)
 }
 
-// Authentication flow helper using local API route
 export const authenticateUser = async (email: string, password: string, action: 'signup' | 'signin' = 'signup') => {
   try {
-    // Try the requested action first
     const response = await fetch('/api/cavos/auth', {
       method: 'POST',
       headers: {
@@ -284,8 +282,66 @@ export const refreshUserToken = async (refreshToken: string) => {
   try {
     const result = await cavosAuth.refreshToken(refreshToken, config.defaultNetwork)
     return result
-  } catch (error) {
-    console.error('Token refresh failed:', error)
+  } catch (error: unknown) {
+    // Check if error is due to expired/invalid refresh token (401)
+    // Don't log these errors here as they're handled gracefully in the hook
+    const errorObj = error as { status?: number; response?: { status?: number }; message?: string }
+    const isExpiredTokenError = 
+      errorObj?.status === 401 ||
+      errorObj?.response?.status === 401 ||
+      (errorObj?.message && (
+        errorObj.message.includes('401') ||
+        errorObj.message.includes('Invalid or expired refresh token') ||
+        errorObj.message.toLowerCase().includes('unauthorized')
+      )) ||
+      (typeof error === 'string' && error.includes('401')) ||
+      (typeof error === 'object' && JSON.stringify(error).includes('Invalid or expired refresh token'))
+    
+    if (!isExpiredTokenError) {
+      // Only log non-401 errors (network issues, etc.)
+      console.error('Token refresh failed:', error)
+    }
+    
+    throw error
+  }
+}
+
+export const recoverUserSession = async (accessToken: string) => {
+  try {
+    const response = await fetch('/api/cavos/session/recover', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        access_token: accessToken,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Session recovery failed' }))
+      const error = new Error(errorData.error || errorData.message || 'Session recovery failed') as ErrorWithStatus
+      error.status = response.status
+      if (errorData.code) {
+        error.code = errorData.code
+      }
+      throw error
+    }
+
+    const result = await response.json()
+    return result
+  } catch (error: unknown) {
+    const errorObj = error as { status?: number; message?: string; code?: string }
+    const isExpiredTokenError = 
+      errorObj?.status === 401 ||
+      errorObj?.message?.includes('401') ||
+      errorObj?.message?.includes('expired') ||
+      errorObj?.message?.toLowerCase().includes('unauthorized')
+    
+    if (!isExpiredTokenError) {
+      console.error('Session recovery failed:', error)
+    }
+    
     throw error
   }
 }

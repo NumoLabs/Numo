@@ -1,15 +1,12 @@
 "use client"
 
-import Link from "next/link"
 import {
   Upload,
   Download,
   Wallet,
-  Activity,
   Bitcoin,
   TrendingUp,
   Star,
-  Clock,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -51,37 +48,29 @@ export function DashboardHero() {
                 <CheckCircle2 className="h-3 w-3" />
                 Active Vault
               </Badge>
-              <Badge className="bg-[#0f1114] text-white border-2 border-orange-500 gap-1">
-                <Activity className="h-3 w-3" />
-                Auto-Rebalancing
-              </Badge>
             </div>
           </div>
           <div className="flex gap-3">
-            <Link href="/deposit">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2"
-              >
-                <Upload className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
-                Deposit
-              </Button>
-            </Link>
-            <Link href="/withdraw">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-black gap-2 transform transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 group bg-[#0f1114]"
-              >
-                <Download className="h-5 w-5 transition-transform duration-300 group-hover:-rotate-12" />
-                Withdraw
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 flex items-center gap-2"
+            >
+              <Upload className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
+              Deposit
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-black gap-2 transform transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 group bg-[#0f1114]"
+            >
+              <Download className="h-5 w-5 transition-transform duration-300 group-hover:-rotate-12" />
+              Withdraw
+            </Button>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-[#0f1114] border-2 border-orange-500 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-300">Total Balance</p>
@@ -113,16 +102,6 @@ export function DashboardHero() {
             </div>
             <p className="text-2xl font-bold">5.8%</p>
             <p className="text-xs text-gray-400">+0.3% vs previous</p>
-          </div>
-          <div className="bg-[#0f1114] border-2 border-orange-500 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-300">Next Rebalance</p>
-                              <div className="h-8 w-8 rounded-full bg-[#0f1114] border-2 border-yellow-500 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-white" />
-                </div>
-            </div>
-            <p className="text-2xl font-bold">12h 34m</p>
-            <p className="text-xs text-gray-400">Or when APY changes</p>
           </div>
         </div>
       </div>

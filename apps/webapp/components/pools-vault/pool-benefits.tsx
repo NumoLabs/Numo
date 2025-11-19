@@ -8,7 +8,7 @@ export function PoolBenefits() {
     {
       icon: TrendingUp,
       title: "High Yield Returns",
-      description: "Earn up to 12.5% APY with automated strategies",
+      description: "Earn up to 12.5% APY with rebalancing strategies",
       color: "bitcoin-gold",
     },
     {
@@ -19,7 +19,7 @@ export function PoolBenefits() {
     },
     {
       icon: Zap,
-      title: "Automated Strategies",
+      title: "Rebalancing Strategies",
       description: "AI-powered trading strategies for optimal returns",
       color: "bitcoin-gold",
     },

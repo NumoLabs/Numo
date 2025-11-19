@@ -48,6 +48,19 @@ export async function fetchCryptoPrice(symbol: string): Promise<number> {
 	return price !== null ? price : 0;
 }
 
+/**
+ * Parse a Vesu amount from human-readable format to wei
+ * @param amount - The amount in human-readable format (e.g., "1.5")
+ * @param decimals - The number of decimals for the token (e.g., 18 for ETH, 8 for WBTC)
+ * @returns The amount in wei as a string
+ */
+export function parseVesuAmount(amount: number | string, decimals: number): string {
+	const amountStr = typeof amount === 'string' ? amount : amount.toString();
+	const [integerPart, decimalPart = ''] = amountStr.split('.');
+	const paddedDecimal = decimalPart.padEnd(decimals, '0').slice(0, decimals);
+	return integerPart + paddedDecimal;
+}
+
 export function findActiveTick(
 	price: number,
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
