@@ -126,8 +126,10 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
   const [vesuPoolsData, setVesuPoolsData] = useState<VesuPool[] | null>(null);
   const [poolBreakdowns, setPoolBreakdowns] = useState<Record<string, { lendingApr: number; rewardsApr: number } | null>>({});
   const [userPosition, setUserPosition] = useState<{
+    shares: bigint;
     assets: bigint;
     formatted: string;
+    usdValue?: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const activeTabFromUrl = searchParams.get('action') || 'overview';
@@ -244,13 +246,18 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
         try {
           const position = await getUserPosition();
           if (position) {
+            console.log('User position loaded:', position);
             setUserPosition({
+              shares: position.shares,
               assets: position.assets,
               formatted: position.formatted,
+              usdValue: position.usdValue,
             });
+          } else {
+            console.warn('getUserPosition returned null or undefined');
           }
         } catch (err) {
-          console.warn('Failed to get user position:', err);
+          console.error('Failed to get user position:', err);
         }
       } catch (err) {
         console.error('Failed to load vault data:', err);
@@ -559,6 +566,10 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
               <div className="text-2xl font-bold text-bitcoin-orange">
                 {isLoading || isVaultLoading || !userPosition ? '...' : `${userPosition.formatted} wBTC`}
               </div>
+              {userPosition && userPosition.shares !== undefined && (
+                <div className="text-xs text-muted-foreground mt-1">
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>

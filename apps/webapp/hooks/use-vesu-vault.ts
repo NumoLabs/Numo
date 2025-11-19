@@ -331,6 +331,8 @@ export function useVesuVault() {
   // Get user's position value in assets
   const getUserPosition = useCallback(async (userAddress?: string) => {
     const targetAddress = userAddress || address;
+    console.log('getUserPosition called:', { isConnected, targetAddress, hasContract: !!contract, hasAddress: !!address });
+    
     if (!isConnected || !targetAddress || !contract) {
       console.warn('getUserPosition: Missing required params', { isConnected, targetAddress, contract: !!contract });
       return {
@@ -343,8 +345,11 @@ export function useVesuVault() {
 
     try {
       // Validate contract is properly initialized
-      if (!contract.address || !contract.provider) {
-        console.warn('getUserPosition: Contract not properly initialized');
+      if (!contract || !contract.address) {
+        console.warn('getUserPosition: Contract not properly initialized', { 
+          hasContract: !!contract,
+          hasAddress: !!contract?.address
+        });
         return {
           shares: BigInt(0),
           assets: BigInt(0),
@@ -353,10 +358,12 @@ export function useVesuVault() {
         };
       }
 
+      console.log('Calling balanceOf for address:', targetAddress);
       const shares = await contract.call('balanceOf', [targetAddress], { blockIdentifier: 'latest' });
+      console.log('balanceOf result:', shares);
       
       if (!shares || shares === null || shares === undefined) {
-        console.warn('getUserPosition: No shares returned');
+        console.warn('getUserPosition: No shares returned', { shares });
         return {
           shares: BigInt(0),
           assets: BigInt(0),

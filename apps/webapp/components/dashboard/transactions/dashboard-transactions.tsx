@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { Bitcoin, Download, Upload, Loader2, AlertCircle } from "lucide-react"
+import { Bitcoin, Loader2, AlertCircle } from "lucide-react"
 import { useWalletTransactions } from "@/hooks/use-wallet-transactions"
 
 export function DashboardTransactions() {

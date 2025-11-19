@@ -301,7 +301,7 @@ export function ProfileContent() {
         description: 'Wallet address copied to clipboard',
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to copy wallet address',

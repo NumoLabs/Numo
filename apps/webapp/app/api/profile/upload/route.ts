@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const walletAddress = request.headers.get('x-wallet-address');
-    const walletNetwork = request.headers.get('x-wallet-network') || 'mainnet';
 
     if (!file) {
       return NextResponse.json(

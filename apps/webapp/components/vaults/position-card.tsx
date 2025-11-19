@@ -14,27 +14,40 @@ export function VesuVaultPosition() {
     usdValue?: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { getUserPosition, isConnected, account } = useVesuVault();
+  const { getUserPosition, isConnected } = useVesuVault();
 
   const loadUserPosition = useCallback(async () => {
-    if (!isConnected || !account) return;
+    if (!isConnected) {
+      console.log('VesuVaultPosition: Not connected, skipping load');
+      return;
+    }
     
+    console.log('VesuVaultPosition: Loading user position...');
     setIsLoading(true);
     try {
       const position = await getUserPosition();
-      setUserPosition(position || null);
+      console.log('VesuVaultPosition: Position loaded:', position);
+      if (position) {
+        setUserPosition(position);
+      } else {
+        console.warn('VesuVaultPosition: getUserPosition returned null/undefined');
+        setUserPosition(null);
+      }
     } catch (err) {
-      console.error('Failed to load user position:', err);
+      console.error('VesuVaultPosition: Failed to load user position:', err);
+      setUserPosition(null);
     } finally {
       setIsLoading(false);
     }
-  }, [isConnected, account, getUserPosition]);
+  }, [isConnected, getUserPosition]);
 
   useEffect(() => {
-    if (isConnected && account) {
+    if (isConnected) {
       loadUserPosition();
+    } else {
+      setUserPosition(null);
     }
-  }, [isConnected, account, loadUserPosition]);
+  }, [isConnected, loadUserPosition]);
 
   if (!isConnected) {
     return (

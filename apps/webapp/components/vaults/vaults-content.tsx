@@ -2,14 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { useAccount } from '@starknet-react/core';
-import { useWallet } from '@/hooks/use-wallet';
 import { motion } from 'framer-motion';
 import { VaultCard, type VaultPool } from './vault-card';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Briefcase, Search, Loader2, AlertCircle, Wallet, TrendingUp, Zap, Sparkles } from 'lucide-react';
+import { Briefcase, Search, Loader2, TrendingUp, Zap, Sparkles } from 'lucide-react';
 import {
   useVaultPools,
   useVesuPoolsData,
@@ -20,23 +18,7 @@ import {
 
 export function VaultsContent() {
   const { address, isConnected } = useAccount();
-  const { connect, connectors, isConnecting } = useWallet();
-  const [selectedConnector, setSelectedConnector] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const handleConnect = async (connectorId: string) => {
-    setSelectedConnector(connectorId);
-    try {
-      const connector = connectors.find(c => c.id === connectorId);
-      if (connector) {
-        await connect({ connector });
-      }
-    } catch (error) {
-      console.error('Failed to connect wallet:', error);
-    } finally {
-      setSelectedConnector(null);
-    }
-  };
 
   const formatAddress = (addr: string | undefined) => {
     if (!addr) return '';

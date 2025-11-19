@@ -14,26 +14,26 @@ const getAlchemyRpcUrl = (): string | null => {
   return `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/${ALCHEMY_API_KEY}`;
 };
 
-// Simple ERC20 ABI for balanceOf
-const ERC20_ABI = [
-  {
-    name: 'balanceOf',
-    type: 'function',
-    inputs: [
-      {
-        name: 'account',
-        type: 'felt'
-      }
-    ],
-    outputs: [
-      {
-        name: 'balance',
-        type: 'Uint256'
-      }
-    ],
-    stateMutability: 'view'
-  }
-];
+// Simple ERC20 ABI for balanceOf - kept for future use
+// const ERC20_ABI = [
+//   {
+//     name: 'balanceOf',
+//     type: 'function',
+//     inputs: [
+//       {
+//         name: 'account',
+//         type: 'felt'
+//       }
+//     ],
+//     outputs: [
+//       {
+//         name: 'balance',
+//         type: 'Uint256'
+//       }
+//     ],
+//     stateMutability: 'view'
+//   }
+// ];
 
 /**
  * GET /api/wallet/wbtc-balance
