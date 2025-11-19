@@ -5,31 +5,31 @@ import { Separator } from "@/components/ui/separator"
 export function DefiExplanation() {
   return (
     <Card className="relative overflow-hidden transition-all duration-300 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 hover:shadow-lg hover:shadow-bitcoin-orange/10">
-      <div className="bg-muted/50 p-4 border-b border-bitcoin-gold/30">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50 flex items-center justify-center">
-            <Zap className="h-6 w-6 text-bitcoin-gold" />
+      <div className="bg-muted/50 p-3 md:p-4 border-b border-bitcoin-gold/30">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50 flex items-center justify-center flex-shrink-0">
+            <Zap className="h-5 w-5 md:h-6 md:w-6 text-bitcoin-gold" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-foreground">What is DeFi?</h2>
-            <p className="text-sm text-muted-foreground">Decentralized Finance: The Future of Money</p>
+          <div className="min-w-0">
+            <h2 className="text-lg md:text-xl font-bold text-foreground">What is DeFi?</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">Decentralized Finance: The Future of Money</p>
           </div>
         </div>
       </div>
-      <CardContent className="p-4">
+      <CardContent className="p-3 md:p-4">
         <div className="prose dark:prose-invert max-w-none">
-          <p className="text-base leading-relaxed mb-4">
+          <p className="text-sm md:text-base leading-relaxed mb-3 md:mb-4">
             DeFi (Decentralized Finance) represents a revolution in the traditional financial system. Imagine a world
             where you can lend, borrow, exchange, and invest without the need for banks or intermediaries.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-4 my-4">
-            <div className="bg-muted/50 rounded-lg p-4 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 transition-all duration-300">
-              <div className="flex items-center gap-2 mb-3">
-                <CheckCircle className="h-5 w-5 text-bitcoin-gold" />
-                <h3 className="text-base font-semibold text-foreground">Traditional Finance</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 my-3 md:my-4">
+            <div className="bg-muted/50 rounded-lg p-3 md:p-4 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 transition-all duration-300">
+              <div className="flex items-center gap-2 mb-2 md:mb-3">
+                <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-bitcoin-gold flex-shrink-0" />
+                <h3 className="text-sm md:text-base font-semibold text-foreground">Traditional Finance</h3>
               </div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-bitcoin-gold"></div>
                   Banks as intermediaries
@@ -49,12 +49,12 @@ export function DefiExplanation() {
               </ul>
             </div>
 
-            <div className="bg-muted/50 rounded-lg p-4 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 transition-all duration-300">
-              <div className="flex items-center gap-2 mb-3">
-                <Zap className="h-5 w-5 text-bitcoin-gold" />
-                <h3 className="text-base font-semibold text-foreground">DeFi</h3>
+            <div className="bg-muted/50 rounded-lg p-3 md:p-4 border-2 border-bitcoin-gold/40 hover:border-bitcoin-gold/60 transition-all duration-300">
+              <div className="flex items-center gap-2 mb-2 md:mb-3">
+                <Zap className="h-4 w-4 md:h-5 md:w-5 text-bitcoin-gold flex-shrink-0" />
+                <h3 className="text-sm md:text-base font-semibold text-foreground">DeFi</h3>
               </div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-bitcoin-gold"></div>
                   No intermediaries
@@ -80,7 +80,7 @@ export function DefiExplanation() {
               <div className="h-10 w-10 rounded-full bg-bitcoin-gold/20 border-2 border-bitcoin-gold/50 flex items-center justify-center flex-shrink-0">
                 <Lightbulb className="h-5 w-5 text-bitcoin-gold" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <h4 className="text-base font-semibold text-foreground mb-2">
                   Key Features of DeFi
                 </h4>

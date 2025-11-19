@@ -1,8 +1,8 @@
 "use client"
 
-import { Menu, Bell, Search, User, LogOut } from "lucide-react"
+import { Menu, Bell, Search, User, LogOut, ArrowLeft } from "lucide-react"
 import { memo, useMemo, useCallback, useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -194,6 +194,8 @@ const UserAvatar = memo(() => {
 UserAvatar.displayName = 'UserAvatar'
 
 export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
+  const pathname = usePathname()
+  const isProfilePage = pathname === "/profile"
   const router = useRouter()
   const { signOut: cavosSignOut, user: authUser, isAuthenticated, accessToken, refreshToken } = useCavosAuthContext()
   const [profile, setProfile] = useState<UserProfileData | null>(null);
@@ -336,31 +338,46 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-800/50 bg-black px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-      <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-        <Menu className="h-5 w-5" />
-      </Button>
-
-      <div className="h-6 w-px bg-gray-700 lg:hidden" />
+      {isProfilePage ? (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="lg:hidden flex items-center gap-2 hover:bg-transparent hover:text-current active:bg-transparent transition-none" 
+          onClick={() => router.push('/dashboard')}
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="text-sm">Back to Dashboard</span>
+        </Button>
+      ) : (
+        <>
+          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div className="h-6 w-px bg-gray-700 lg:hidden" />
+        </>
+      )}
 
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-        <div className="relative flex flex-1 items-center">
-          <div className="relative w-full max-w-lg">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-black-400" />
-            </div>
-            <Input
-              className="block w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm py-2.5 pl-10 pr-12 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg sm:text-sm"
-              placeholder="Search transactions, strategies, pools..."
-              type="search"
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <kbd className="hidden sm:inline-flex items-center rounded border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                ⌘K
-              </kbd>
+        {!isProfilePage && (
+          <div className="relative flex flex-1 items-center">
+            <div className="relative w-full max-w-lg">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="h-4 w-4 text-black-400" />
+              </div>
+              <Input
+                className="block w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm py-2.5 pl-10 pr-12 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg sm:text-sm"
+                placeholder="Search transactions, strategies, pools..."
+                type="search"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <kbd className="hidden sm:inline-flex items-center rounded border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                  ⌘K
+                </kbd>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-x-4 lg:gap-x-6">
+        )}
+        <div className={`flex items-center gap-x-4 lg:gap-x-6 ${isProfilePage ? 'ml-auto' : ''}`}>
           <Button variant="ghost" size="sm" className="relative hover:bg-transparent hover:text-current">
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-xs text-white flex items-center justify-center animate-pulse">

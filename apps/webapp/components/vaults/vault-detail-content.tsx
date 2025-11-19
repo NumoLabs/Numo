@@ -758,17 +758,17 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.3, delay: 0.7 + index * 0.1 }}
-                          className="p-4 border rounded-lg space-y-3 hover:border-bitcoin-orange/30 hover:shadow-sm transition-all duration-200"
+                          className="p-3 md:p-4 border rounded-lg space-y-3 hover:border-bitcoin-orange/30 hover:shadow-sm transition-all duration-200"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
                               <Badge 
                                 key={`pool-badge-${pool.pool_id}`}
-                                className="bg-bitcoin-orange/20 text-bitcoin-orange border-bitcoin-orange/30"
+                                className="bg-bitcoin-orange/20 text-bitcoin-orange border-bitcoin-orange/30 text-xs"
                               >
                                 Pool {index + 1}
                               </Badge>
-                              <span className="font-semibold">{poolName}</span>
+                              <span className="font-semibold text-sm md:text-base truncate">{poolName}</span>
                             </div>
                             {apy != null && typeof apy === 'number' && !isNaN(apy) ? (
                               <TooltipProvider delayDuration={0}>
@@ -852,20 +852,20 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                               </Badge>
                             )}
                           </div>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-sm">
                             <div>
-                              <p className="text-muted-foreground">Pool Address</p>
-                              <p className="font-mono text-xs break-all">{pool.pool_id}</p>
+                              <p className="text-xs md:text-sm text-muted-foreground mb-1">Pool Address</p>
+                              <p className="font-mono text-[10px] md:text-xs break-all">{pool.pool_id}</p>
                             </div>
                             <div>
-                              <p className="text-muted-foreground">vToken Address</p>
-                              <p className="font-mono text-xs break-all">{pool.v_token}</p>
+                              <p className="text-xs md:text-sm text-muted-foreground mb-1">vToken Address</p>
+                              <p className="font-mono text-[10px] md:text-xs break-all">{pool.v_token}</p>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between pt-2 border-t">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-2 border-t gap-2 sm:gap-0">
                             <div>
-                              <p className="text-sm text-muted-foreground">Pool Balance</p>
-                              <p className="font-semibold">
+                              <p className="text-xs md:text-sm text-muted-foreground">Pool Balance</p>
+                              <p className="text-sm md:text-base font-semibold">
                                 {isLoading ? (
                                   <span className="text-muted-foreground">Loading...</span>
                                 ) : balance ? (
@@ -876,8 +876,8 @@ export function VaultDetailContent({ vaultId }: VaultDetailContentProps) {
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm text-muted-foreground">Max Weight</p>
-                              <p className="font-semibold">{(pool.max_weight / 100).toFixed(0)}%</p>
+                              <p className="text-xs md:text-sm text-muted-foreground">Max Weight</p>
+                              <p className="text-sm md:text-base font-semibold">{(pool.max_weight / 100).toFixed(0)}%</p>
                             </div>
                           </div>
                         </motion.div>
