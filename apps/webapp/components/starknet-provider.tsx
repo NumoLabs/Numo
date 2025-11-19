@@ -9,6 +9,7 @@ import {
   jsonRpcProvider,
   voyager,
 } from "@starknet-react/core";
+import { xverse } from "./connectors/xverse-connector";
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
   // Static RPC provider configuration
@@ -25,6 +26,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const connectors = useMemo(() => [
     braavos(),
     argent(),
+    xverse(),
   ], []);
 
   return (

@@ -56,7 +56,7 @@ export function DepositActions({ isValid, isLoading = false, selectedToken, onDe
                 htmlFor="confirm-terms"
                 className="text-sm leading-relaxed cursor-pointer text-gray-700 dark:text-gray-300"
               >
-                I understand that my funds will be deposited in an automated vault that invests in DeFi protocols and
+                I understand that my funds will be deposited in an rebalancing vault that invests in DeFi protocols and
                 that there is a risk of capital loss.
               </label>
             </div>
