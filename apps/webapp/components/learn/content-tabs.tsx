@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DefiExplanation } from "./basics/defi-explanation"
@@ -15,8 +15,6 @@ export function ContentTabs() {
   const searchParams = useSearchParams()
   const activeTabFromUrl = searchParams.get('tab') || 'defi'
   const [activeTab, setActiveTab] = useState(activeTabFromUrl)
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
   // Tab configuration
   const tabs = useMemo(() => [
@@ -47,37 +45,6 @@ export function ContentTabs() {
     router.replace(currentUrl.pathname + currentUrl.search, { scroll: false })
   }
 
-  // Update indicator position when active tab changes
-  useEffect(() => {
-    const updateIndicator = () => {
-      const activeIndex = tabs.findIndex(tab => tab.id === activeTab)
-      if (activeIndex === -1 || !tabRefs.current[activeIndex]) return
-
-      const activeButton = tabRefs.current[activeIndex]
-      if (!activeButton) return
-
-      const container = activeButton.parentElement
-      if (!container) return
-
-      const containerRect = container.getBoundingClientRect()
-      const buttonRect = activeButton.getBoundingClientRect()
-
-      setIndicatorStyle({
-        left: buttonRect.left - containerRect.left,
-        width: buttonRect.width,
-      })
-    }
-
-    // Initial update
-    updateIndicator()
-
-    // Update on resize
-    window.addEventListener('resize', updateIndicator)
-    return () => {
-      window.removeEventListener('resize', updateIndicator)
-    }
-  }, [activeTab, tabs])
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -88,14 +55,11 @@ export function ContentTabs() {
       {/* Pill Nav */}
       <div className="relative w-full">
         <div className="grid grid-cols-2 md:flex md:items-center gap-1.5 md:gap-1.5 p-1.5 md:p-1.5 bg-muted/50 rounded-lg md:rounded-full border border-border/50 backdrop-blur-sm">
-          {tabs.map((tab, index) => {
+          {tabs.map((tab) => {
             const isActive = activeTab === tab.id
             return (
               <button
                 key={`tab-button-${tab.id}`}
-                ref={(el) => {
-                  tabRefs.current[index] = el
-                }}
                 onClick={() => handleTabChange(tab.id)}
                 className={`
                   relative z-10 px-3 md:px-4 py-2 md:py-2 text-xs md:text-sm font-medium rounded-lg md:rounded-full transition-colors duration-200 text-center
