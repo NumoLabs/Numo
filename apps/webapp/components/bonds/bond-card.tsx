@@ -52,7 +52,7 @@ export function BondCard({
       className={cn(
         "relative overflow-hidden transition-all duration-300 group cursor-pointer",
         "hover:shadow-lg hover:shadow-bitcoin-orange/10 hover:border-bitcoin-orange/40",
-        "flex flex-row items-center justify-between h-20",
+        "flex flex-row items-center justify-between min-h-[80px] md:h-20 p-3 md:p-0",
         "border border-border/50 hover:border-bitcoin-orange/30"
       )}
       onClick={onClick}
@@ -64,58 +64,58 @@ export function BondCard({
       <div className="absolute inset-0 bg-gradient-to-r from-bitcoin-orange/0 via-bitcoin-orange/5 to-bitcoin-orange/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       {/* Bond Icon and Info */}
-      <div className="flex items-center gap-3 min-w-0 flex-1 px-4 relative z-10">
+      <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1 px-2 md:px-4 relative z-10">
         <motion.div 
-          className="mr-2"
+          className="flex-shrink-0"
           whileHover={{ scale: 1.1, rotate: 5 }}
           transition={{ duration: 0.2 }}
         >
           <Image 
             src="/wbtc-icon.png" 
             alt="Bond" 
-            width={35} 
-            height={35}
-            className="object-contain"
+            width={30}
+            height={30}
+            className="md:w-[35px] md:h-[35px] object-contain"
           />
         </motion.div>
         <div className="flex flex-col min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold truncate group-hover:text-bitcoin-orange transition-colors duration-300">
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <h3 className="text-xs md:text-sm font-semibold truncate group-hover:text-bitcoin-orange transition-colors duration-300">
               {name}
             </h3>
             <Lock className="h-3 w-3 text-bitcoin-orange flex-shrink-0" />
           </div>
-          <p className="text-xs text-muted-foreground truncate mt-0.5">
+          <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-1 md:truncate mt-0.5">
             {description}
           </p>
         </div>
       </div>
 
       {/* Assets */}
-      <div className="flex flex-col items-center min-w-[100px] flex-shrink-0 relative z-10 px-4">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">TVL</p>
+      <div className="flex flex-col items-center min-w-[80px] md:min-w-[100px] flex-shrink-0 relative z-10 px-2 md:px-4">
+        <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">TVL</p>
         {isLoading || totalAssets === null || totalAssets === undefined ? (
-          <span className="inline-block w-16 h-4 bg-muted rounded animate-pulse" />
+          <span className="inline-block w-12 md:w-16 h-3 md:h-4 bg-muted rounded animate-pulse" />
         ) : (
-          <span className="text-sm font-semibold text-bitcoin-orange group-hover:scale-105 transition-transform inline-block">
+          <span className="text-xs md:text-sm font-semibold text-bitcoin-orange group-hover:scale-105 transition-transform inline-block text-center break-words max-w-[80px] md:max-w-none">
             {formatTotalAssets(totalAssets)} wBTC
           </span>
         )}
       </div>
 
       {/* View Button */}
-      <div className="flex items-center min-w-[100px] flex-shrink-0 px-4 relative z-10">
+      <div className="flex items-center min-w-[70px] md:min-w-[100px] flex-shrink-0 px-2 md:px-4 relative z-10">
         <Button
           variant="default"
           size="sm"
-          className="group-hover:bg-bitcoin-orange group-hover:shadow-md group-hover:shadow-bitcoin-orange/20 transition-all duration-300"
+          className="group-hover:bg-bitcoin-orange group-hover:shadow-md group-hover:shadow-bitcoin-orange/20 transition-all duration-300 text-xs md:text-sm px-2 md:px-3 h-7 md:h-9"
           onClick={(e) => {
             e.stopPropagation();
             onClick?.();
           }}
         >
-          <Clock className="h-4 w-4 mr-2" />
-          Manage
+          <Clock className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">Manage</span>
         </Button>
       </div>
     </Card>

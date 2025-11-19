@@ -93,10 +93,10 @@ export function DashboardHero() {
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-500/10 to-yellow-500/10 rounded-full blur-3xl"></div>
       <div className="relative z-10">
         {/* Balance Toggle Button - Top Right Corner */}
-        <div className="absolute -top-2 right-0 mb-4">
+        <div className="absolute hidden md:block -top-2 right-0 mb-4">
           <button
             onClick={() => setShowBalance(!showBalance)}
-            className="h-8 w-8 rounded-full bg-[#0f1114] hover:bg-gray-800 flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-orange-500"
+            className="h-8 w-8 rounded-full bg-[#0f1114] hover:bg-gray-800 flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-orange-500 z-20"
             title={showBalance ? "Hide balance" : "Show balance"}
           >
             {showBalance ? <Eye className="h-4 w-4 text-orange-500" /> : <EyeOff className="h-4 w-4 text-orange-500" />}
@@ -105,12 +105,22 @@ export function DashboardHero() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="h-12 w-12 rounded-full bg-[#0f1114] border-2 border-orange-500 flex items-center justify-center">
+              <div className="hidden md:flex h-12 w-12 rounded-full bg-[#0f1114] border-2 border-orange-500 items-center justify-center">
                 <Wallet className="h-6 w-6 text-orange-500" />
               </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold">Welcome back!</h1>
-                <p className="text-gray-300">Your vault is automatically generating returns</p>
+              <div className="flex-1 flex items-start justify-between gap-3">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold">Welcome back!</h1>
+                  <p className="text-gray-300">Your vault is automatically generating returns</p>
+                </div>
+                {/* Balance Toggle Button - Mobile: Next to "Welcome back!" */}
+                <button
+                  onClick={() => setShowBalance(!showBalance)}
+                  className="md:hidden h-8 w-8 rounded-full bg-[#0f1114] hover:bg-gray-800 flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-orange-500 flex-shrink-0 mt-1"
+                  title={showBalance ? "Hide balance" : "Show balance"}
+                >
+                  {showBalance ? <Eye className="h-4 w-4 text-orange-500" /> : <EyeOff className="h-4 w-4 text-orange-500" />}
+                </button>
               </div>
             </div>
             <div className="flex items-center gap-4 mb-6">

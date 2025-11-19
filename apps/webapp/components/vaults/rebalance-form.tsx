@@ -723,7 +723,7 @@ export function RebalanceForm() {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full h-16 bg-gradient-to-r from-bitcoin-orange via-bitcoin-gold to-bitcoin-orange hover:from-bitcoin-orange/95 hover:via-bitcoin-gold/95 hover:to-bitcoin-orange/95 text-white font-bold text-xl shadow-2xl shadow-bitcoin-orange/40 hover:shadow-2xl hover:shadow-bitcoin-orange/60 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+              className="w-full h-16 bg-gradient-to-r from-bitcoin-orange via-bitcoin-gold to-bitcoin-orange hover:from-bitcoin-orange/95 hover:via-bitcoin-gold/95 hover:to-bitcoin-orange/95 text-white font-bold text-xl shadow-2xl shadow-bitcoin-orange/40 hover:shadow-2xl hover:shadow-bitcoin-orange/60 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group border-2 border-white"
               disabled={isLoadingPools || isPending || !form.formState.isValid}
             >
               {/* Shine effect */}

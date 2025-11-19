@@ -218,20 +218,20 @@ export function VaultHero() {
             </div>
 
             {/* Spacer to maintain layout */}
-            <div className="py-4"></div>
+            <div className="py-1 md:py-4"></div>
 
             <div
-              className="flex flex-col gap-2 min-[400px]:flex-row animate-slide-up-fade-in"
+              className="flex flex-row justify-center gap-6 md:justify-start md:gap-2 animate-slide-up-fade-in px-4 md:px-0"
               style={{ animationDelay: "0.4s" }}
             >
               {isAuthenticated ? (
-                <Link href="/dashboard">
+                <Link href="/dashboard" className="w-fit md:w-fit">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse"
+                    className="w-fit md:w-auto bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black px-1.5 md:px-6 py-2 rounded-lg font-bold transition-all duration-200 shadow-bitcoin hover:shadow-bitcoin-gold focus-visible:shadow-bitcoin-gold transform hover:-translate-y-1 hover:scale-105 focus-visible:-translate-y-1 focus-visible:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none animate-bitcoin-pulse text-xs md:text-base"
                   >
                     Start Earning BTC
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    <ArrowRight className="h-3 w-3 md:h-4 md:w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 </Link>
               ) : (
@@ -245,11 +245,11 @@ export function VaultHero() {
                   </Button>
                 </Link>
               )}
-              <Link href="#features">
+              <Link href="#features" className="w-fit md:w-fit">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 border-2 border-orange-500 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300 focus:scale-105 focus:shadow-lg focus:-translate-y-1"
+                  className="w-fit md:w-auto transition-all duration-300 hover:scale-105 hover:shadow-lg hover:-translate-y-1 border-2 border-orange-500 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300 focus:scale-105 focus:shadow-lg focus:-translate-y-1 px-3 md:px-6"
                 >
                   Explore Features
                 </Button>
@@ -258,7 +258,7 @@ export function VaultHero() {
           </div>
 
           <motion.div 
-            className="flex items-center justify-center relative"
+            className="flex items-center justify-center relative mt-8 md:mt-0"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 

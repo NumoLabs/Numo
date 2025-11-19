@@ -226,12 +226,12 @@ export function VaultsContent() {
 
       {/* Header */}
       <motion.div 
-        className="relative flex items-center justify-between"
+        className="relative flex flex-col md:flex-row md:items-center md:justify-between"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="flex flex-col mb-8">
+        <div className="flex flex-col mb-4 md:mb-8">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mt-8">
             Vaults
           </h1>
@@ -242,7 +242,7 @@ export function VaultsContent() {
         {/* Connected Wallet Info */}
         {isConnected && address && (
           <motion.div 
-            className="relative flex items-center gap-2 px-3 py-2 rounded-lg border border-green-500/30 bg-green-500/10 backdrop-blur-sm hover:border-green-500/50 hover:shadow-md hover:shadow-green-500/20 transition-all duration-300 group overflow-hidden"
+            className="relative flex items-center gap-2 px-2 md:px-3 py-2 rounded-lg border border-green-500/30 bg-green-500/10 backdrop-blur-sm hover:border-green-500/50 hover:shadow-md hover:shadow-green-500/20 transition-all duration-300 group overflow-visible md:overflow-hidden flex-shrink-0 min-w-fit w-fit md:w-auto"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
@@ -260,8 +260,8 @@ export function VaultsContent() {
                 ease: "easeInOut"
               }}
             />
-            <div className="w-2 h-2 rounded-full bg-green-500 relative z-10 shadow-lg shadow-green-500/50" />
-            <span className="text-xs font-medium text-green-400 font-mono relative z-10">
+            <div className="w-2 h-2 rounded-full bg-green-500 relative z-10 shadow-lg shadow-green-500/50 flex-shrink-0" />
+            <span className="text-xs font-medium text-green-400 font-mono relative z-10 whitespace-nowrap">
               {formatAddress(address)}
             </span>
           </motion.div>
