@@ -1,7 +1,6 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useWalletStatus } from "./use-wallet"
-import { useCavosAuth } from "./use-cavos-auth"
 
 /**
  * Custom hook to handle wallet authentication and automatic redirect
@@ -11,12 +10,22 @@ export function useWalletAuth() {
   const router = useRouter()
   const pathname = usePathname()
   const { isConnected, address } = useWalletStatus()
-  
-  // Get Cavos auth state
-  const cavosAuth = useCavosAuth()
-  const isCavosAuthenticated = cavosAuth?.isAuthenticated || false
+  const [isInitializing, setIsInitializing] = useState(true)
+
+  // Give auto-reconnect time to work (2.5 seconds)
+  useEffect(() => {
+    const initTimeout = setTimeout(() => {
+      setIsInitializing(false)
+    }, 2500)
+
+    return () => clearTimeout(initTimeout)
+  }, [])
 
   useEffect(() => {
+    // Wait for initialization to complete before checking
+    if (isInitializing) {
+      return
+    }
     // Define routes that require wallet connection
     const protectedRoutes = [
       "/dashboard",
@@ -25,7 +34,9 @@ export function useWalletAuth() {
       "/history",
       "/pools",
       "/bonds",
-      "/forecast"
+      "/forecast",
+      "/profile",
+      "/vaults"
     ]
 
     // Define public routes that don't require wallet connection
@@ -39,23 +50,22 @@ export function useWalletAuth() {
       pathname === route || pathname.startsWith(`${route}/`)
     )
 
-    // Check if user is authenticated (either wallet or Cavos)
-    const isAuthenticated = isConnected || isCavosAuthenticated
+    const isAuthenticated = isConnected && !!address
 
     // Redirect if on protected route without authentication (but not on public routes)
     if (isProtectedRoute && !isPublicRoute && !isAuthenticated) {
-      // Small delay to prevent flash and ensure clean redirect
+      // Short delay since we already waited during initialization
       const timeoutId = setTimeout(() => {
         router.push("/")
       }, 100)
       
       return () => clearTimeout(timeoutId)
     }
-  }, [isConnected, isCavosAuthenticated, pathname, router])
+  }, [isConnected, address, pathname, router, isInitializing])
 
   return {
     address,
-    isAuthenticated: isConnected || isCavosAuthenticated,
+    isAuthenticated: isConnected && !!address,
     isProtectedRoute: pathname !== "/" && !pathname.startsWith("/#")
   }
 } 

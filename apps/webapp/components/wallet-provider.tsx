@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useEffect, useRef } from 'react'
+import React, { useMemo, useEffect, useRef, useCallback } from 'react'
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 import { WalletContext } from '@/hooks/use-wallet'
 
@@ -17,129 +17,159 @@ export function WalletProvider({ children }: WalletProviderProps) {
   const { disconnect, status: disconnectStatus } = useDisconnect()
   const hasAttemptedReconnect = useRef(false)
   const isInitialMount = useRef(true)
+  const hasCreatedUser = useRef(false)
 
-  // Persist wallet connection state to localStorage
+  // Create user in database when wallet connects
   useEffect(() => {
     if (typeof window === 'undefined') return
+    if (!isConnected || !address) return
+    if (hasCreatedUser.current) return // Only create once per connection
 
-    if (isConnected && address) {
-      let connectorId: string | undefined
-      
+    const createUserProfile = async () => {
       try {
-        const stored = localStorage.getItem('starknet_last_connector')
-        if (stored) {
-          connectorId = stored
-        }
-      } catch {
-        // Ignore errors reading internal storage
-      }
-      
-      // If no connectorId found, use first available connector
-      if (!connectorId) {
-        const availableConnector = connectors.find(c => {
-          try {
-            return c.available()
-          } catch {
-            return false
-          }
+        // Silently create user profile by calling the profile API
+        const response = await fetch('/api/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-wallet-address': address,
+            'x-wallet-network': 'mainnet', // Default to mainnet, can be updated later
+          },
         })
-        connectorId = availableConnector?.id || connectors[0]?.id
-      }
-      
-      if (connectorId) {
-        localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify({
-          address,
-          connectorId,
-          timestamp: Date.now()
-        }))
-      }
-      // Mark that we're not in initial mount anymore
-      isInitialMount.current = false
-    }
-    // Don't remove localStorage here - let explicit disconnect handle it
-  }, [isConnected, address, connectors])
 
-  // Restore wallet connection on mount (persistence)
+        if (response.ok) {
+          hasCreatedUser.current = true
+          // User created or already exists - no need to show anything
+        } else {
+          // Log error but don't show to user (silent failure)
+          console.warn('Failed to create user profile:', await response.text().catch(() => 'Unknown error'))
+        }
+      } catch (error) {
+        // Silent error - don't interrupt user experience
+        console.warn('Error creating user profile:', error)
+      }
+    }
+
+    // Small delay to avoid race conditions
+    const timeoutId = setTimeout(createUserProfile, 500)
+    
+    return () => clearTimeout(timeoutId)
+  }, [isConnected, address])
   useEffect(() => {
     if (typeof window === 'undefined') return
+    
     if (isConnected) {
       // Reset flag if already connected (in case user manually connected)
       hasAttemptedReconnect.current = false
       isInitialMount.current = false
       return
     }
-    if (connectStatus === 'pending') return // Connection in progress
-    if (!connectors || connectors.length === 0) return // Connectors not ready yet
 
-    // Only attempt once per session
-    if (hasAttemptedReconnect.current) return
-
-    const attemptReconnect = async () => {
-      hasAttemptedReconnect.current = true
-
+    if (!isInitialMount.current && !isConnected && !address) {
       try {
-        const savedConnection = localStorage.getItem(WALLET_STORAGE_KEY)
-        if (!savedConnection) {
-          isInitialMount.current = false
-          return
+        localStorage.removeItem(WALLET_STORAGE_KEY)
+        localStorage.removeItem('starknet_last_connector')
+        localStorage.removeItem('walletStarknetkitLatest')
+        // Clear any other potential storage keys
+        const keysToRemove: string[] = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && (
+            key.includes('starknet') || 
+            key.includes('wallet') ||
+            key.includes('connector')
+          )) {
+            keysToRemove.push(key)
+          }
         }
-
-        const { connectorId, address: savedAddress } = JSON.parse(savedConnection)
-        if (!connectorId || !savedAddress) {
-          // Clear invalid data
-          localStorage.removeItem(WALLET_STORAGE_KEY)
-          isInitialMount.current = false
-          return
-        }
-
-        // Find the connector that was previously used
-        const connector = connectors.find(c => c.id === connectorId)
-        if (!connector) {
-          // Connector no longer available, clear storage
-          localStorage.removeItem(WALLET_STORAGE_KEY)
-          isInitialMount.current = false
-          return
-        }
-
-        // Check if the wallet extension is available
-        if (!connector.available()) {
-          // Wallet extension not available, but keep storage in case user installs it later
-          isInitialMount.current = false
-          return
-        }
-
-        // Silently reconnect without showing popups
-        await connect({ connector })
-        isInitialMount.current = false
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+        
+        hasAttemptedReconnect.current = false
+        hasCreatedUser.current = false
       } catch (error) {
-        console.error('Error restoring wallet connection:', error)
-        // Don't clear storage on error - user might want to retry
-        isInitialMount.current = false
+        console.warn('Error clearing localStorage on disconnect:', error)
       }
     }
-
-    // Small delay to ensure connectors are fully initialized
-    const timeoutId = setTimeout(attemptReconnect, 200)
+    
+    // Mark initial mount as complete after a short delay to allow auto-reconnect
+    const timeoutId = setTimeout(() => {
+      isInitialMount.current = false
+    }, 2000) // Give auto-reconnect 2 seconds to work
     
     return () => clearTimeout(timeoutId)
-  }, [isConnected, connectStatus, connectors, connect])
+  }, [isConnected, address])
 
-  // Handle explicit disconnect - clear storage
   useEffect(() => {
     if (disconnectStatus === 'success' || disconnectStatus === 'error') {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem(WALLET_STORAGE_KEY)
+        try {
+          localStorage.removeItem(WALLET_STORAGE_KEY)
+          localStorage.removeItem('starknet_last_connector')
+          localStorage.removeItem('walletStarknetkitLatest')
+          
+          // Clear any other potential storage keys
+          const keysToRemove: string[] = []
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key && (
+              key.includes('starknet') || 
+              key.includes('wallet') ||
+              key.includes('connector')
+            )) {
+              keysToRemove.push(key)
+            }
+          }
+          keysToRemove.forEach(key => localStorage.removeItem(key))
+        } catch (error) {
+          console.warn('Error clearing localStorage on disconnect:', error)
+        }
+        
         hasAttemptedReconnect.current = false
         isInitialMount.current = false
+        hasCreatedUser.current = false // Reset so user can be created again on reconnect
       }
     }
   }, [disconnectStatus])
+
+
+  const handleDisconnect = useCallback(async () => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(WALLET_STORAGE_KEY)
+        localStorage.removeItem('starknet_last_connector')
+        localStorage.removeItem('walletStarknetkitLatest')
+        
+        // Clear any other potential storage keys
+        const keysToRemove: string[] = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && (
+            key.includes('starknet') || 
+            key.includes('wallet') ||
+            key.includes('connector')
+          )) {
+            keysToRemove.push(key)
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+      } catch (error) {
+        console.warn('Error clearing localStorage before disconnect:', error)
+      }
+    }
+    
+    // Reset flags
+    hasAttemptedReconnect.current = false
+    hasCreatedUser.current = false
+    
+    // Now disconnect
+    await disconnect()
+  }, [disconnect])
 
   const contextValue = useMemo(() => ({
     address,
     isConnected: isConnected ?? false,
     connect,
-    disconnect,
+    disconnect: handleDisconnect,
     connectors,
     isConnecting: connectStatus === 'pending',
     isDisconnecting: disconnectStatus === 'pending',
@@ -147,7 +177,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
     address,
     isConnected,
     connect,
-    disconnect,
+    handleDisconnect,
     connectors,
     connectStatus,
     disconnectStatus

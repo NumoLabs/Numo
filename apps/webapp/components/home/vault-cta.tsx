@@ -3,11 +3,45 @@
 import { useState, useEffect } from "react"
 import { CheckCircle2, Sparkles, Star } from "lucide-react"
 import { motion } from "framer-motion"
-import { CavosAuthModal } from "../ui/cavos-auth-modal"
 import { Button } from "../ui/button"
+import { useWalletStatus } from "@/hooks/use-wallet"
+import { useWallet } from "@/hooks/use-wallet"
+import { useConnect } from '@starknet-react/core'
+import { StarknetkitConnector, useStarknetkitConnectModal } from 'starknetkit'
 
 export function VaultCTA() {
   const [userCount, setUserCount] = useState<number | null>(null)
+  const { isConnected, address } = useWalletStatus()
+  const { connectAsync, connectors } = useConnect()
+  const { isConnecting } = useWallet()
+  const { starknetkitConnectModal } = useStarknetkitConnectModal({
+    connectors: connectors as StarknetkitConnector[],
+    modalTheme: 'dark',
+  })
+
+  const handleConnect = async () => {
+    try {
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('starknet_last_connector')
+          localStorage.removeItem('walletStarknetkitLatest')
+          localStorage.removeItem('starknet_wallet_connection')
+        } catch (error) {
+          console.warn('Error clearing localStorage before modal:', error)
+        }
+      }
+
+      const { connector } = await starknetkitConnectModal()
+      
+      if (!connector) {
+        return
+      }
+      
+      await connectAsync({ connector })
+    } catch (error) {
+      console.error('Failed to connect wallet:', error)
+    }
+  }
 
   // Fetch real user count from Supabase via API route
   useEffect(() => {
@@ -85,19 +119,32 @@ export function VaultCTA() {
                 transition={{ duration: 0.3, delay: 0.2 }}
                 viewport={{ once: true }}
               >
-                <CavosAuthModal
-                  trigger={
-                    <Button
-                      size={undefined}
-                      className="!h-auto group relative w-full sm:w-48 overflow-hidden font-bold rounded-lg !py-2 !px-6 text-base shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse sm:mr-4"
-                    >
+                {isConnected && address ? (
+                  <Button
+                    size={undefined}
+                    asChild
+                    className="!h-auto group relative w-full sm:w-48 overflow-hidden font-bold rounded-lg !py-2 !px-6 text-base shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse sm:mr-4"
+                  >
+                    <a href="/dashboard">
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        Join Numo
+                        Go to Dashboard
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </Button>
-                  }
-                />
+                    </a>
+                  </Button>
+                ) : (
+                  <Button
+                    size={undefined}
+                    onClick={handleConnect}
+                    disabled={isConnecting || connectors.length === 0}
+                    className="!h-auto group relative w-full sm:w-48 overflow-hidden font-bold rounded-lg !py-2 !px-6 text-base shadow-xl transition-all transform focus:outline-none focus:ring-4 focus:ring-orange-500/50 bg-gradient-to-r from-orange-500 via-yellow-500 to-orange-500 hover:from-orange-400 hover:via-yellow-400 hover:to-orange-400 text-black shadow-bitcoin hover:-translate-y-1 hover:shadow-bitcoin-gold animate-bitcoin-pulse sm:mr-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </Button>
+                )}
 
                 <div className="text-center sm:text-left w-full sm:w-auto">
                   <div className="text-[10px] sm:text-xs text-gray-400">

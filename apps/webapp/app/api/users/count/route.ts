@@ -23,28 +23,17 @@ export async function GET() {
   }
 
   try {
-    // Try to get count from users table
+    // Get count from users table
     const { count, error } = await supabase
       .from('users')
       .select('*', { count: 'exact', head: true })
 
     if (error) {
       console.error('Error fetching user count from users table:', error)
-      
-      // Fallback: try users_with_primary_wallet view
-      const { count: count2, error: error2 } = await supabase
-        .from('users_with_primary_wallet')
-        .select('*', { count: 'exact', head: true })
-      
-      if (error2) {
-        console.error('Error fetching user count from users_with_primary_wallet:', error2)
-        return NextResponse.json(
-          { error: 'Failed to fetch user count', count: 0 },
-          { status: 500 }
-        )
-      }
-
-      return NextResponse.json({ count: count2 ?? 0 })
+      return NextResponse.json(
+        { error: 'Failed to fetch user count', count: 0 },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ count: count ?? 0 })

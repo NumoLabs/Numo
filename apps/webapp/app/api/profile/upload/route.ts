@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const userId = formData.get('userId') as string;
+    const walletAddress = request.headers.get('x-wallet-address');
 
     if (!file) {
       return NextResponse.json(
@@ -38,12 +38,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!userId) {
+    if (!walletAddress || walletAddress.trim().length === 0) {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        { error: 'Wallet address is required. Please provide x-wallet-address header.' },
         { status: 400 }
       );
     }
+
+    // Use wallet address as user identifier
+    const userId = walletAddress.trim();
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];

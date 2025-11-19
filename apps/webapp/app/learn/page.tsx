@@ -1,10 +1,13 @@
+import { Suspense } from "react"
 import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout"
-import { CavosAuthGuard } from "@/components/auth"
+import { WalletAuthGuard } from "@/components/auth"
 
 export default function LearnPage() {
   return (
-    <CavosAuthGuard>
-      <DashboardLayout />
-    </CavosAuthGuard>
+    <WalletAuthGuard>
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-white">Loading...</div></div>}>
+        <DashboardLayout />
+      </Suspense>
+    </WalletAuthGuard>
   )
 }

@@ -14,7 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useCavosAuthContext } from "@/components/cavos-auth-provider"
+import { useWalletStatus } from "@/hooks/use-wallet"
+import { useWallet } from "@/hooks/use-wallet"
 
 interface TopNavigationProps {
   setSidebarOpen: (open: boolean) => void
@@ -23,26 +24,26 @@ interface TopNavigationProps {
 interface UserProfileData {
   username: string | null;
   avatar_url: string | null;
-  email: string;
+  wallet_address: string;
 }
 
 // Cache key for user profile in sessionStorage
-const getProfileCacheKey = (userId: string) => `user_profile_${userId}`;
+const getProfileCacheKey = (walletAddress: string) => `user_profile_${walletAddress}`;
 
 // Memoized avatar component to prevent unnecessary re-renders
 const UserAvatar = memo(() => {
-  const { user: authUser, isAuthenticated, accessToken, refreshToken } = useCavosAuthContext();
+  const { isConnected, address } = useWalletStatus();
   const [profile, setProfile] = useState<UserProfileData | null>(null);
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!isAuthenticated || !authUser?.id) {
+      if (!isConnected || !address) {
         setProfile(null);
         return;
       }
 
       // Try to load from cache first
-      const cacheKey = getProfileCacheKey(authUser.id);
+      const cacheKey = getProfileCacheKey(address);
       try {
         const cachedData = sessionStorage.getItem(cacheKey);
         if (cachedData) {
@@ -53,7 +54,7 @@ const UserAvatar = memo(() => {
             setProfile({
               username: parsed.username,
               avatar_url: parsed.avatar_url,
-              email: parsed.email || authUser.email || '',
+              wallet_address: parsed.wallet_address || address,
             });
             return; // Use cached data, skip fetch
           }
@@ -64,61 +65,20 @@ const UserAvatar = memo(() => {
 
       // Fetch from API if no valid cache
       try {
-        const token = accessToken || 
-          (typeof window !== 'undefined' 
-            ? localStorage.getItem('cavos_access_token')
-            : null);
-        
-        if (!token || typeof token !== 'string' || token.trim().length === 0) {
-          console.warn('No access token available for profile fetch');
-          return;
-        }
-        
-        let response = await fetch('/api/profile', {
+        const response = await fetch('/api/profile', {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'x-wallet-address': address,
+            'x-wallet-network': 'mainnet',
           },
         });
-        
-        // If 401, try to refresh token and retry
-        if (response.status === 401) {
-          try {
-            // Only attempt refresh if not already marked as invalid
-            const refreshResult = await refreshToken();
-            
-            // Get new token after refresh
-            const newToken = refreshResult?.access_token || 
-              (typeof window !== 'undefined' 
-                ? localStorage.getItem('cavos_access_token')
-                : null);
-            
-            if (newToken) {
-              // Retry with new token
-              response = await fetch('/api/profile', {
-                headers: {
-                  'Authorization': `Bearer ${newToken}`,
-                },
-              });
-            }
-          } catch (refreshError: unknown) {
-            // If refresh token is expired (401), signOut will be called automatically
-            // Just silently fail for avatar loading
-            const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError || '')
-            if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
-              // Session expired - signOut will be called automatically, just return
-              return;
-            }
-            // For other errors, log and return
-            return;
-          }
-        }
         
         if (response.ok) {
           const data = await response.json();
           const profileData = {
             username: data.username,
             avatar_url: data.avatar_url,
-            email: data.email || authUser.email || '',
+            wallet_address: data.wallet_address || address,
           };
           
           setProfile(profileData);
@@ -143,8 +103,8 @@ const UserAvatar = memo(() => {
     // Listen for profile updates
     const handleProfileUpdate = () => {
       // Clear cache when profile is updated
-      if (authUser?.id) {
-        const cacheKey = getProfileCacheKey(authUser.id);
+      if (address) {
+        const cacheKey = getProfileCacheKey(address);
         try {
           sessionStorage.removeItem(cacheKey);
         } catch {
@@ -159,9 +119,9 @@ const UserAvatar = memo(() => {
     return () => {
       window.removeEventListener('profile-updated', handleProfileUpdate);
     };
-  }, [isAuthenticated, authUser?.id, authUser?.email, accessToken, refreshToken]);
+  }, [isConnected, address]);
 
-  const username = profile?.username || authUser?.email?.split('@')[0] || 'User';
+  const username = profile?.username || address?.slice(0, 8) || 'User';
   const initials = useMemo(() => {
     return username
       .split(' ')
@@ -197,18 +157,25 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
   const pathname = usePathname()
   const isProfilePage = pathname === "/profile"
   const router = useRouter()
-  const { signOut: cavosSignOut, user: authUser, isAuthenticated, accessToken, refreshToken } = useCavosAuthContext()
+  const { isConnected, address } = useWalletStatus();
+  const { disconnect } = useWallet();
   const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Only render DropdownMenu after mount to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!isAuthenticated || !authUser?.id) {
+      if (!isConnected || !address) {
         setProfile(null);
         return;
       }
 
       // Try to load from cache first
-      const cacheKey = getProfileCacheKey(authUser.id);
+      const cacheKey = getProfileCacheKey(address);
       try {
         const cachedData = sessionStorage.getItem(cacheKey);
         if (cachedData) {
@@ -219,7 +186,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
             setProfile({
               username: parsed.username,
               avatar_url: parsed.avatar_url,
-              email: parsed.email || authUser.email || '',
+              wallet_address: parsed.wallet_address || address,
             });
             return; // Use cached data, skip fetch
           }
@@ -230,61 +197,20 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
 
       // Fetch from API if no valid cache
       try {
-        const token = accessToken || 
-          (typeof window !== 'undefined' 
-            ? localStorage.getItem('cavos_access_token')
-            : null);
-        
-        if (!token || typeof token !== 'string' || token.trim().length === 0) {
-          console.warn('No access token available for profile fetch');
-          return;
-        }
-        
-        let response = await fetch('/api/profile', {
+        const response = await fetch('/api/profile', {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'x-wallet-address': address,
+            'x-wallet-network': 'mainnet',
           },
         });
-        
-        // If 401, try to refresh token and retry
-        if (response.status === 401) {
-          try {
-            // Only attempt refresh if not already marked as invalid
-            const refreshResult = await refreshToken();
-            
-            // Get new token after refresh
-            const newToken = refreshResult?.access_token || 
-              (typeof window !== 'undefined' 
-                ? localStorage.getItem('cavos_access_token')
-                : null);
-            
-            if (newToken) {
-              // Retry with new token
-              response = await fetch('/api/profile', {
-                headers: {
-                  'Authorization': `Bearer ${newToken}`,
-                },
-              });
-            }
-          } catch (refreshError: unknown) {
-            // If refresh token is expired (401), signOut will be called automatically
-            // Just silently fail for avatar loading
-            const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError || '')
-            if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
-              // Session expired - signOut will be called automatically, just return
-              return;
-            }
-            // For other errors, log and return
-            return;
-          }
-        }
         
         if (response.ok) {
           const data = await response.json();
           const profileData = {
             username: data.username,
             avatar_url: data.avatar_url,
-            email: data.email || authUser.email || '',
+            wallet_address: data.wallet_address || address,
           };
           
           setProfile(profileData);
@@ -309,8 +235,8 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
     // Listen for profile updates
     const handleProfileUpdate = () => {
       // Clear cache when profile is updated
-      if (authUser?.id) {
-        const cacheKey = getProfileCacheKey(authUser.id);
+      if (address) {
+        const cacheKey = getProfileCacheKey(address);
         try {
           sessionStorage.removeItem(cacheKey);
         } catch {
@@ -325,15 +251,15 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
     return () => {
       window.removeEventListener('profile-updated', handleProfileUpdate);
     };
-  }, [isAuthenticated, authUser?.id, authUser?.email, accessToken, refreshToken]);
+  }, [isConnected, address]);
 
-  const handleCavosSignOut = useCallback(async () => {
-    await cavosSignOut()
+  const handleDisconnect = useCallback(async () => {
+    await disconnect()
     router.push('/')
-  }, [cavosSignOut, router])
+  }, [disconnect, router])
 
-  const usernameDisplay = profile?.username || authUser?.email?.split('@')[0] || 'User';
-  const userEmail = profile?.email || authUser?.email || '';
+  const usernameDisplay = profile?.username || address?.slice(0, 8) || 'User';
+  const walletDisplay = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
   const username = usernameDisplay ? `@${usernameDisplay.toLowerCase().replace(/\s+/g, '_')}` : '@user';
 
   return (
@@ -387,6 +313,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
 
           <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-700" />
 
+          {mounted ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gradient-to-r hover:from-cyan-500 hover:to-blue-500 hover:ring-2 hover:ring-cyan-500/50 transition-all duration-200">
@@ -397,7 +324,9 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{username}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
+                    {walletDisplay && (
+                      <p className="text-xs leading-none text-muted-foreground font-mono">{walletDisplay}</p>
+                    )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -407,14 +336,19 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={handleCavosSignOut} 
+                  onClick={handleDisconnect} 
                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:text-red-600 dark:hover:text-red-400 dark:hover:bg-red-950/50 cursor-pointer focus:text-red-500 focus:bg-red-50 dark:focus:text-red-500 dark:focus:bg-red-950/50"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
+                  Disconnect Wallet
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          ) : (
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gradient-to-r hover:from-cyan-500 hover:to-blue-500 hover:ring-2 hover:ring-cyan-500/50 transition-all duration-200">
+              <UserAvatar />
+            </Button>
+          )}
         </div>
       </div>
     </div>

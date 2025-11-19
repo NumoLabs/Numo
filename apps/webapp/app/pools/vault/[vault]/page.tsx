@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard/layout/dashboard-layout"
-import { CavosAuthGuard } from "@/components/auth"
+import { WalletAuthGuard } from "@/components/auth"
 
 // type Props = {
 //   params: Promise<{ vault: string }>
@@ -30,8 +30,8 @@ export default async function VaultDetailPage(
   // }
 
   return (
-    <CavosAuthGuard>
+    <WalletAuthGuard>
       <DashboardLayout>{/* rest of code here */}</DashboardLayout>
-    </CavosAuthGuard>
+    </WalletAuthGuard>
   )
 }

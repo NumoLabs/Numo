@@ -4,12 +4,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 import Image from "next/image"
-import { useEffect, useState, useCallback } from "react"
+import { } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import WalletConnector from "@/components/ui/connectWallet"
-import { useCavosAuth } from "@/hooks/use-cavos-auth"
+import { useWalletStatus } from "@/hooks/use-wallet"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 
@@ -19,67 +19,9 @@ interface HeaderProps {
 
 export function Header({ variant = "auto" }: HeaderProps) {
   const pathname = usePathname()
-  const { isAuthenticated: isCavosAuthenticated, isInitialized: isCavosInitialized } = useCavosAuth()
+  const { isConnected, address } = useWalletStatus()
   
-  // Check localStorage directly for immediate feedback
-  const checkLocalStorage = useCallback(() => {
-    if (typeof window === 'undefined') return false
-    
-    const accessToken = localStorage.getItem('cavos_access_token')
-    const refreshToken = localStorage.getItem('cavos_refresh_token')
-    const storedUser = localStorage.getItem('cavos_user')
-    
-    return !!(
-      accessToken && 
-      accessToken !== 'undefined' && 
-      accessToken !== 'null' &&
-      accessToken.trim().length > 0 &&
-      refreshToken && 
-      refreshToken !== 'undefined' && 
-      refreshToken !== 'null' &&
-      refreshToken.trim().length > 0 &&
-      storedUser && 
-      storedUser !== 'undefined' && 
-      storedUser !== 'null' &&
-      storedUser.trim().length > 0
-    )
-  }, [])
-  
-  const [hasLocalStorageAuth, setHasLocalStorageAuth] = useState(() => checkLocalStorage())
-  
-  // Force re-render when localStorage changes
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    
-    const handleStorageChange = () => {
-      setHasLocalStorageAuth(checkLocalStorage())
-    }
-    
-    // Listen for custom storage event
-    window.addEventListener('cavos-auth-update', handleStorageChange)
-    
-    // Also check periodically for the first few seconds after mount
-    const interval = setInterval(() => {
-      const hasAuth = checkLocalStorage()
-      if (hasAuth !== hasLocalStorageAuth) {
-        setHasLocalStorageAuth(hasAuth)
-        clearInterval(interval)
-      }
-    }, 100)
-    
-    const timeout = setTimeout(() => {
-      clearInterval(interval)
-    }, 5000) // Stop checking after 5 seconds
-    
-    return () => {
-      window.removeEventListener('cavos-auth-update', handleStorageChange)
-      clearInterval(interval)
-      clearTimeout(timeout)
-    }
-  }, [checkLocalStorage, hasLocalStorageAuth])
-  
-  // Calculate if dashboard should be shown
-  const shouldShowDashboard = isCavosInitialized && (isCavosAuthenticated || hasLocalStorageAuth)
+  const shouldShowDashboard = isConnected && !!address
 
   const getVariant = () => {
     if (variant !== "auto") return variant
@@ -207,7 +149,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
                   <Image src="/numo-logo.png" alt="Numo Logo" width={40} height={40} className="h-14 w-14" />
                   <span>Numo</span>
                 </Link>
-                {isCavosAuthenticated && (
+                {shouldShowDashboard && (
                   <>
                     <Link
                       href="/dashboard"
@@ -253,15 +195,6 @@ export function Header({ variant = "auto" }: HeaderProps) {
                       )}
                     >
                       Learn DeFi
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className={cn(
-                        "hover:text-foreground",
-                        pathname === "/settings" ? "text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      Settings
                     </Link>
                   </>
                 )}
@@ -337,9 +270,7 @@ export function Header({ variant = "auto" }: HeaderProps) {
             </Link>
           </nav>
         </div>
-        <div className="flex items-center gap-6 ml-auto pl-12">
-          <WalletConnector />
-        </div>
+        {/* WalletConnector removed from dashboard pages - connection is done in landing */}
       </div>
     </header>
   )

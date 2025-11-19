@@ -1,34 +1,35 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useCavosAuthContext } from '@/components/cavos-auth-provider';
+import { useWalletStatus } from '@/hooks/use-wallet';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Loader2, Save, Edit2, X, Upload } from 'lucide-react';
+import { User, Wallet, Loader2, Save, Edit2, X, Upload, Copy, Check } from 'lucide-react';
+import type { NetworkType } from '@/lib/supabase/users';
 
 interface UserProfile {
   id: string;
-  email: string;
+  wallet_address: string;
+  wallet_network: NetworkType;
   username: string | null;
   avatar_url: string | null;
-  primary_wallet_address: string | null;
-  primary_wallet_network: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export function ProfileContent() {
-  const { user: authUser, isAuthenticated, accessToken: contextAccessToken, refreshToken } = useCavosAuthContext();
+  const { isConnected, address } = useWalletStatus();
   const { toast } = useToast();
   
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [walletNetwork, setWalletNetwork] = useState<NetworkType>('mainnet');
   
   const [formData, setFormData] = useState({
     username: '',
@@ -46,70 +47,29 @@ export function ProfileContent() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
+  // Copy wallet address state
+  const [copied, setCopied] = useState(false);
+
   // Load user profile
   useEffect(() => {
     const loadProfile = async () => {
-      if (!isAuthenticated || !authUser?.id) {
+      if (!isConnected || !address) {
         setIsLoading(false);
         return;
       }
 
       try {
         setIsLoading(true);
-        // Get access token from context first, then localStorage as fallback
-        const accessToken = contextAccessToken || 
-          (typeof window !== 'undefined' 
-            ? localStorage.getItem('cavos_access_token')
-            : null);
-        
-        if (!accessToken || typeof accessToken !== 'string' || accessToken.trim().length === 0) {
-          throw new Error('Access token is required. Please sign in again.');
-        }
         
         const headers: HeadersInit = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
+          'x-wallet-address': address,
+          'x-wallet-network': walletNetwork,
         };
         
-        let response = await fetch('/api/profile', {
+        const response = await fetch('/api/profile', {
           headers,
         });
-        
-        // If 401, try to refresh token and retry
-        if (response.status === 401) {
-          try {
-            // Only attempt refresh if not already marked as invalid
-            const refreshResult = await refreshToken();
-            
-            // Get new token after refresh (from result or localStorage)
-            const newToken = refreshResult?.access_token || 
-              (typeof window !== 'undefined' 
-                ? localStorage.getItem('cavos_access_token')
-                : null);
-            
-            if (newToken) {
-              // Retry with new token
-              const newHeaders: HeadersInit = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${newToken}`,
-              };
-              
-              response = await fetch('/api/profile', {
-                headers: newHeaders,
-              });
-            } else {
-              throw new Error('Failed to get new token after refresh');
-            }
-          } catch (refreshError: unknown) {
-            // If refresh token is expired (401), signOut will be called automatically
-            // Just throw a user-friendly error
-            const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError || '')
-            if (errorMessage.includes('401') || errorMessage.includes('Invalid or expired refresh token') || errorMessage.includes('Refresh token')) {
-              throw new Error('Your session has expired. Please sign in again.');
-            }
-            throw refreshError;
-          }
-        }
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
@@ -118,6 +78,10 @@ export function ProfileContent() {
 
         const data = await response.json();
         setProfile(data);
+        // Update wallet network from profile if available
+        if (data.wallet_network) {
+          setWalletNetwork(data.wallet_network);
+        }
         const initialFormData = {
           username: data.username || '',
           avatarUrl: data.avatar_url || '',
@@ -136,15 +100,15 @@ export function ProfileContent() {
     };
 
     loadProfile();
-  }, [isAuthenticated, authUser?.id, toast, contextAccessToken, refreshToken]);
+  }, [isConnected, address, walletNetwork, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isAuthenticated || !authUser?.id) {
+    if (!isConnected || !address) {
       toast({
         title: 'Error',
-        description: 'You must be authenticated to update your profile',
+        description: 'You must connect your wallet to update your profile',
         variant: 'destructive',
       });
       return;
@@ -171,23 +135,14 @@ export function ProfileContent() {
           return;
         }
       }
-
-      const accessToken = contextAccessToken || 
-        (typeof window !== 'undefined' 
-          ? localStorage.getItem('cavos_access_token')
-          : null);
       
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'x-wallet-address': address,
+        'x-wallet-network': walletNetwork,
       };
       
-      if (!accessToken || typeof accessToken !== 'string' || accessToken.trim().length === 0) {
-        throw new Error('Access token is required. Please sign in again.');
-      }
-      
-      headers['Authorization'] = `Bearer ${accessToken}`;
-      
-      let response = await fetch('/api/profile', {
+      const response = await fetch('/api/profile', {
         method: 'PUT',
         headers,
         body: JSON.stringify({
@@ -196,40 +151,6 @@ export function ProfileContent() {
         }),
       });
 
-      // If 401, try to refresh token and retry
-      if (response.status === 401) {
-        try {
-          const refreshResult = await refreshToken();
-          
-          // Get new token after refresh
-          const newToken = refreshResult?.access_token || 
-            (typeof window !== 'undefined' 
-              ? localStorage.getItem('cavos_access_token')
-              : null);
-          
-          if (newToken) {
-            // Retry with new token
-            const newHeaders: HeadersInit = {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${newToken}`,
-            };
-            
-            response = await fetch('/api/profile', {
-              method: 'PUT',
-              headers: newHeaders,
-              body: JSON.stringify({
-                username: formData.username || null,
-                avatar_url: avatarUrl || null,
-              }),
-            });
-          } else {
-            throw new Error('Failed to get new token after refresh');
-          }
-        } catch {
-          throw new Error('Your session has expired. Please sign in again.');
-        }
-      }
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to update profile');
@@ -237,6 +158,11 @@ export function ProfileContent() {
 
       const updatedProfile = await response.json();
       setProfile(updatedProfile);
+      
+      // Update wallet network from profile if available
+      if (updatedProfile.wallet_network) {
+        setWalletNetwork(updatedProfile.wallet_network);
+      }
       
       // Update original form data to match saved data
       const savedFormData = {
@@ -327,18 +253,21 @@ export function ProfileContent() {
   };
 
   const uploadAvatar = async (file: File): Promise<string | null> => {
-    if (!authUser?.id) {
-      throw new Error('User ID is required');
+    if (!address) {
+      throw new Error('Wallet address is required');
     }
 
     try {
       setIsUploadingAvatar(true);
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('userId', authUser.id);
 
       const response = await fetch('/api/profile/upload', {
         method: 'POST',
+        headers: {
+          'x-wallet-address': address,
+          'x-wallet-network': walletNetwork,
+        },
         body: formData,
       });
 
@@ -361,6 +290,26 @@ export function ProfileContent() {
     }
   };
 
+  const handleCopyWallet = async () => {
+    if (!address) return;
+
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      toast({
+        title: 'Copied!',
+        description: 'Wallet address copied to clipboard',
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy wallet address',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -369,7 +318,7 @@ export function ProfileContent() {
     );
   }
 
-  const username = profile?.username || authUser?.email?.split('@')[0] || 'User';
+  const username = profile?.username || address?.slice(0, 8) || 'User';
   const initials = username
     .split(' ')
     .map(n => n[0])
@@ -403,6 +352,7 @@ export function ProfileContent() {
                     (isEditing ? (formData.avatarUrl || profile?.avatar_url || '') : (profile?.avatar_url || formData.avatarUrl || ''))
                   } 
                   alt={username} 
+                  className="object-cover"
                 />
                 <AvatarFallback className="text-2xl bg-gradient-to-br from-bitcoin-orange to-bitcoin-gold">
                   {initials}
@@ -440,7 +390,11 @@ export function ProfileContent() {
                 <p className="text-sm font-medium">
                   {isEditing ? (formData.username || username) : username}
                 </p>
-                <p className="text-xs text-muted-foreground">{profile?.email || authUser?.email}</p>
+                {address && (
+                  <p className="text-xs text-muted-foreground font-mono">
+                    {address.slice(0, 6)}...{address.slice(-4)}
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -469,24 +423,6 @@ export function ProfileContent() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email (Read-only) */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profile?.email || authUser?.email || ''}
-                    disabled
-                    className="pl-10 bg-muted/50 cursor-not-allowed"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
-              </div>
-
               {/* Username */}
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>
@@ -505,18 +441,35 @@ export function ProfileContent() {
               </div>
 
               {/* Wallet Address (Read-only) */}
-              {profile?.primary_wallet_address && (
+              {address && (
                 <div className="space-y-2">
                   <Label htmlFor="wallet">Wallet Address</Label>
+                  <div className="relative flex items-center gap-2">
+                    <Wallet className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
                   <Input
                     id="wallet"
                     type="text"
-                    value={profile.primary_wallet_address}
+                      value={address}
                     disabled
-                    className="bg-muted/50 cursor-not-allowed font-mono text-sm"
+                      className="pl-10 pr-12 bg-muted/50 cursor-not-allowed font-mono text-sm"
                   />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopyWallet}
+                      className="absolute right-1 h-8 w-8 hover:bg-muted/80"
+                      title="Copy wallet address"
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Network: {profile.primary_wallet_network || 'mainnet'}
+                    Network: {walletNetwork}
                   </p>
                 </div>
               )}

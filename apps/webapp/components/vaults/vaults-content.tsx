@@ -2,14 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { useAccount } from '@starknet-react/core';
-import { useWallet } from '@/hooks/use-wallet';
 import { motion } from 'framer-motion';
 import { VaultCard, type VaultPool } from './vault-card';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Briefcase, Search, Loader2, AlertCircle, Wallet, TrendingUp, Zap, Sparkles } from 'lucide-react';
+import { Briefcase, Search, Loader2, TrendingUp, Zap, Sparkles } from 'lucide-react';
 import {
   useVaultPools,
   useVesuPoolsData,
@@ -20,23 +18,7 @@ import {
 
 export function VaultsContent() {
   const { address, isConnected } = useAccount();
-  const { connect, connectors, isConnecting } = useWallet();
-  const [selectedConnector, setSelectedConnector] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const handleConnect = async (connectorId: string) => {
-    setSelectedConnector(connectorId);
-    try {
-      const connector = connectors.find(c => c.id === connectorId);
-      if (connector) {
-        await connect({ connector });
-      }
-    } catch (error) {
-      console.error('Failed to connect wallet:', error);
-    } finally {
-      setSelectedConnector(null);
-    }
-  };
 
   const formatAddress = (addr: string | undefined) => {
     if (!addr) return '';
@@ -172,133 +154,7 @@ export function VaultsContent() {
   }, [vaults]);
 
   if (!isConnected) {
-    return (
-      <div className="relative space-y-8 min-h-screen">
-        {/* Animated Background Elements */}
-        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-          <motion.div 
-            className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-bitcoin-orange/20 via-bitcoin-orange/10 to-transparent rounded-full blur-3xl"
-            animate={{ 
-              x: [0, 50, 0],
-              y: [0, -30, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{ 
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div 
-            className="absolute top-1/3 right-1/4 w-80 h-80 bg-gradient-to-br from-bitcoin-gold/20 via-bitcoin-gold/10 to-transparent rounded-full blur-3xl"
-            animate={{ 
-              x: [0, -40, 0],
-              y: [0, 40, 0],
-              scale: [1, 0.9, 1],
-            }}
-            transition={{ 
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="relative">
-            <div className="absolute -left-4 -top-4 w-32 h-32 bg-bitcoin-orange/10 rounded-full blur-2xl" />
-            <div className="relative">
-              <div className="flex items-center gap-3 -mt-6">
-                <h1 className="text-4xl md:text-3x1 font-bold tracking-tight">
-                  Vaults
-                </h1>
-              </div>
-              <p className="text-gray-400 mt-2 text-lg ml-2">
-                Connect your wallet to explore and interact with yield farming vaults
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Wallet Connection Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-        <Card className="relative overflow-hidden border-2 border-bitcoin-orange/40 bg-gradient-to-br from-bitcoin-orange/10 via-bitcoin-gold/5 to-gray-900/50 backdrop-blur-md shadow-xl shadow-bitcoin-orange/10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-bitcoin-orange/20 rounded-full blur-3xl -mr-32 -mt-32" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-bitcoin-gold/15 rounded-full blur-2xl -ml-24 -mb-24" />
-          <CardHeader className="relative z-10">
-            <CardTitle className="flex items-center gap-3 text-bitcoin-orange text-xl">
-              Connect StarkNet Wallet
-            </CardTitle>
-            <CardDescription className="text-gray-300 mt-2">
-              Connect your StarkNet wallet to view and interact with vaults
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5 relative z-10">
-            <Alert className="border-2 border-bitcoin-orange/40 bg-gradient-to-r from-bitcoin-orange/15 to-bitcoin-orange/10 backdrop-blur-sm">
-              <AlertCircle className="h-5 w-5 text-bitcoin-orange" />
-              <AlertDescription className="text-bitcoin-orange font-medium">
-                Please connect your StarkNet wallet to view available vaults
-              </AlertDescription>
-            </Alert>
-
-            {/* Wallet Options */}
-            <div className="space-y-4">
-              <h4 className="font-semibold text-sm text-gray-300 uppercase tracking-wider">Available Wallets</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {connectors.map((connector) => (
-                  <Button
-                    key={connector.id}
-                    onClick={() => handleConnect(connector.id)}
-                    disabled={isConnecting || selectedConnector === connector.id}
-                    className="w-full justify-start h-14 bg-gradient-to-r from-bitcoin-orange/15 to-bitcoin-gold/10 hover:from-bitcoin-orange/25 hover:to-bitcoin-gold/15 border-2 border-bitcoin-orange/30 hover:border-bitcoin-orange/50 text-bitcoin-orange font-medium rounded-xl transition-all duration-300 shadow-lg shadow-bitcoin-orange/10 hover:shadow-xl hover:shadow-bitcoin-orange/20 disabled:opacity-50"
-                    variant="outline"
-                  >
-                    {selectedConnector === connector.id ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <Wallet className="mr-2 h-5 w-5" />
-                        {connector.name}
-                      </>
-                    )}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Instructions */}
-            <div className="text-xs text-gray-400 space-y-2 pt-4 border-t border-gray-700/50">
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-bitcoin-orange" />
-                <p>Supported wallets: Argent, Braavos</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-bitcoin-gold" />
-                <p>Make sure you&apos;re on StarkNet Mainnet</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-bitcoin-orange" />
-                <p>You&apos;ll need wBTC to make deposits</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        </motion.div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -431,27 +287,23 @@ export function VaultsContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {isLoading || vaults.length === 0 ? (
-                  <span className="inline-block w-24 h-6 bg-muted rounded animate-pulse" />
-                ) : (
-                  (() => {
-                    // Handle zero or very small values
-                    if (totalTVL === 0) {
-                      return '0.0000 wBTC';
-                    }
-                    
-                    // Show more decimal places for very small values
-                    if (totalTVL > 0 && totalTVL < 0.0001) {
-                      return `${totalTVL.toFixed(8)} wBTC`;
-                    }
-                    
-                    // Format with 4 decimal places for normal values
-                    return `${totalTVL.toFixed(4)} wBTC`;
-                  })()
-                )}
+                {isLoading || vaults.length === 0 ? '...' : (() => {
+                  // Handle zero or very small values
+                  if (totalTVL === 0) {
+                    return '0.0000 wBTC';
+                  }
+                  
+                  // Show more decimal places for very small values
+                  if (totalTVL > 0 && totalTVL < 0.0001) {
+                    return `${totalTVL.toFixed(8)} wBTC`;
+                  }
+                  
+                  // Format with 4 decimal places for normal values
+                  return `${totalTVL.toFixed(4)} wBTC`;
+                })()}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Total value locked {vaults.length > 1 ? `across ${vaults.length} vaults` : ''}
+                {isLoading || vaults.length === 0 ? '...' : `Total value locked ${vaults.length > 1 ? `across ${vaults.length} vaults` : ''}`}
               </p>
             </CardContent>
           </Card>
@@ -472,13 +324,11 @@ export function VaultsContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {isLoading ? (
-                  <span className="inline-block w-16 h-6 bg-muted rounded animate-pulse" />
-                ) : (
-                  `${avgApy.toFixed(2)}%`
-                )}
+                {isLoading ? '...' : `${avgApy.toFixed(2)}%`}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Average yield</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isLoading ? '...' : 'Average yield'}
+              </p>
             </CardContent>
           </Card>
         </motion.div>

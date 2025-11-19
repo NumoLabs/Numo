@@ -1,123 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserWithPrimaryWallet, updateUserProfile } from '@/lib/supabase/cavos-users';
-import { verifyTokenWithCavos } from '@/app/api/cavos/verify-token';
+import { getUserByWallet, getOrCreateUserByWallet, updateUserProfile, type NetworkType } from '@/lib/supabase/users';
 
-async function getUserIdFromToken(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
+async function getWalletFromHeader(request: NextRequest): Promise<{ address: string; network: NetworkType } | null> {
+  const walletAddress = request.headers.get('x-wallet-address');
+  const walletNetwork = (request.headers.get('x-wallet-network') || 'mainnet') as NetworkType;
   
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!walletAddress || walletAddress.trim().length === 0) {
     return null;
   }
   
-  const token = authHeader.substring(7).trim(); // Remove 'Bearer ' prefix
-  
-  if (!token || token.length === 0) {
+  // Validate wallet address format (basic validation)
+  if (!/^0x[0-9a-fA-F]{63,64}$/.test(walletAddress.trim())) {
     return null;
   }
   
-  try {
-    const cavosVerification = await verifyTokenWithCavos(token);
-    if (cavosVerification?.valid && cavosVerification.userId) {
-      return cavosVerification.userId;
-    }
-    if (cavosVerification?.valid === false) {
-    }
-  } catch {
-    // Ignore API verification errors, try local JWT decode
-  }
-  
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      return null;
-    }
-    
-    let payload: Record<string, unknown>;
-    try {
-      const base64Payload = parts[1]
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-      
-      const paddedPayload = base64Payload + '='.repeat((4 - base64Payload.length % 4) % 4);
-      
-      payload = JSON.parse(
-        Buffer.from(paddedPayload, 'base64').toString('utf-8')
-      );
-    } catch {
-      return null;
-    }
-    
-    if (payload.exp) {
-      const expirationTime = typeof payload.exp === 'number' 
-        ? payload.exp 
-        : parseInt(String(payload.exp), 10);
-      
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      if (expirationTime < currentTime) {
-        return null;
-      }
-    }
-    
-    if (payload.iat) {
-      const issuedAt = typeof payload.iat === 'number'
-        ? payload.iat
-        : parseInt(String(payload.iat), 10);
-      
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      if (issuedAt > currentTime + 300) {
-        return null;
-      }
-      
-      const thirtyDaysAgo = currentTime - (30 * 24 * 60 * 60);
-      if (issuedAt < thirtyDaysAgo) {
-        return null;
-      }
-    }
-    
-    const userId = payload.user_id 
-      || payload.userId 
-      || payload.sub 
-      || payload.id
-      || (payload.data && typeof payload.data === 'object' && 'user_id' in payload.data 
-        ? (payload.data as Record<string, unknown>).user_id 
-        : null);
-        
-    if (!userId || (typeof userId !== 'string' && typeof userId !== 'number')) {
-      return null;
-    }
-    
-    const finalUserId = String(userId);
-    return finalUserId;
-  } catch {
+  // Validate network
+  const validNetworks: NetworkType[] = ['mainnet', 'sepolia', 'goerli', 'devnet'];
+  if (!validNetworks.includes(walletNetwork)) {
     return null;
   }
+
+  return {
+    address: walletAddress.trim(),
+    network: walletNetwork
+  };
 }
 
 /**
  * GET /api/profile
  * Get the current user's profile
- * Requires Authorization header with Bearer token
+ * Requires x-wallet-address header with wallet address
+ * Optional x-wallet-network header (defaults to mainnet)
  */
 export async function GET(request: NextRequest) {
   try {
-    const cavosUserId = await getUserIdFromToken(request);
+    const wallet = await getWalletFromHeader(request);
     
-    if (!cavosUserId) {
+    if (!wallet) {
       return NextResponse.json(
-        { error: 'Authentication required. Please provide Authorization header with Bearer token.' },
+        { error: 'Authentication required. Please provide x-wallet-address header with your wallet address.' },
         { status: 401 }
       );
     }
 
-    const userProfile = await getUserWithPrimaryWallet(cavosUserId);
+    // Get or create user profile
+    let userProfile = await getUserByWallet(wallet.address, wallet.network);
+
+    // If user doesn't exist, create it
+    if (!userProfile) {
+      const userId = await getOrCreateUserByWallet({
+        walletAddress: wallet.address,
+        walletNetwork: wallet.network,
+      });
+
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Failed to create user profile' },
+          { status: 500 }
+        );
+      }
+
+      // Fetch the newly created profile
+      userProfile = await getUserByWallet(wallet.address, wallet.network);
 
     if (!userProfile) {
       return NextResponse.json(
-        { error: 'User profile not found' },
+          { error: 'User profile not found after creation' },
         { status: 404 }
       );
+      }
     }
 
     return NextResponse.json(userProfile);
@@ -132,18 +83,19 @@ export async function GET(request: NextRequest) {
 /**
  * PUT /api/profile
  * Update the current user's profile
- * Requires Authorization header with Bearer token
+ * Requires x-wallet-address header with wallet address
+ * Optional x-wallet-network header (defaults to mainnet)
  */
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { username, avatar_url } = body;
 
-    const cavosUserId = await getUserIdFromToken(request);
+    const wallet = await getWalletFromHeader(request);
 
-    if (!cavosUserId) {
+    if (!wallet) {
       return NextResponse.json(
-        { error: 'Authentication required. Please provide Authorization header with Bearer token.' },
+        { error: 'Authentication required. Please provide x-wallet-address header with your wallet address.' },
         { status: 401 }
       );
     }
@@ -162,10 +114,42 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update user profile
-    const updatedProfile = await updateUserProfile(cavosUserId, {
-      username: username || null,
-      avatar_url: avatar_url || null,
+    // Ensure user exists before updating
+    let userProfile = await getUserByWallet(wallet.address, wallet.network);
+    
+    if (!userProfile) {
+      // Create user if doesn't exist
+      const userId = await getOrCreateUserByWallet({
+        walletAddress: wallet.address,
+        walletNetwork: wallet.network,
+        username: username !== undefined ? username : undefined,
+        avatarUrl: avatar_url !== undefined ? avatar_url : undefined,
+      });
+
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Failed to create user profile' },
+          { status: 500 }
+        );
+      }
+
+      // Fetch the newly created profile
+      userProfile = await getUserByWallet(wallet.address, wallet.network);
+      
+      if (!userProfile) {
+        return NextResponse.json(
+          { error: 'User profile not found after creation' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(userProfile);
+    }
+
+    // Update existing user profile
+    const updatedProfile = await updateUserProfile(wallet.address, wallet.network, {
+      username: username !== undefined ? username : undefined,
+      avatar_url: avatar_url !== undefined ? avatar_url : undefined,
     });
 
     if (!updatedProfile) {

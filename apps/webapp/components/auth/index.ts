@@ -1,1 +1,1 @@
-export { CavosAuthGuard } from './cavos-auth-guard'
+export { WalletAuthGuard } from './wallet-auth-guard'

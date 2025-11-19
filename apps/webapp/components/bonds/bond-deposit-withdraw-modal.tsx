@@ -360,11 +360,6 @@ export function BondDepositWithdrawModal({
                       </>
                     )}
                   </div>
-                  {canWithdrawFunds && (
-                    <p className="text-xs text-muted-foreground">
-                      Max withdraw: {maxWithdraw} WBTC
-                    </p>
-                  )}
                 </div>
               </div>
             </CardContent>
