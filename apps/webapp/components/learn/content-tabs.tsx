@@ -86,8 +86,8 @@ export function ContentTabs() {
       className="space-y-6"
     >
       {/* Pill Nav */}
-      <div className="relative w-full overflow-x-auto">
-        <div className="relative inline-flex items-center gap-1 p-1 sm:p-1.5 bg-muted/50 rounded-full border border-border/50 backdrop-blur-sm min-w-max sm:min-w-0">
+      <div className="relative w-full">
+        <div className="grid grid-cols-2 md:flex md:items-center gap-1.5 md:gap-1.5 p-1.5 md:p-1.5 bg-muted/50 rounded-lg md:rounded-full border border-border/50 backdrop-blur-sm">
           {tabs.map((tab, index) => {
             const isActive = activeTab === tab.id
             return (
@@ -98,10 +98,10 @@ export function ContentTabs() {
                 }}
                 onClick={() => handleTabChange(tab.id)}
                 className={`
-                  relative z-10 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap flex-shrink-0
+                  relative z-10 px-3 md:px-4 py-2 md:py-2 text-xs md:text-sm font-medium rounded-lg md:rounded-full transition-colors duration-200 text-center
                   ${isActive 
-                    ? 'text-bitcoin-orange' 
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-bitcoin-orange bg-background border border-bitcoin-orange/30 shadow-md shadow-bitcoin-orange/10' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                   }
                 `}
               >
@@ -109,27 +109,11 @@ export function ContentTabs() {
               </button>
             )
           })}
-          {/* Active indicator pill */}
-          {indicatorStyle.width > 0 && (
-            <motion.div
-              className="absolute top-1 sm:top-1.5 bottom-1 sm:bottom-1.5 bg-background border border-bitcoin-orange/30 rounded-full shadow-lg shadow-bitcoin-orange/10 z-0"
-              initial={false}
-              animate={{
-                left: indicatorStyle.left,
-                width: indicatorStyle.width,
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 30,
-              }}
-            />
-          )}
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         <AnimatePresence mode="wait" initial={false}>
           {activeTab === 'defi' && (
             <motion.div
