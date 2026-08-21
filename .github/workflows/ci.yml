@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  webapp:
+    name: webapp (typecheck / lint / build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/webapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test
+
+      # Lint is advisory for now: the existing code has a backlog of biome
+      # findings. Drop `continue-on-error` once that backlog is cleared so
+      # regressions actually block a merge.
+      - name: Lint
+        run: bun run lint
+        continue-on-error: true
+
+      - name: Build
+        run: bun run build
+        env:
+          # Build-time only. Real values live in the deployment environment;
+          # these just let the build resolve without a configured backend.
+          NEXT_PUBLIC_STARKNET_RPC_URL: https://rpc.starknet.lava.build
+
+  contracts:
+    name: contracts (build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/contracts
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: 2.12.2
+
+      - name: Build
+        run: scarb build
+
+  # Fork tests need a real mainnet RPC endpoint. They only run when the
+  # MAINNET_RPC_URL secret is set, so forks and PRs without it are not failed
+  # by a missing credential.
+  contracts-test:
+    name: contracts (fork tests)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: apps/contracts
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: 2.12.2
+
+      - uses: foundry-rs/setup-snfoundry@v3
+        with:
+          starknet-foundry-version: 0.50.0
+
+      # Runs one test at a time. In parallel the fork tests burst-hit the RPC and
+      # a rate-limited response surfaces as
+      # "JsonRpc provider error: expected value at line 1" — indistinguishable
+      # from a real contract failure. Sequential is slower but honest.
+      - name: Test
+        env:
+          MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
+        run: |
+          if [ -z "$MAINNET_RPC_URL" ]; then
+            echo "::warning::MAINNET_RPC_URL secret not set — skipping fork tests"
+            exit 0
+          fi
+          ./run-tests.sh --sequential
