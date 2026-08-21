@@ -1,9 +1,10 @@
 // Real Vesu Implementation based on vesu-v1 repository
 // This file contains the actual implementation patterns from the official Vesu repository
 
-import { CallData, CairoCustomEnum, type AccountInterface, type RpcProvider } from 'starknet';
+import { CallData, CairoCustomEnum, type AccountInterface, type RpcProvider, type InvokeFunctionResponse } from 'starknet';
 import { getVesuConfig, getVesuV2Config } from './vesu-config';
 import { parseVesuAmount } from './utils';
+import { isSameAddress } from '@/lib/address';
 
 // Constants from vesu-v1/lib/config.ts
 export const SCALE = BigInt(10 ** 18);
@@ -169,7 +170,7 @@ export function getAssetIndex(assetAddress: string, isTestnet: boolean = true): 
   ];
   
   const assets = isTestnet ? testnetAssets : mainnetAssets;
-  const index = assets.findIndex(addr => addr.toLowerCase() === assetAddress.toLowerCase());
+  const index = assets.findIndex(addr => isSameAddress(addr, assetAddress));
   
   return index >= 0 ? index : 0; // Default to 0 if not found
 }
@@ -422,7 +423,7 @@ export class VesuV2TransactionFlow {
       receiver: userAddress
     });
     
-    let depositResult;
+    let depositResult: InvokeFunctionResponse | undefined;
     try {
       if (!account) {
         throw new Error('Account is not available for deposit transaction');
@@ -481,7 +482,7 @@ export class VesuV2TransactionFlow {
     // According to Vesu V2 documentation:
     // withdraw(assets: u256, receiver: ContractAddress, owner: ContractAddress) -> u256
     // Burns shares from `owner` and sends exactly `assets` of underlying tokens to `receiver`.
-    let withdrawalResult;
+    let withdrawalResult: InvokeFunctionResponse | undefined;
     try {
       withdrawalResult = await account.execute({
         contractAddress: vTokenAddress,
@@ -656,7 +657,7 @@ export class VesuTransactionFlow {
     
     // Step 2: Execute vToken deposit transaction
     console.log('🔧 Executing vToken deposit...');
-    let depositResult;
+    let depositResult: InvokeFunctionResponse | undefined;
     try {
       depositResult = await account.execute({
         contractAddress: vTokenAddress,
@@ -709,7 +710,7 @@ export class VesuTransactionFlow {
     
     // Execute vToken withdraw transaction
     // The withdraw function burns shares and sends exactly the requested amount of underlying assets
-    let withdrawalResult;
+    let withdrawalResult: InvokeFunctionResponse | undefined;
     try {
       withdrawalResult = await account.execute({
         contractAddress: vTokenAddress,

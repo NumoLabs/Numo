@@ -3,6 +3,7 @@ import type { Token } from '@/types/Tokens';
 import axios from 'axios';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { parseTokenAmount } from '@/lib/units';
 
 export const q96 = 2 ** 96;
 
@@ -13,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function tickToPrice(tick: number) {
-	// biome-ignore lint/style/useExponentiationOperator: <explanation>
+	// biome-ignore lint/style/useExponentiationOperator: Math.pow reads better with these operands
 	const price = Math.pow(1.000001, tick);
 	return price;
 }
@@ -42,7 +43,6 @@ export function calculateDepositAmounts(
 
 export async function fetchCryptoPrice(symbol: string): Promise<number> {
 	const { data: price } = (
-		// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
 		await axios.post(`/api/pragma`, { endpoint: symbol })
 	).data;
 	return price !== null ? price : 0;
@@ -53,84 +53,65 @@ export async function fetchCryptoPrice(symbol: string): Promise<number> {
  * @param amount - The amount in human-readable format (e.g., "1.5")
  * @param decimals - The number of decimals for the token (e.g., 18 for ETH, 8 for WBTC)
  * @returns The amount in wei as a string
+ *
+ * Thin wrapper over parseTokenAmount, which is the tested implementation.
+ * The previous version concatenated strings directly and broke on numbers that
+ * stringify to exponential notation (`0.0000001` -> `"1e-700000000"`).
  */
 export function parseVesuAmount(amount: number | string, decimals: number): string {
-	const amountStr = typeof amount === 'string' ? amount : amount.toString();
-	const [integerPart, decimalPart = ''] = amountStr.split('.');
-	const paddedDecimal = decimalPart.padEnd(decimals, '0').slice(0, decimals);
-	return integerPart + paddedDecimal;
+	return parseTokenAmount(amount, decimals).toString();
 }
 
 export function findActiveTick(
 	price: number,
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 	liquidityData: any[],
 	t0: Token,
 	t1: Token
 ): number {
+	// The original had an `else { return returnTick }` inside the forEach. A
+	// return inside forEach does not break the loop — it only exits that one
+	// callback — so it never did anything. Scanning every entry and keeping the
+	// last tick at or below `price` is the behaviour that has always shipped,
+	// and is correct for the ascending tick data Ekubo returns.
 	let returnTick = 0;
-	// biome-ignore lint/complexity/noForEach: <explanation>
-	[...liquidityData].forEach(({ tick }: { tick: number }) => {
+	for (const { tick } of liquidityData as { tick: number }[]) {
 		const tickPrice =
 			tickToPrice(Number(tick)) * 10 ** (t0.decimals - t1.decimals);
 		if (tickPrice <= price) {
 			returnTick = tick;
-		} else {
-			return returnTick;
 		}
-	});
+	}
 	return returnTick;
 }
 
 export function getTicksInRange(
 	minTick: number,
 	maxTick: number,
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 	liquidityData: any[],
 	tick_spacing: number
 ) {
+	// Same dead `else { return ticks }` as above. Note that turning it into a
+	// real `break` would be wrong here: this must collect every tick in range,
+	// not stop at the first one that fails the spacing check.
 	const ticks: number[] = [];
-	// biome-ignore lint/complexity/noForEach: <explanation>
-	[...liquidityData].forEach(({ tick }: { tick: number }) => {
+	for (const { tick } of liquidityData as { tick: number }[]) {
 		if (minTick <= tick && tick <= maxTick && tick % tick_spacing === 0) {
 			ticks.push(tick);
-		} else {
-			return ticks;
 		}
-	});
+	}
 	return ticks;
 }
 
-export function getTickFromPrice(
-	price: number,
-	t0: Token,
-	t1: Token,
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	liquidityData: any[],
-	tick_spacing: number
-) {
-	let returnTick = 0;
-	// biome-ignore lint/complexity/noForEach: <explanation>
-	[...liquidityData].forEach(({ tick }: { tick: number }) => {
-		const tickPrice =
-			tickToPrice(Number(tick)) * 10 ** (t0.decimals - t1.decimals);
-		if (tickPrice <= price && tick % tick_spacing === 0) {
-			returnTick = tickPrice;
-		} else {
-			return returnTick;
-		}
-	});
-	return returnTick;
-}
-
 export const getPoolFeePercentage = (fee: number): string => {
-	// biome-ignore lint/style/useTemplate: <explanation>
+	// biome-ignore lint/style/useTemplate: concatenation is clearer here
 	return ((Number(fee) / Number(2 ** 128)) * 100).toFixed(2) + '%';
 };
 
 export const getTickSpacing = (fee: number, tickSpacing: number) => {
 	const feeStr = ((Number(fee) / Number(2 ** 128)) * 100).toString();
-	// biome-ignore lint/suspicious/noDoubleEquals: <explanation>
+	// biome-ignore lint/suspicious/noDoubleEquals: loose compare is deliberate: value may be a string or number
 	if (tickSpacing == 354892) {
 		return 'DCA-Enabled';
 	}

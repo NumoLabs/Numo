@@ -20,10 +20,10 @@ export async function getEarnPositions(address: string) {
 	const pools = await getVesuPools();
 
 	const vesuPositions: VesuEarnPosition[] = await Promise.all(
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 		filteredData.map(async (position: any) => {
 			const poolData = pools.find(
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 				(pool: { id: any }) => pool.id === position.pool.id
 			);
 			let poolApy = 0;
@@ -36,7 +36,7 @@ export async function getEarnPositions(address: string) {
 
 			if (poolData) {
 				const asset = poolData.assets.find(
-					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 					(asset: { symbol: any }) =>
 						asset.symbol === position.collateral.symbol
 				);
@@ -84,14 +84,14 @@ export async function getVesuPools() {
 		// Process API response
 		
 	return data
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 			.filter((pool: any) => pool.isVerified !== false)
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 		.map((pool: any) => ({
 			id: pool.id,
 			name: pool.name,
 			address: pool.extensionContractAddress,
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 				assets: (pool.assets || []).map((asset: any) => {
 				// Extract raw values for debugging
 				// Vesu API may have both supplyApr (APR) and supplyApy (APY)
@@ -212,12 +212,11 @@ export async function getBestVesuPool(
 ): Promise<VesuPool | undefined> {
 	const pools = await getVesuPools();
 	let maxApy = 0;
-	let bestPool = undefined;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	// biome-ignore lint/complexity/noForEach: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: element of an untyped external API array
+	let bestPool: any;
+	// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 		pools.forEach((pool: any) => {
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 				pool.assets.forEach((asset: any) => {
 			if (asset.symbol === token) {
 				const apy =
@@ -240,7 +239,6 @@ export async function getBestVesuPool(
 }
 
 export async function getVesuTokens() {
-	// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
 	const { data } = (await axios.get(`https://api.vesu.xyz/tokens`)).data;
 
 	return data;

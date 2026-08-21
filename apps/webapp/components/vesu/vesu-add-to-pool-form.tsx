@@ -23,7 +23,10 @@ import type { VesuPool } from '@/types/VesuPools';
 import { formatApy } from '@/lib/vesu-config';
 import { Contract, RpcProvider } from 'starknet';
 import { useProvider } from '@starknet-react/core';
-import { useEffect, useCallback } from 'react';
+import { useId,useEffect, useCallback } from 'react';
+import { getPublicRpcUrl } from '@/lib/rpc';
+import { formatTokenAmount, fromU256 } from '@/lib/units';
+import { isSameAddress } from '@/lib/address';
 
 interface VesuAddToPoolFormProps {
   pool: VesuPool;
@@ -32,6 +35,10 @@ interface VesuAddToPoolFormProps {
 }
 
 export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoolFormProps) {
+  // useId(): hardcoded ids collide when a component renders more than
+  // once on a page, which silently breaks label->input association.
+  const depositAmountId = useId();
+
   const [amount, setAmount] = useState('');
   const [selectedAsset, setSelectedAsset] = useState(pool.assets[0] || null);
 
@@ -85,8 +92,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         provider = contextProvider as any as RpcProvider;
       } else {
-        const rpcUrl = process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
-          'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
+        const rpcUrl = getPublicRpcUrl();
         provider = new RpcProvider({
           nodeUrl: rpcUrl
         });
@@ -112,18 +118,22 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
       const result = await Promise.race([balancePromise, timeoutPromise]);
       console.log('Raw balance result:', result);
       
-      // Handle different response formats
-      let balanceWei;
+      // Handle different response formats.
+      // `result.balance.low || result.balance` dropped the u256 high word, so
+      // any balance at or above 2^128 came back wrong; fromU256 reads both.
+      let balanceWei: bigint;
       if (result.balance && typeof result.balance === 'object') {
-        balanceWei = result.balance.low || result.balance;
+        balanceWei = fromU256(result.balance);
       } else if (typeof result.balance === 'string' || typeof result.balance === 'number') {
-        balanceWei = result.balance;
+        balanceWei = BigInt(result.balance);
       } else {
         console.error('Unexpected balance format:', result);
         return 0;
       }
-      
-      const balance = Number(balanceWei) / Math.pow(10, decimals);
+
+      // Exact string conversion instead of Number(wei) / 10 ** decimals, which
+      // loses the low digits of 18-decimal balances.
+      const balance = Number(formatTokenAmount(balanceWei, decimals));
       
       // Validate the result
       if (isNaN(balance) || balance < 0) {
@@ -151,7 +161,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
     ? (() => {
         const foundBalance = balances.find(b => {
           // Match by address or symbol for better compatibility
-          const addressMatch = b.address.toLowerCase() === selectedAsset.address.toLowerCase();
+          const addressMatch = isSameAddress(b.address, selectedAsset.address);
           const symbolMatch = b.symbol?.toLowerCase() === selectedAsset.symbol.toLowerCase();
           return addressMatch || symbolMatch;
         })?.balance;
@@ -382,12 +392,16 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
           <div className="space-y-2">
             <Label>Select Asset</Label>
             <div className="grid gap-2">
-              {pool.assets.map((asset, index) => {
+              {pool.assets.map((asset) => {
                 const hasAssetData = asset.apy > 0 || asset.currentUtilization > 0;
                 return (
-                  <div
-                    key={index}
-                    className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                  // A button rather than a clickable div: this selects the
+                  // asset, so it must be focusable and activatable by keyboard.
+                  <button
+                    type="button"
+                    key={asset.address ?? asset.symbol}
+                    aria-pressed={selectedAsset?.symbol === asset.symbol}
+                    className={`w-full text-left p-3 rounded-lg border-2 cursor-pointer transition-all ${
                       selectedAsset?.symbol === asset.symbol
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20'
                         : 'border-gray-200 hover:border-blue-300'
@@ -416,7 +430,7 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
                         </Badge>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -425,12 +439,12 @@ export function VesuAddToPoolForm({ pool, onAddToPool, isLoading }: VesuAddToPoo
 
         {/* Amount Input */}
         <div className="space-y-2">
-          <Label htmlFor="deposit-amount">
+          <Label htmlFor={depositAmountId}>
             Amount ({selectedAsset?.symbol || 'Token'})
           </Label>
           <div className="flex gap-2">
             <Input
-              id="deposit-amount"
+              id={depositAmountId}
               type="number"
               placeholder="0.001"
               value={amount}

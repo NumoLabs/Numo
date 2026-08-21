@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useVesuVault, type PoolProps, WBTC_ADDRESS } from '@/hooks/use-vesu-vault';
+import { useVesuVault, type PoolProps, WBTC_ADDRESS, WBTC_DECIMALS } from '@/hooks/use-vesu-vault';
+import { formatTokenAmount, parseTokenAmount } from '@/lib/units';
 import { type Action, Feature } from '@/types/VesuVault';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getVesuPools } from '@/app/api/vesuApi';
 import type { VesuPool } from '@/types/VesuPools';
 import Image from 'next/image';
+import { isSameAddress } from '@/lib/address';
 
 // Schema for rebalance form
 const rebalanceFormSchema = z.object({
@@ -181,7 +183,7 @@ export function RebalanceForm() {
   // Get pool name from Vesu API
   const getPoolName = (poolId: string): string => {
     if (!vesuPoolsData) return `Pool ${poolId.slice(0, 8)}...`;
-    const pool = vesuPoolsData.find((p) => p.id.toLowerCase() === poolId.toLowerCase());
+    const pool = vesuPoolsData.find((p) => isSameAddress(p.id, poolId));
     return pool?.name || `Pool ${poolId.slice(0, 8)}...`;
   };
 
@@ -247,12 +249,23 @@ export function RebalanceForm() {
       return;
     }
 
-    const amountFloat = parseFloat(data.amount);
-    const amountStr = amountFloat.toFixed(8);
-    const [integerPart, decimalPart = ''] = amountStr.split('.');
-    const paddedDecimal = decimalPart.padEnd(8, '0').slice(0, 8);
-    const fullAmountStr = integerPart + paddedDecimal;
-    const amountInWei = BigInt(fullAmountStr);
+    // Previously this used parseFloat + toFixed(8), which rounds *up*: entering
+    // a full balance like 0.999999999 asked the contract for 1.00000000 and the
+    // withdraw reverted. parseTokenAmount truncates instead, and rejects input
+    // that would otherwise reach BigInt() as "NaN00000000" and throw here —
+    // outside the try block below, taking the whole handler down.
+    let amountInWei: bigint;
+    try {
+      amountInWei = parseTokenAmount(data.amount, WBTC_DECIMALS);
+    } catch {
+      form.setError('amount', { message: 'Enter a valid amount' });
+      return;
+    }
+
+    if (amountInWei === 0n) {
+      form.setError('amount', { message: 'Amount must be greater than zero' });
+      return;
+    }
 
     if (fromPoolBalance < amountInWei) {
       const availableAmount = formatBalance(fromPoolBalance);
@@ -344,15 +357,23 @@ export function RebalanceForm() {
     }
   };
 
-  // Calculate preview values
-  const amountFloat = amount ? parseFloat(amount) : 0;
-  const isValidAmount = !isNaN(amountFloat) && amountFloat > 0 && fromPoolBalance && 
-    (BigInt(Math.floor(amountFloat * 1e8)) <= fromPoolBalance);
-  const previewFromBalance = fromPoolBalance && amountFloat > 0 
-    ? formatBalance(fromPoolBalance - BigInt(Math.floor(amountFloat * 1e8)))
+  // Calculate preview values.
+  // Parsed the same way as the submitted amount, so what the preview shows is
+  // what the transaction actually moves. `Math.floor(amount * 1e8)` drifted
+  // from it — 0.29 * 1e8 floors to 28999999, one satoshi short.
+  let previewWei = 0n;
+  try {
+    previewWei = amount ? parseTokenAmount(amount, WBTC_DECIMALS) : 0n;
+  } catch {
+    previewWei = 0n;
+  }
+  const isValidAmount =
+    previewWei > 0n && !!fromPoolBalance && previewWei <= fromPoolBalance;
+  const previewFromBalance = fromPoolBalance && previewWei > 0n
+    ? formatBalance(fromPoolBalance - previewWei)
     : formatBalance(fromPoolBalance);
-  const previewToBalance = toPoolBalance && amountFloat > 0
-    ? formatBalance(toPoolBalance + BigInt(Math.floor(amountFloat * 1e8)))
+  const previewToBalance = toPoolBalance && previewWei > 0n
+    ? formatBalance(toPoolBalance + previewWei)
     : formatBalance(toPoolBalance);
 
   if (!isConnected) {
@@ -661,11 +682,11 @@ export function RebalanceForm() {
                             </FormDescription>
                           ) : null}
                         </div>
-                        {amountFloat > 0 && fromPoolBalance && fromPoolBalance > BigInt(0) && (
+                        {previewWei > 0n && fromPoolBalance && fromPoolBalance > BigInt(0) && (
                           <div className="text-xs whitespace-nowrap">
                             <span className="text-muted-foreground">Percentage: </span>
                             <span className="font-bold text-bitcoin-orange">
-                              {((amountFloat / (Number(fromPoolBalance) / 1e8)) * 100).toFixed(2)}%
+                              {((Number(previewWei) / Number(fromPoolBalance)) * 100).toFixed(2)}%
                             </span>
                           </div>
                         )}
@@ -703,7 +724,7 @@ export function RebalanceForm() {
                     </div>
                     <div className="flex items-center justify-between p-4 rounded-lg bg-bitcoin-orange/10 border border-bitcoin-orange/30">
                       <span className="text-sm font-semibold text-bitcoin-orange/80">Amount</span>
-                      <span className="text-xl font-bold text-bitcoin-orange">{amountFloat.toFixed(8)} wBTC</span>
+                      <span className="text-xl font-bold text-bitcoin-orange">{formatTokenAmount(previewWei, WBTC_DECIMALS)} wBTC</span>
                     </div>
                   </div>
                 </CardContent>

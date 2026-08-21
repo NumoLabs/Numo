@@ -1,9 +1,11 @@
 // Hook to get real wallet balance for Vesu assets
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWallet } from './use-wallet';
 import { useProvider } from '@starknet-react/core';
 import { Contract, RpcProvider } from 'starknet';
 import { getVesuAssets } from '@/lib/vesu-real-data';
+import { getPublicRpcUrl } from '@/lib/rpc';
+import { formatTokenAmount, fromU256 } from '@/lib/units';
 
 interface WalletBalance {
   symbol: string;
@@ -25,31 +27,22 @@ export function useWalletBalance(): UseWalletBalanceReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Try to use provider from Starknet context first, fallback to creating new one
-  const contextProvider = useProvider();
-  
+  // Try to use provider from Starknet context first, fallback to creating one.
+  // useProvider() returns `{ provider }`, so the old code read `.baseUrl` off
+  // the wrapper object — always undefined, so the context branch never ran and
+  // a fresh RpcProvider was built on every use.
+  const { provider: contextProvider } = useProvider();
+
   // MAINNET ONLY: Always use mainnet RPC
-  // Use provider from context if available, otherwise create new one
   const provider = useMemo(() => {
-    // If context provider is available and has a valid nodeUrl, use it
-    if (contextProvider && (contextProvider as any).baseUrl) {
-      console.log('🔧 Using provider from Starknet context');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return contextProvider as any as RpcProvider;
+    if (contextProvider) {
+      return contextProvider as RpcProvider;
     }
-    
-    // Otherwise, create a new provider
-    const rpcUrl = process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
-      'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
-    
-    console.log('🔧 Creating new RPC Provider with URL:', rpcUrl);
-    
-    return new RpcProvider({
-      nodeUrl: rpcUrl
-    });
+
+    return new RpcProvider({ nodeUrl: getPublicRpcUrl() });
   }, [contextProvider]);
 
-  const getBalance = async (tokenAddress: string, decimals: number, symbol: string): Promise<number> => {
+  const getBalance = useCallback(async (tokenAddress: string, decimals: number, symbol: string): Promise<number> => {
     if (!address) {
       console.log(`No address available for ${symbol}`);
       return 0;
@@ -87,8 +80,11 @@ export function useWalletBalance(): UseWalletBalanceReturn {
       );
       
       const result = await Promise.race([balancePromise, timeoutPromise]);
-      const balanceWei = result.balance.low;
-      const balance = Number(balanceWei) / Math.pow(10, decimals);
+      // Both u256 words, and an exact decimal conversion: `.low` alone drops
+      // anything above 2^128, and Number(wei)/10**18 loses the low digits of
+      // 18-decimal balances.
+      const balanceWei = fromU256(result.balance);
+      const balance = Number(formatTokenAmount(balanceWei, decimals));
       
       console.log(`${symbol} balance: ${balance} (${balanceWei} wei, ${decimals} decimals)`);
       return balance;
@@ -115,9 +111,9 @@ export function useWalletBalance(): UseWalletBalanceReturn {
       // Return 0 instead of throwing to prevent breaking the entire balance fetch
       return 0;
     }
-  };
+  }, [address, provider]);
 
-  const fetchBalances = async () => {
+  const fetchBalances = useCallback(async () => {
     if (!address) {
       setBalances([]);
       return;
@@ -230,11 +226,11 @@ export function useWalletBalance(): UseWalletBalanceReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [address, provider, getBalance]);
 
   useEffect(() => {
     fetchBalances();
-  }, [address]);
+  }, [fetchBalances]);
 
   return {
     balances,

@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, Copy, ExternalLink, Loader2, RefreshCcw, Search,
 import Link from "next/link"
 import type { ProcessedAsset, VesuPool } from "@/types/VesuPools"
 import { VesuAddToPoolForm } from "@/components/vesu/vesu-add-to-pool-form"
+import { isSameAddress } from '@/lib/address';
 
 // Mapeo de direcciones conocidas de Vesu V2 pools
 const VESU_V2_POOL_ADDRESSES = new Set([
@@ -229,7 +230,7 @@ export function PoolsVaultContent() {
       return undefined
     }
 
-    return vesuPools.find((pool) => pool.address.toLowerCase() === selectedPoolAddress.toLowerCase())
+    return vesuPools.find((pool) => isSameAddress(pool.address, selectedPoolAddress))
   }, [selectedPoolAddress, vesuPools])
 
   const renderLoadingState = () => (
