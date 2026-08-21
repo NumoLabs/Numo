@@ -38,7 +38,7 @@ Create a project in your **personal** account, then:
 
 | Key | Where | Notes |
 | --- | --- | --- |
-| Alchemy | dashboard.alchemy.com → new app, Starknet Mainnet | The old key `c0P2DVGVr0OOBtgc3tSqm` was public in this repo. **Revoke it** even though it is no longer in the code — it is still in the git history. |
+| Alchemy | dashboard.alchemy.com → new app, Starknet Mainnet | The previous key (starts `c0P2DV…`) was committed to this public repo. **Revoke it** — removing it from the code does not invalidate it, and it is still reachable in git history. |
 | Pragma | dev.pragma.build | Only needed for price feeds (`/api/pragma`). |
 
 If you put a keyed RPC URL in `NEXT_PUBLIC_STARKNET_RPC_URL`, restrict it by
