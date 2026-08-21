@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Account, CallData, Contract, RpcProvider, CairoCustomEnum } from 'starknet';
+import { Account, CallData, Contract, RpcProvider, CairoCustomEnum, type InvokeFunctionResponse } from 'starknet';
 import { useWallet } from '@/hooks/use-wallet';
 import { useAccount } from '@starknet-react/core';
 import { VESU_REBALANCE_ABI } from '@/abis/VesuRebalance';
@@ -7,12 +7,18 @@ import { Feature } from '@/types/VesuVault';
 import type { Action, Claim, Route, AvnuMultiRouteSwap, YieldInfo } from '@/types/VesuVault';
 import { getVesuPools } from '@/app/api/vesuApi';
 import type { VesuPool, ProcessedAsset } from '@/types/VesuPools';
+import { getPublicRpcUrl } from '@/lib/rpc';
+import { isSameAddress } from '@/lib/address';
 
 // Contract address - Updated to V2 deployment
 const VESU_VAULT_ADDRESS = '0x06852252Dc7884612bC61409C535c5EC1Dfa1F29c73264481D2ee81b8D5415a5';
 
 // Known wBTC address on StarkNet Mainnet
 export const WBTC_ADDRESS = '0x03Fe2b97C1Fd336E750087D68B9b867997Fd64a2661fF3ca5A7C771641e8e7AC';
+
+// wBTC uses 8 decimals like BTC itself, not the 18 that is the ERC-20 default.
+// The literal `1e8` / `8` was repeated across a dozen files; import this instead.
+export const WBTC_DECIMALS = 8;
 
 // Pool management types
 // Note: pool_id is now the pool address (ContractAddress)
@@ -115,7 +121,7 @@ function formatWeiToDecimal(wei: bigint, decimals: number = 8): string {
 
 // Create provider outside component to avoid re-creation
 const provider = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm',
+  nodeUrl: getPublicRpcUrl(),
 });
 
 export function useVesuVault() {
@@ -491,7 +497,7 @@ export function useVesuVault() {
       }];
 
       // Execute withdraw transaction
-      let tx;
+      let tx: InvokeFunctionResponse | undefined;
       try {
         tx = await account.execute(calls);
       } catch (executeError: any) {
@@ -791,7 +797,7 @@ export function useVesuVault() {
 
       // Execute approve and deposit in a single multicall transaction
       console.log('Executing multicall (approve + deposit)...');
-      let tx;
+      let tx: InvokeFunctionResponse | undefined;
       try {
         tx = await account.execute(calls);
         console.log('Deposit transaction:', tx.transaction_hash);
@@ -1117,7 +1123,7 @@ export function useVesuVault() {
       console.log('Pools array to serialize:', poolsArray);
 
       // Use contract.invoke which handles serialization automatically
-      let tx;
+      let tx: InvokeFunctionResponse | undefined;
       try {
         tx = await contractInstance.invoke('set_allowed_pools', [poolsArray]);
         console.log('Set allowed pools transaction:', tx.transaction_hash);
@@ -1960,31 +1966,23 @@ export function useVesuVault() {
         
         // Find the pool by ID (pool ID matches the pool contract address)
         // The API's extensionContractAddress is null, but the pool ID matches the contract address
-        const poolAddressLower = poolAddress.toLowerCase();
+        // Matched felt-wise, not as strings: the Vesu API zero-pads addresses
+        // while the contract and this repo's config store some unpadded, so a
+        // lowercase compare misses any address with a leading zero nibble.
         const pool = pools.find((p: VesuPool) => {
-          // Try matching by pool ID first (most reliable)
-          // The pool ID in the API is the same as the pool contract address
-          if (p.id) {
-            const poolIdLower = p.id.toLowerCase();
-            const idMatch = poolIdLower === poolAddressLower;
-            
-            if (idMatch) {
-              console.log(`[getPoolYield] Found pool match by ID: ${p.name} (ID: ${p.id})`);
-              return true;
-            }
+          // Try matching by pool ID first (most reliable).
+          // The pool ID in the API is the same as the pool contract address.
+          if (p.id && isSameAddress(p.id, poolAddress)) {
+            console.log(`[getPoolYield] Found pool match by ID: ${p.name} (ID: ${p.id})`);
+            return true;
           }
-          
-          // Fallback: try matching by address (extensionContractAddress) if available
-          if (p.address) {
-            const poolApiAddress = p.address.toLowerCase();
-            const addressMatch = poolApiAddress === poolAddressLower;
-            
-            if (addressMatch) {
-              console.log(`[getPoolYield] Found pool match by address: ${p.name} (address: ${poolApiAddress})`);
-              return true;
-            }
+
+          // Fallback: try matching by address (extensionContractAddress).
+          if (p.address && isSameAddress(p.address, poolAddress)) {
+            console.log(`[getPoolYield] Found pool match by address: ${p.name} (address: ${p.address})`);
+            return true;
           }
-          
+
           return false;
         });
         
@@ -2028,68 +2026,18 @@ export function useVesuVault() {
           console.log(`[getPoolYield] Known WBTC address: ${WBTC_ADDRESS.toLowerCase()}`);
           
           // Find the specific asset in the pool that matches our vault's asset
-          // Try matching by address first, then by symbol as fallback
-          let assetMatch = pool.assets.find((a: ProcessedAsset) => {
-            if (!a.address) return false;
-            
-            const assetAddressLower = assetAddress.toLowerCase();
-            const knownWbtcAddressLower = WBTC_ADDRESS.toLowerCase();
-            let poolAssetAddressLower = a.address.toLowerCase();
-            
-            // Normalize addresses for comparison
-            // Remove '0x' prefix and pad/trim for comparison
-            const normalizeAddress = (addr: string): string => {
-              if (!addr) return '';
-              let normalized = addr.toLowerCase();
-              if (normalized.startsWith('0x')) {
-                normalized = normalized.slice(2);
-              }
-              // Pad to 64 chars (32 bytes in hex)
-              normalized = normalized.padStart(64, '0');
-              return normalized;
-            };
-            
-            const normalizedVaultAsset = normalizeAddress(assetAddress);
-            const normalizedKnownWbtc = normalizeAddress(knownWbtcAddressLower);
-            const normalizedPoolAsset = normalizeAddress(poolAssetAddressLower);
-            
-            // Try direct match
-            let match = normalizedPoolAsset === normalizedVaultAsset || 
-                       normalizedPoolAsset === normalizedKnownWbtc ||
-                       poolAssetAddressLower === assetAddressLower ||
-                       poolAssetAddressLower === knownWbtcAddressLower;
-            
-            // If no direct match, try converting pool asset address from felt252 to hex
-            if (!match && a.address && !a.address.startsWith('0x')) {
-              try {
-                const poolAssetFelt = BigInt(a.address);
-                const poolAssetHex = `0x${poolAssetFelt.toString(16).padStart(64, '0')}`.toLowerCase();
-                const normalizedPoolHex = normalizeAddress(poolAssetHex);
-                match = normalizedPoolHex === normalizedVaultAsset || normalizedPoolHex === normalizedKnownWbtc;
-                if (match) {
-                  console.log(`[getPoolYield] Matched asset by converting felt252 to hex: ${a.symbol} (${a.address} -> ${poolAssetHex})`);
-                }
-              } catch (e) {
-                // Ignore conversion errors
-              }
-            }
-            
-            // Also try the reverse: if pool asset is in hex, try comparing with felt252 format
-            if (!match && a.address.startsWith('0x')) {
-              try {
-                const poolAssetFelt = BigInt(a.address);
-                const poolAssetFeltStr = poolAssetFelt.toString();
-                if (poolAssetFeltStr === assetAddressFelt || poolAssetFeltStr === WBTC_ADDRESS.replace('0x', '')) {
-                  match = true;
-                  console.log(`[getPoolYield] Matched asset by comparing felt252 strings: ${a.symbol}`);
-                }
-              } catch (e) {
-                // Ignore conversion errors
-              }
-            }
-            
-            return match;
-          });
+          // Try matching by address first, then by symbol as fallback.
+          //
+          // This used to be ~50 lines of hand-rolled normalisation (strip 0x,
+          // pad, retry as felt, retry as decimal). One of those branches
+          // compared a decimal felt string against a hex string with the 0x
+          // removed, which could never match. isSameAddress compares numeric
+          // values, so every spelling of an address collapses to one check.
+          let assetMatch = pool.assets.find(
+            (a: ProcessedAsset) =>
+              isSameAddress(a.address, assetAddress) ||
+              isSameAddress(a.address, WBTC_ADDRESS)
+          );
           
           if (!assetMatch) {
             console.log(`[getPoolYield] No address match found, trying symbol match for WBTC...`);
@@ -2137,7 +2085,7 @@ export function useVesuVault() {
                 return p.assets.some((a: ProcessedAsset) => {
                   if (!a.address || !assetMatch.address) return false;
                   // Match by address (most reliable) or symbol
-                  const addressMatch = a.address.toLowerCase() === assetMatch.address.toLowerCase();
+                  const addressMatch = isSameAddress(a.address, assetMatch.address);
                   const symbolMatch = a.symbol?.toUpperCase() === assetMatch.symbol?.toUpperCase();
                   return addressMatch || symbolMatch;
                 });
@@ -2156,7 +2104,7 @@ export function useVesuVault() {
                 otherPoolsWithAsset.forEach((p: VesuPool) => {
                   const matchingAsset = p.assets.find((a: ProcessedAsset) => {
                     if (!a.address || !assetMatch.address) return false;
-                    const addressMatch = a.address.toLowerCase() === assetMatch.address.toLowerCase();
+                    const addressMatch = isSameAddress(a.address, assetMatch.address);
                     const symbolMatch = a.symbol?.toUpperCase() === assetMatch.symbol?.toUpperCase();
                     return addressMatch || symbolMatch;
                   });
@@ -2481,7 +2429,10 @@ export function useVesuVault() {
     if (isConnected) {
       loadVaultData();
     }
-  }, [isConnected]);
+    // loadVaultData is a useCallback over [isConnected, contract], and `contract`
+    // is a useMemo with an empty dep array — so this identity only changes when
+    // isConnected does. Listing it keeps the closure fresh without re-running.
+  }, [isConnected, loadVaultData]);
 
   return {
     isConnected,

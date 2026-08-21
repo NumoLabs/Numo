@@ -1,12 +1,20 @@
 #!/bin/bash
+set -euo pipefail
+
+# RPC endpoint comes from the environment (see .env.example). Never hardcode a
+# keyed URL here: this file is committed.
+if [ -z "${MAINNET_RPC_URL:-}" ]; then
+  echo "Error: MAINNET_RPC_URL is not set. Copy .env.example to .env and fill it in." >&2
+  exit 1
+fi
 
 # Deploy VesuRebalance contract (V2) - Refactored for V2
 # Class Hash: 0x07b23ad6a013abcf5858942b457fc51f99c15c14e6dd88fa86d8a3c9da45aedf
 # Constructor params: name, symbol, asset, access_control, allowed_pools, settings, oracle
 # In V2, constructor only needs oracle (not vesuStruct)
 
-sncast --account aguilar1x deploy \
-  --url https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm \
+sncast --account "${SNCAST_ACCOUNT:-aguilar1x}" deploy \
+  --url "$MAINNET_RPC_URL" \
   --class-hash 0x07b23ad6a013abcf5858942b457fc51f99c15c14e6dd88fa86d8a3c9da45aedf \
   --constructor-calldata \
   0 \

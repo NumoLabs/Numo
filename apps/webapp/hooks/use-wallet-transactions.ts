@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWalletStatus } from './use-wallet';
 import { RpcProvider } from 'starknet';
+import { getPublicRpcUrl } from '@/lib/rpc';
 
 interface Transaction {
   hash: string;
@@ -20,14 +21,13 @@ interface UseWalletTransactionsReturn {
   refetch: () => Promise<void>;
 }
 
-// Alchemy API key and RPC URL
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
-const ALCHEMY_RPC_URL = ALCHEMY_API_KEY
-  ? `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/${ALCHEMY_API_KEY}`
-  : 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
+// Client-side RPC endpoint. Never build this from an API key here: this hook runs
+// in the browser, so any key would be inlined into the bundle. Keyed endpoints
+// belong behind NEXT_PUBLIC_STARKNET_RPC_URL (domain-restricted) or a route handler.
+const RPC_URL = getPublicRpcUrl();
 
 /**
- * Hook to get wallet transactions using Alchemy RPC for Starknet
+ * Hook to get wallet transactions from the configured Starknet RPC endpoint
  */
 export function useWalletTransactions(limit: number = 50): UseWalletTransactionsReturn {
   const { address, isConnected } = useWalletStatus();
@@ -82,7 +82,7 @@ export function useWalletTransactions(limit: number = 50): UseWalletTransactions
 
     try {
       console.log('[useWalletTransactions] Creating provider...');
-      const provider = new RpcProvider({ nodeUrl: ALCHEMY_RPC_URL });
+      const provider = new RpcProvider({ nodeUrl: RPC_URL });
       
       console.log('[useWalletTransactions] Getting latest block number...');
       // Get latest block number with timeout
@@ -172,8 +172,6 @@ export function useWalletTransactions(limit: number = 50): UseWalletTransactions
         } catch (blockError) {
           // Continue to next block if this one fails or times out
           console.warn(`[useWalletTransactions] Failed to fetch block ${blockNum}:`, blockError);
-          // Don't break, continue to next block
-          continue;
         }
       }
 

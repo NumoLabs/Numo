@@ -6,6 +6,8 @@ import { useToast } from './use-toast';
 import { LOCK_TO_EARN_BOND_ABI, LOCK_TO_EARN_BOND_ADDRESS } from '@/abis/LockToEarnBond';
 import { getVesuPools } from '@/app/api/vesuApi';
 import type { VesuPool, ProcessedAsset } from '@/types/VesuPools';
+import { getPublicRpcUrl } from '@/lib/rpc';
+import { isSameAddress } from '@/lib/address';
 
 // ERC20 ABI for token approval and balance checking
 const ERC20_ABI = [
@@ -64,7 +66,7 @@ interface SetAllowedPoolsParams {
   }>;
 }
 
-interface DepositResult {
+export interface DepositResult {
   approvalTxHash?: string;
   depositTxHash?: string;
   success: boolean;
@@ -128,7 +130,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Use contract.call with blockIdentifier instead
@@ -174,7 +176,7 @@ export function useLockToEarnBond() {
 
     try {
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Get asset address from contract
@@ -553,7 +555,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Get asset address from contract
@@ -643,7 +645,7 @@ export function useLockToEarnBond() {
       } catch (executeError: any) {
         // Detect if user rejected the transaction
         let errorMessage = 'Execute failed';
-        let errorDetails = '';
+        const errorDetails = '';
         
         if (executeError instanceof Error) {
           errorMessage = executeError.message || 'Execute failed';
@@ -761,7 +763,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Check if user can withdraw using contract.call
@@ -859,7 +861,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Emergency withdraw from all pools...');
@@ -932,7 +934,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Emergency withdraw for user:', userAddress);
@@ -999,7 +1001,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Emergency burn shares for user:', userAddress, shares ? `amount: ${shares}` : 'all shares');
@@ -1078,7 +1080,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Emergency withdraw from pool index:', poolIndex);
@@ -1146,7 +1148,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Get asset address
@@ -1304,7 +1306,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Get asset address
@@ -1466,7 +1468,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       const contract = new Contract(LOCK_TO_EARN_BOND_ABI, LOCK_TO_EARN_BOND_ADDRESS, provider);
@@ -1501,7 +1503,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Get asset address
@@ -1602,7 +1604,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Getting user shares balance for:', userAddress);
@@ -1673,7 +1675,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       const contract = new Contract(LOCK_TO_EARN_BOND_ABI, LOCK_TO_EARN_BOND_ADDRESS, provider);
@@ -1794,7 +1796,7 @@ export function useLockToEarnBond() {
     try {
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Received params.pools:', params.pools);
@@ -1926,7 +1928,7 @@ export function useLockToEarnBond() {
 
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       console.log('Calling get_lock_info with:', {
@@ -2064,7 +2066,7 @@ export function useLockToEarnBond() {
 
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Use contract.call with blockIdentifier
@@ -2104,7 +2106,7 @@ export function useLockToEarnBond() {
 
       // Use same RPC as useVesuVault (Alchemy v0_9) for consistency
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Use contract.call with blockIdentifier
@@ -2136,7 +2138,7 @@ export function useLockToEarnBond() {
   const getMinLockPeriod = useCallback(async (): Promise<number | null> => {
     try {
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       const contract = new Contract(LOCK_TO_EARN_BOND_ABI, LOCK_TO_EARN_BOND_ADDRESS, provider);
@@ -2159,7 +2161,7 @@ export function useLockToEarnBond() {
   const getMaxLockPeriod = useCallback(async (): Promise<number | null> => {
     try {
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
 
       const contract = new Contract(LOCK_TO_EARN_BOND_ABI, LOCK_TO_EARN_BOND_ADDRESS, provider);
@@ -2182,18 +2184,14 @@ export function useLockToEarnBond() {
   const getPoolYield = useCallback(async (poolAddress: string): Promise<number | null> => {
     try {
       const pools = await getVesuPools();
-      const poolAddressLower = poolAddress.toLowerCase();
-      
-      // Find the pool by ID (pool ID matches the pool contract address)
+
+      // Find the pool by ID (pool ID matches the pool contract address).
+      // Compared felt-wise: the Vesu API returns zero-padded addresses while the
+      // contract and this repo's config store some of them unpadded, so a
+      // lowercase string compare misses them (e.g. the Prime pool).
       const pool = pools.find((p: VesuPool) => {
-        if (p.id) {
-          const poolIdLower = p.id.toLowerCase();
-          return poolIdLower === poolAddressLower;
-        }
-        if (p.address) {
-          const poolApiAddress = p.address.toLowerCase();
-          return poolApiAddress === poolAddressLower;
-        }
+        if (p.id) return isSameAddress(p.id, poolAddress);
+        if (p.address) return isSameAddress(p.address, poolAddress);
         return false;
       });
       
@@ -2204,34 +2202,18 @@ export function useLockToEarnBond() {
       
       // Get the bond's asset address
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm'
+        nodeUrl: getPublicRpcUrl()
       });
       const contract = new Contract(LOCK_TO_EARN_BOND_ABI, LOCK_TO_EARN_BOND_ADDRESS, provider);
       const asset = await contract.call('asset', [], { blockIdentifier: 'latest' });
-      const assetBigInt = BigInt(asset.toString());
-      const assetAddressHex = `0x${assetBigInt.toString(16).padStart(64, '0')}`;
-      const assetAddress = assetAddressHex.toLowerCase();
-      
+      const assetAddress = BigInt(asset.toString());
+
       // Find the specific asset in the pool that matches the bond's asset (WBTC)
       const wbtcSymbols = ['WBTC', 'wBTC', 'WBTC.E', 'wbtc', 'BTC'];
-      const normalizeAddress = (addr: string): string => {
-        if (!addr) return '';
-        let normalized = addr.toLowerCase();
-        if (normalized.startsWith('0x')) {
-          normalized = normalized.slice(2);
-        }
-        normalized = normalized.padStart(64, '0');
-        return normalized;
-      };
-      
-      const normalizedVaultAsset = normalizeAddress(assetAddress);
-      let assetMatch = pool.assets.find((a: ProcessedAsset) => {
-        if (!a.address) return false;
-        const poolAssetAddressLower = a.address.toLowerCase();
-        const normalizedPoolAsset = normalizeAddress(poolAssetAddressLower);
-        return normalizedPoolAsset === normalizedVaultAsset || 
-               poolAssetAddressLower === assetAddress;
-      });
+
+      let assetMatch = pool.assets.find((a: ProcessedAsset) =>
+        isSameAddress(a.address, assetAddress)
+      );
       
       if (!assetMatch) {
         assetMatch = pool.assets.find((a: ProcessedAsset) => {

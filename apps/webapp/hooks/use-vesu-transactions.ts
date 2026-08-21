@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getVesuConfig } from '@/lib/vesu-config';
 import { parseVesuAmount } from '@/lib/utils';
 import { vesuTransactionFlow } from '@/lib/vesu-real-implementation';
+import { getPublicRpcUrl } from '@/lib/rpc';
 
 export function useVesuTransactions() {
   const { address, account } = useAccount();
@@ -36,7 +37,7 @@ export function useVesuTransactions() {
     try {
       // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // Step 1: Approve token spending
@@ -129,7 +130,7 @@ export function useVesuTransactions() {
     try {
       // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: getPublicRpcUrl()
       });
 
       // For withdrawal, we use negative collateral_delta
@@ -217,8 +218,7 @@ export function useVesuTransactions() {
     try {
       // MAINNET ONLY: Always use mainnet RPC
       const provider = new RpcProvider({ 
-        nodeUrl: process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
-          'https://starknet-mainnet.public.blastapi.io/rpc/v0_7'
+        nodeUrl: getPublicRpcUrl()
       });
 
       return await vesuTransactionFlow.getVTokenBalance(vTokenAddress, address, provider);

@@ -122,7 +122,7 @@ try {
   // Generate sncast command
   const sncastCmd = [
     "sncast", "--account", "aguilar1x", "deploy",
-    "--url", "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm",
+    "--url", process.env.MAINNET_RPC_URL || "<set MAINNET_RPC_URL>",
     "--class-hash", "0x07b23ad6a013abcf5858942b457fc51f99c15c14e6dd88fa86d8a3c9da45aedf",
     "--constructor-calldata"
   ].concat(calldata);

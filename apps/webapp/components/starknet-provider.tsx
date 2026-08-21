@@ -1,5 +1,6 @@
 "use client";
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 
 import { mainnet } from "@starknet-react/chains";
 import {
@@ -9,13 +10,14 @@ import {
   jsonRpcProvider,
   voyager,
 } from "@starknet-react/core";
+import { getPublicRpcUrl } from "@/lib/rpc";
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
   // Static RPC provider configuration
   const provider = useMemo(() => {
     function rpc() {
       return {
-        nodeUrl: `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/c0P2DVGVr0OOBtgc3tSqm`
+        nodeUrl: getPublicRpcUrl(),
       }
     }
     return jsonRpcProvider({ rpc });

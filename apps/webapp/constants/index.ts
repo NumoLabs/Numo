@@ -1,5 +1,6 @@
 // constants.ts
 import { RpcProvider, constants } from 'starknet';
+import { getPublicRpcUrl } from '@/lib/rpc';
 
 // MAINNET ONLY: Always returns mainnet addresses
 export const getAddresses = (chainId: string | undefined) => ({
@@ -28,9 +29,10 @@ export const ARGENT_SESSION_SERVICE_BASE_URL =
 export const ARGENT_WEBWALLET_URL =
 	process.env.NEXT_PUBLIC_ARGENT_WEBWALLET_URL || 'https://web.argent.xyz';
 
-// MAINNET ONLY: Always returns mainnet RPC URL
-export const getNodeUrl = (chainId?: string) =>
-	process.env.NEXT_PUBLIC_MAINNET_RPC || 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
+// MAINNET ONLY: Always returns mainnet RPC URL.
+// Single source of truth lives in lib/rpc.ts — see the note there before adding
+// another env var for the same endpoint.
+export const getNodeUrl = (_chainId?: string) => getPublicRpcUrl();
 
 export const getProvider = (nodeUrl: string | undefined) =>
 	new RpcProvider({ nodeUrl });

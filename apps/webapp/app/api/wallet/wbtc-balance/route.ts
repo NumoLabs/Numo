@@ -1,16 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { RpcProvider, Contract } from 'starknet';
+import { getServerRpcUrl } from '@/lib/rpc';
 
 // wBTC contract address on Starknet Mainnet
 const WBTC_ADDRESS = '0x03Fe2b97C1Fd336E750087D68B9b867997Fd64a2661fF3ca5A7C771641e8e7AC';
 const WBTC_DECIMALS = 8;
 
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+// Server-only key. Do NOT fall back to NEXT_PUBLIC_ALCHEMY_API_KEY: that would
+// mean the key is also inlined into the client bundle wherever it is read.
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
 // Build Alchemy RPC URL from API key
 const getAlchemyRpcUrl = (): string | null => {
   if (!ALCHEMY_API_KEY) return null;
-  
+
   return `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/${ALCHEMY_API_KEY}`;
 };
 
@@ -37,8 +40,11 @@ const getAlchemyRpcUrl = (): string | null => {
 
 /**
  * GET /api/wallet/wbtc-balance
- * Get wBTC balance for a wallet address
- * Requires x-wallet-address header with wallet address
+ * Get wBTC balance for a wallet address.
+ *
+ * `x-wallet-address` here is a query parameter, not an identity claim: balances
+ * are public on-chain data, so there is nothing to authorize. Do not copy this
+ * pattern for anything user-owned — see /api/profile for that.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -64,9 +70,7 @@ export async function GET(request: NextRequest) {
     let source = 'rpc';
 
     const alchemyRpcUrl = getAlchemyRpcUrl();
-    const rpcUrl = alchemyRpcUrl || 
-      process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 
-      'https://starknet-mainnet.public.blastapi.io/rpc/v0_7';
+    const rpcUrl = alchemyRpcUrl || getServerRpcUrl();
 
     source = alchemyRpcUrl ? 'alchemy-rpc' : 'public-rpc';
 
@@ -125,7 +129,7 @@ export async function GET(request: NextRequest) {
       }
       
       // Convert to human readable format
-      balance = Number(balanceWei) / Math.pow(10, WBTC_DECIMALS);
+      balance = Number(balanceWei) / 10 ** WBTC_DECIMALS;
       
       console.log('wBTC Balance fetched:', {
         walletAddress: walletAddress.trim(),
