@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getSession } from '@/lib/auth/session';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -20,6 +21,19 @@ const supabase = supabaseUrl && supabaseServiceKey
  */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate before anything else, so an anonymous caller learns nothing
+    // about how the server is configured.
+    //
+    // Storage costs money and never expires: without a verified session anyone
+    // could fill the bucket with 5 MB files indefinitely.
+    const session = getSession(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Authentication required. Sign in with your wallet first.' },
+        { status: 401 }
+      );
+    }
+
     if (!supabase) {
       return NextResponse.json(
         { error: 'Supabase not configured' },
@@ -29,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const walletAddress = request.headers.get('x-wallet-address');
 
     if (!file) {
       return NextResponse.json(
@@ -38,15 +51,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!walletAddress || walletAddress.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Wallet address is required. Please provide x-wallet-address header.' },
-        { status: 400 }
-      );
-    }
-
-    // Use wallet address as user identifier
-    const userId = walletAddress.trim();
+    // Identifier comes from the session, never from the request body: it is what
+    // scopes the uploaded object to its owner.
+    const userId = session.address;
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
@@ -69,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Sanitize userId for use in filename (remove/replace invalid characters)
     // Supabase Storage doesn't allow: |, :, /, \, ?, *, ", <, >, and some other special chars
     const sanitizedUserId = userId
-      .replace(/[|:/\?*"<>]/g, '_')  // Replace invalid characters with underscore
+      .replace(/[|:/?*"<>]/g, '_')  // Replace invalid characters with underscore
       .replace(/\s+/g, '_')           // Replace spaces with underscore
       .replace(/_{2,}/g, '_')         // Replace multiple underscores with single
       .replace(/^_+|_+$/g, '');       // Remove leading/trailing underscores
@@ -85,35 +92,10 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Check if bucket exists, create if it doesn't
+    // The bucket is infrastructure, not something to provision per request:
+    // listBuckets/createBucket added two round-trips to every upload and needed
+    // elevated privileges. Create it once (see .env.example / README) instead.
     const bucketName = 'avatars';
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
-    
-    if (!listError) {
-      const bucketExists = buckets?.some(bucket => bucket.name === bucketName);
-      
-      if (!bucketExists) {
-        // Try to create the bucket
-        const { error: createError } = await supabase.storage.createBucket(bucketName, {
-          public: true,
-          allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-          fileSizeLimit: 5242880 // 5MB in bytes
-        });
-        
-        if (createError) {
-          console.error('Error creating bucket:', createError);
-          // If bucket creation fails, provide detailed instructions
-          return NextResponse.json(
-            { 
-              error: 'Storage bucket not configured',
-              message: 'Please create an "avatars" bucket in Supabase Storage:\n1. Go to your Supabase project\n2. Navigate to Storage\n3. Create a new bucket named "avatars"\n4. Make it public\n5. Set allowed file types: image/jpeg, image/jpg, image/png, image/gif, image/webp\n6. Set max file size to 5MB',
-              details: createError.message
-            },
-            { status: 500 }
-          );
-        }
-      }
-    }
 
     // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
@@ -124,79 +106,21 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('Error uploading file:', uploadError);
-      console.error('Upload error message:', uploadError.message);
-      console.error('Full upload error:', JSON.stringify(uploadError, Object.getOwnPropertyNames(uploadError)));
-      
-      const errorMessage = uploadError.message || 'Unknown error';
-      
-      // If bucket still doesn't exist after creation attempt
-      if (errorMessage.includes('Bucket not found') || 
-          errorMessage.includes('not found') ||
-          errorMessage.includes('does not exist')) {
+      // Storage errors carry bucket names, policy text and provider internals.
+      // Keep them in the server log; hand the client a flat message.
+      console.error('Error uploading avatar:', uploadError);
+
+      const errorMessage = uploadError.message || '';
+
+      if (/permission|forbidden|403/i.test(errorMessage)) {
         return NextResponse.json(
-          { 
-            error: 'Storage bucket not configured',
-            message: 'Please create an "avatars" bucket in Supabase Storage:\n1. Go to your Supabase project\n2. Navigate to Storage\n3. Create a new bucket named "avatars"\n4. Make it public\n5. Set allowed file types: image/jpeg, image/jpg, image/png, image/gif, image/webp\n6. Set max file size to 5MB',
-            details: errorMessage
-          },
-          { status: 500 }
-        );
-      }
-      
-      // Check for permission errors
-      if (errorMessage.includes('permission') || 
-          errorMessage.includes('Forbidden') ||
-          errorMessage.includes('403')) {
-        return NextResponse.json(
-          { 
-            error: 'Permission denied',
-            message: 'You do not have permission to upload to this bucket. Please check your Supabase Storage policies.',
-            details: errorMessage
-          },
+          { error: 'Permission denied' },
           { status: 403 }
         );
       }
-      
-      // Check for file already exists
-      if (errorMessage.includes('already exists') || 
-          errorMessage.includes('duplicate')) {
-        // Try again with upsert
-        const { error: upsertError } = await supabase.storage
-          .from(bucketName)
-          .upload(filePath, buffer, {
-            contentType: file.type,
-            upsert: true
-          });
-          
-        if (upsertError) {
-          return NextResponse.json(
-            { 
-              error: 'Failed to upload file',
-              message: 'File upload failed even with overwrite enabled',
-              details: upsertError.message || 'Unknown error'
-            },
-            { status: 500 }
-          );
-        }
-        
-        // Get public URL after successful upsert
-        const { data: urlData } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(filePath);
-          
-        return NextResponse.json({
-          url: urlData.publicUrl,
-          path: filePath
-        });
-      }
-      
+
       return NextResponse.json(
-        { 
-          error: 'Failed to upload file',
-          message: uploadError.message || 'Unknown upload error',
-          details: JSON.stringify(uploadError, Object.getOwnPropertyNames(uploadError))
-        },
+        { error: 'Failed to upload file' },
         { status: 500 }
       );
     }
@@ -213,7 +137,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error in upload route:', error);
     return NextResponse.json(
-      { error: 'Failed to upload image', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to upload image' },
       { status: 500 }
     );
   }

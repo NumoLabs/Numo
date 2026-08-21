@@ -1,5 +1,7 @@
 import { createContext, useContext } from 'react'
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
+import type { useConnect, useDisconnect } from '@starknet-react/core'
+
+import type { SessionStatus } from './use-wallet-session'
 
 interface WalletContextType {
   address: string | undefined
@@ -9,6 +11,16 @@ interface WalletContextType {
   connectors: ReturnType<typeof useConnect>['connectors']
   isConnecting: boolean
   isDisconnecting: boolean
+  /**
+   * Whether the server has accepted a wallet signature for this address.
+   * A connected wallet is NOT authenticated: connecting happens purely in the
+   * browser, so `/api/*` calls only succeed once this is true.
+   */
+  isAuthenticated: boolean
+  sessionStatus: SessionStatus
+  sessionError: string | null
+  /** Retry the signature prompt, e.g. after the user dismissed it. */
+  signIn: () => Promise<boolean>
 }
 
 export const WalletContext = createContext<WalletContextType | null>(null)

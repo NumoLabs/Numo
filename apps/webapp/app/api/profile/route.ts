@@ -1,46 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getUserByWallet, getOrCreateUserByWallet, updateUserProfile, type NetworkType } from '@/lib/supabase/users';
+import { type NextRequest, NextResponse } from 'next/server';
+import { getUserByWallet, getOrCreateUserByWallet, updateUserProfile } from '@/lib/supabase/users';
+import { getSession } from '@/lib/auth/session';
 
-async function getWalletFromHeader(request: NextRequest): Promise<{ address: string; network: NetworkType } | null> {
-  const walletAddress = request.headers.get('x-wallet-address');
-  const walletNetwork = (request.headers.get('x-wallet-network') || 'mainnet') as NetworkType;
-  
-  if (!walletAddress || walletAddress.trim().length === 0) {
-    return null;
-  }
-  
-  // Validate wallet address format (basic validation)
-  if (!/^0x[0-9a-fA-F]{63,64}$/.test(walletAddress.trim())) {
-    return null;
-  }
-  
-  // Validate network
-  const validNetworks: NetworkType[] = ['mainnet', 'sepolia', 'goerli', 'devnet'];
-  if (!validNetworks.includes(walletNetwork)) {
-    return null;
-  }
-
-  return {
-    address: walletAddress.trim(),
-    network: walletNetwork
-  };
-}
+const UNAUTHENTICATED = {
+  error: 'Authentication required. Sign in with your wallet first.',
+};
 
 /**
  * GET /api/profile
- * Get the current user's profile
- * Requires x-wallet-address header with wallet address
- * Optional x-wallet-network header (defaults to mainnet)
+ * Get the current user's profile.
+ *
+ * Identity comes from the signed session cookie, which is only issued after a
+ * verified wallet signature (see /api/auth/login). It is deliberately NOT taken
+ * from a request header: a header is caller-controlled, so that let anyone read
+ * or overwrite any profile by naming someone else's address.
  */
 export async function GET(request: NextRequest) {
   try {
-    const wallet = await getWalletFromHeader(request);
-    
+    const wallet = getSession(request);
+
     if (!wallet) {
-      return NextResponse.json(
-        { error: 'Authentication required. Please provide x-wallet-address header with your wallet address.' },
-        { status: 401 }
-      );
+      return NextResponse.json(UNAUTHENTICATED, { status: 401 });
     }
 
     // Get or create user profile
@@ -82,22 +62,17 @@ export async function GET(request: NextRequest) {
 
 /**
  * PUT /api/profile
- * Update the current user's profile
- * Requires x-wallet-address header with wallet address
- * Optional x-wallet-network header (defaults to mainnet)
+ * Update the current user's profile. Identity comes from the session cookie.
  */
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { username, avatar_url } = body;
 
-    const wallet = await getWalletFromHeader(request);
+    const wallet = getSession(request);
 
     if (!wallet) {
-      return NextResponse.json(
-        { error: 'Authentication required. Please provide x-wallet-address header with your wallet address.' },
-        { status: 401 }
-      );
+      return NextResponse.json(UNAUTHENTICATED, { status: 401 });
     }
 
     if (username !== undefined && username !== null && typeof username !== 'string') {

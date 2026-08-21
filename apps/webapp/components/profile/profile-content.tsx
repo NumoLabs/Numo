@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useId,useState, useEffect } from 'react';
 import { useWalletStatus } from '@/hooks/use-wallet';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,12 @@ interface UserProfile {
 }
 
 export function ProfileContent() {
+  // useId() rather than hardcoded strings: a duplicated id breaks the
+  // label->input association if this component ever renders twice.
+  const avatarUploadId = useId();
+  const usernameId = useId();
+  const walletId = useId();
+
   const { isConnected, address } = useWalletStatus();
   const { toast } = useToast();
   
@@ -61,15 +67,9 @@ export function ProfileContent() {
       try {
         setIsLoading(true);
         
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-          'x-wallet-address': address,
-          'x-wallet-network': walletNetwork,
-        };
-        
-        const response = await fetch('/api/profile', {
-          headers,
-        });
+        // No identity headers: the session cookie is sent automatically and is
+        // the only thing the server trusts.
+        const response = await fetch('/api/profile');
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
@@ -138,10 +138,8 @@ export function ProfileContent() {
       
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
-        'x-wallet-address': address,
-        'x-wallet-network': walletNetwork,
       };
-      
+
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers,
@@ -264,10 +262,6 @@ export function ProfileContent() {
 
       const response = await fetch('/api/profile/upload', {
         method: 'POST',
-        headers: {
-          'x-wallet-address': address,
-          'x-wallet-network': walletNetwork,
-        },
         body: formData,
       });
 
@@ -361,7 +355,7 @@ export function ProfileContent() {
               {isEditing && (
                 <div className="relative">
                   <label
-                    htmlFor="avatar-upload"
+                    htmlFor={avatarUploadId}
                     className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-bitcoin-orange via-orange-600 to-bitcoin-orange hover:from-orange-400 hover:via-orange-500 hover:to-orange-400 rounded-lg transition-all"
                   >
                     {isUploadingAvatar ? (
@@ -377,7 +371,7 @@ export function ProfileContent() {
                     )}
                   </label>
                   <input
-                    id="avatar-upload"
+                    id={avatarUploadId}
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                     onChange={handleAvatarChange}
@@ -425,11 +419,11 @@ export function ProfileContent() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Username */}
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor={usernameId}>Username</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="username"
+                    id={usernameId}
                     type="text"
                     placeholder="Enter your username"
                     value={formData.username}
@@ -443,11 +437,11 @@ export function ProfileContent() {
               {/* Wallet Address (Read-only) */}
               {address && (
                 <div className="space-y-2">
-                  <Label htmlFor="wallet">Wallet Address</Label>
+                  <Label htmlFor={walletId}>Wallet Address</Label>
                   <div className="relative flex items-center gap-2">
                     <Wallet className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
                   <Input
-                    id="wallet"
+                    id={walletId}
                     type="text"
                       value={address}
                     disabled

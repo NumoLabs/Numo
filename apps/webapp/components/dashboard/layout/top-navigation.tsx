@@ -65,13 +65,7 @@ const UserAvatar = memo(() => {
 
       // Fetch from API if no valid cache
       try {
-        const response = await fetch('/api/profile', {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-wallet-address': address,
-            'x-wallet-network': 'mainnet',
-          },
-        });
+        const response = await fetch('/api/profile');
         
         if (response.ok) {
           const data = await response.json();
@@ -197,13 +191,7 @@ export function TopNavigation({ setSidebarOpen }: TopNavigationProps) {
 
       // Fetch from API if no valid cache
       try {
-        const response = await fetch('/api/profile', {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-wallet-address': address,
-            'x-wallet-network': 'mainnet',
-          },
-        });
+        const response = await fetch('/api/profile');
         
         if (response.ok) {
           const data = await response.json();

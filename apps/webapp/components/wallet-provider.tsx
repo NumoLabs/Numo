@@ -1,8 +1,10 @@
 "use client"
 
-import React, { useMemo, useEffect, useRef, useCallback } from 'react'
+import type React from 'react'
+import { useMemo, useEffect, useRef, useCallback } from 'react'
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 import { WalletContext } from '@/hooks/use-wallet'
+import { useWalletSession } from '@/hooks/use-wallet-session'
 
 interface WalletProviderProps {
   children: React.ReactNode
@@ -17,44 +19,13 @@ export function WalletProvider({ children }: WalletProviderProps) {
   const { disconnect, status: disconnectStatus } = useDisconnect()
   const hasAttemptedReconnect = useRef(false)
   const isInitialMount = useRef(true)
-  const hasCreatedUser = useRef(false)
 
-  // Create user in database when wallet connects
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (!isConnected || !address) return
-    if (hasCreatedUser.current) return // Only create once per connection
-
-    const createUserProfile = async () => {
-      try {
-        // Silently create user profile by calling the profile API
-        const response = await fetch('/api/profile', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-wallet-address': address,
-            'x-wallet-network': 'mainnet', // Default to mainnet, can be updated later
-          },
-        })
-
-        if (response.ok) {
-          hasCreatedUser.current = true
-          // User created or already exists - no need to show anything
-        } else {
-          // Log error but don't show to user (silent failure)
-          console.warn('Failed to create user profile:', await response.text().catch(() => 'Unknown error'))
-        }
-      } catch (error) {
-        // Silent error - don't interrupt user experience
-        console.warn('Error creating user profile:', error)
-      }
-    }
-
-    // Small delay to avoid race conditions
-    const timeoutId = setTimeout(createUserProfile, 500)
-    
-    return () => clearTimeout(timeoutId)
-  }, [isConnected, address])
+  // Prompts for a signature once per connected wallet and establishes the
+  // server session. The user row is created by /api/auth/login, after the
+  // signature is verified — previously a plain GET with a spoofable header
+  // created it, so anyone could seed rows for wallets they did not own.
+  const session = useWalletSession()
+  const { signOut } = session
   useEffect(() => {
     if (typeof window === 'undefined') return
     
@@ -82,10 +53,9 @@ export function WalletProvider({ children }: WalletProviderProps) {
             keysToRemove.push(key)
           }
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key))
+        for (const key of keysToRemove) localStorage.removeItem(key)
         
         hasAttemptedReconnect.current = false
-        hasCreatedUser.current = false
       } catch (error) {
         console.warn('Error clearing localStorage on disconnect:', error)
       }
@@ -119,14 +89,13 @@ export function WalletProvider({ children }: WalletProviderProps) {
               keysToRemove.push(key)
             }
           }
-          keysToRemove.forEach(key => localStorage.removeItem(key))
+          for (const key of keysToRemove) localStorage.removeItem(key)
         } catch (error) {
           console.warn('Error clearing localStorage on disconnect:', error)
         }
         
         hasAttemptedReconnect.current = false
         isInitialMount.current = false
-        hasCreatedUser.current = false // Reset so user can be created again on reconnect
       }
     }
   }, [disconnectStatus])
@@ -151,7 +120,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
             keysToRemove.push(key)
           }
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key))
+        for (const key of keysToRemove) localStorage.removeItem(key)
       } catch (error) {
         console.warn('Error clearing localStorage before disconnect:', error)
       }
@@ -159,11 +128,14 @@ export function WalletProvider({ children }: WalletProviderProps) {
     
     // Reset flags
     hasAttemptedReconnect.current = false
-    hasCreatedUser.current = false
-    
+
+    // Drop the server session too, otherwise the cookie outlives the wallet
+    // connection and the next visitor on this browser inherits it.
+    await signOut()
+
     // Now disconnect
     await disconnect()
-  }, [disconnect])
+  }, [disconnect, signOut])
 
   const contextValue = useMemo(() => ({
     address,
@@ -173,6 +145,10 @@ export function WalletProvider({ children }: WalletProviderProps) {
     connectors,
     isConnecting: connectStatus === 'pending',
     isDisconnecting: disconnectStatus === 'pending',
+    isAuthenticated: session.isAuthenticated,
+    sessionStatus: session.status,
+    sessionError: session.error,
+    signIn: session.signIn,
   }), [
     address,
     isConnected,
@@ -180,7 +156,11 @@ export function WalletProvider({ children }: WalletProviderProps) {
     handleDisconnect,
     connectors,
     connectStatus,
-    disconnectStatus
+    disconnectStatus,
+    session.isAuthenticated,
+    session.status,
+    session.error,
+    session.signIn
   ])
 
   return (
