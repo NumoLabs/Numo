@@ -138,3 +138,20 @@ Contributions are welcome! Feel free to submit pull requests or open issues.
 ---
 
 Developed with ❤️ by the Numo Team
+## Linting
+
+`bun run lint` runs Biome.
+
+Two settings are deliberate and worth knowing before you "fix" them:
+
+- **`noUnknownAtRules` is off.** Biome's CSS linter does not recognise Tailwind's
+  `@tailwind` / `@apply` directives and reports them as unknown at-rules.
+  Tailwind validates them itself at build time.
+- **The remaining `useExhaustiveDependencies` findings are known and benign.**
+  Each one lists a dependency that is a module-level constant
+  (`getVesuConfig()` returns a frozen config object; `contract` is a
+  `useMemo(..., [])`), so the extra entry never triggers a re-run. They are left
+  in place rather than silenced so a genuinely unstable dependency still shows up.
+
+Every other rule is expected to pass. If `bun run lint` reports something new,
+it is new.

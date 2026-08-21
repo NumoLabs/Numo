@@ -86,6 +86,7 @@ Numo/
 * Node.js (v18+)
 * Bun
 * Git
+* [Scarb](https://docs.swmansion.com/scarb/) 2.12.2 and [Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/) 0.50.0 — only for `apps/contracts`
 
 ### Installation
 
@@ -96,16 +97,56 @@ git clone https://github.com/your-username/numo.git
 cd numo
 ```
 
-2. Install dependencies:
+2. Install dependencies (root, then webapp):
 
 ```bash
-bun install
+bun install && cd apps/webapp && bun install
 ```
 
-3. Start the development server:
+3. Configure the environment:
 
 ```bash
-cd apps/webapp && bun dev
+cp apps/webapp/.env.example apps/webapp/.env.local
+```
+
+The app builds and runs with everything blank — it falls back to a public
+Starknet RPC node — but these features stay dark until configured:
+
+| Variable | Needed for | Exposed to browser |
+| --- | --- | --- |
+| `NEXT_PUBLIC_STARKNET_RPC_URL` | All on-chain reads (falls back to a rate-limited public node) | **Yes** |
+| `STARKNET_RPC_URL` | Server-side RPC; safe place for a keyed URL | No |
+| `ALCHEMY_API_KEY` | `/api/wallet/wbtc-balance` | No |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase client | **Yes** |
+| `SUPABASE_SERVICE_ROLE_KEY` | User profiles, avatar upload, user count | No |
+| `PRAGMA_API_KEY` | Price feeds via `/api/pragma` | No |
+| `NEXT_PUBLIC_SITE_URL` | Same-origin check on `/api/starknet-rpc` behind a proxy/CDN | **Yes** |
+
+> Anything named `NEXT_PUBLIC_*` is inlined into the JavaScript bundle and is
+> readable by anyone. Never put a secret behind that prefix.
+
+Avatar uploads additionally need a **public** Supabase Storage bucket named
+`avatars` (max 5 MB, image MIME types). Create it once in the Supabase
+dashboard — the app does not provision it.
+
+4. Start the development server:
+
+```bash
+bun run dev
+```
+
+### Contracts
+
+```bash
+cp apps/contracts/.env.example apps/contracts/.env   # set MAINNET_RPC_URL
+bun run contracts:build
+bun run contracts:test    # fork tests; requires MAINNET_RPC_URL
+```
+
+### Checks
+
+```bash
+bun run typecheck && bun run lint && bun run build
 ```
 
 ## 💡 Use Cases
