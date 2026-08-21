@@ -172,7 +172,11 @@ pub mod test_vesu_rebalance {
         let vesu_rebal = declare("VesuRebalance").unwrap().contract_class();
         let allowed_pools = get_allowed_pools();
         let settings = get_settings();
-        let vesu_settings = get_vesu_settings();
+        // In V2 the constructor takes an oracle address, not a vesuStruct.
+        // This test still built V1 calldata via get_vesu_settings(), a function
+        // that no longer exists anywhere -- which is why the whole test crate
+        // failed to compile and `snforge test` could not run at all.
+        let oracle = get_oracle();
         let mut calldata: Array<felt252> = array![];
         calldata.append_serde(VAULT_NAME());
         calldata.append_serde(VAULT_SYMBOL());
@@ -180,7 +184,7 @@ pub mod test_vesu_rebalance {
         calldata.append(accessControl.into());
         allowed_pools.serialize(ref calldata);
         settings.serialize(ref calldata);
-        vesu_settings.serialize(ref calldata);
+        calldata.append(oracle.into());
 
         let (address, _) = vesu_rebal.deploy(@calldata).expect('Vesu vault deploy failed');
 

@@ -22,6 +22,11 @@ mod VesuRebalance {
     use openzeppelin::token::erc20::{ERC20Component,};
     use openzeppelin::token::erc20::interface::IERC20Mixin;
     use numo_contracts::components::erc4626::{ERC4626Component};
+    // Deliberately still on alexandria's List rather than starknet::storage::Vec:
+    // the two have different storage layouts, so switching would change the
+    // layout of an already-deployed contract and require a migration. Declaring
+    // the feature documents that choice and silences the build warning.
+    #[feature("deprecated-list-trait")]
     use alexandria_storage::list::{List, ListTrait};
     use numo_contracts::interfaces::IDistributor::{Claim};
     use numo_contracts::components::swap::{AvnuMultiRouteSwap};
