@@ -22,7 +22,7 @@ export function PoolDetails({ pool }: PoolDetailsProps) {
               <h4 className="font-medium mb-2">Benefits</h4>
               <ul className="list-disc pl-5 space-y-1">
                 {pool.benefits.map((benefit, index) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static list, never reordered
                   <li key={index} className="text-sm">
                     {benefit}
                   </li>

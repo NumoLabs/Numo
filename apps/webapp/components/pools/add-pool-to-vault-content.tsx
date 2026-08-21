@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useId,useState, useEffect, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, Plus, TrendingUp, Info, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -58,6 +58,11 @@ const vaultsData = [
 ]
 
 export function AddPoolToVaultContent() {
+  // useId(): hardcoded ids collide when a component renders more than
+  // once on a page, which silently breaks label->input association.
+  const allocationId = useId();
+  const amountId = useId();
+
   const params = useParams()
   const router = useRouter()
   const poolSlug = params.pool as string
@@ -293,10 +298,10 @@ export function AddPoolToVaultContent() {
 
               {/* Amount Input */}
               <div className="space-y-2">
-                <Label htmlFor="amount">Amount to Allocate</Label>
+                <Label htmlFor={amountId}>Amount to Allocate</Label>
                 <div className="relative">
                   <Input
-                    id="amount"
+                    id={amountId}
                     type="number"
                     placeholder="0.00"
                     value={amount}
@@ -310,7 +315,7 @@ export function AddPoolToVaultContent() {
               {/* Allocation Percentage */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="allocation">Allocation Percentage</Label>
+                  <Label htmlFor={allocationId}>Allocation Percentage</Label>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -324,7 +329,7 @@ export function AddPoolToVaultContent() {
                 </div>
                 <div className="relative">
                   <Input
-                    id="allocation"
+                    id={allocationId}
                     type="number"
                     placeholder="0"
                     value={allocation}

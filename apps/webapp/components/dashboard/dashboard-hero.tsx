@@ -94,7 +94,7 @@ export function DashboardHero() {
       <div className="relative z-10">
         {/* Balance Toggle Button - Top Right Corner */}
         <div className="absolute hidden md:block -top-2 right-0 mb-4">
-          <button
+          <button type="button"
             onClick={() => setShowBalance(!showBalance)}
             className="h-8 w-8 rounded-full bg-[#0f1114] hover:bg-gray-800 flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-orange-500 z-20"
             title={showBalance ? "Hide balance" : "Show balance"}
@@ -114,7 +114,7 @@ export function DashboardHero() {
                   <p className="text-gray-300">Your vault is automatically generating returns</p>
                 </div>
                 {/* Balance Toggle Button - Mobile: Next to "Welcome back!" */}
-                <button
+                <button type="button"
                   onClick={() => setShowBalance(!showBalance)}
                   className="md:hidden h-8 w-8 rounded-full bg-[#0f1114] hover:bg-gray-800 flex items-center justify-center transition-all duration-200 hover:scale-105 border-2 border-orange-500 flex-shrink-0 mt-1"
                   title={showBalance ? "Hide balance" : "Show balance"}

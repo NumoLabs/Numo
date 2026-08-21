@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useId,useState, useEffect } from "react"
 import { Lock, Unlock, Loader2, CheckCircle, AlertCircle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useLockToEarnBond } from "@/hooks/use-lock-to-earn-bond"
+import { type DepositResult, useLockToEarnBond } from "@/hooks/use-lock-to-earn-bond"
 import { useWalletStatus } from "@/hooks/use-wallet"
 import { useToast } from "@/hooks/use-toast"
 
@@ -67,6 +67,12 @@ export function BondDepositWithdrawModal({
   isOpen,
   onOpenChange,
 }: BondDepositWithdrawModalProps) {
+  // useId(): hardcoded ids collide when a component renders more than
+  // once on a page, which silently breaks label->input association.
+  const customLockPeriodId = useId();
+  const depositAmountId = useId();
+  const withdrawAmountId = useId();
+
   const { address, isConnected } = useWalletStatus()
   const { toast } = useToast()
   
@@ -198,7 +204,7 @@ export function BondDepositWithdrawModal({
     const hasActiveLock = lockInfo && lockInfo.lockUntil > 0
 
     try {
-      let result
+      let result: DepositResult
       
       if (hasActiveLock) {
         result = await depositLocked({
@@ -401,9 +407,9 @@ export function BondDepositWithdrawModal({
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="deposit-amount" className="text-sm">Amount (WBTC)</Label>
+                  <Label htmlFor={depositAmountId} className="text-sm">Amount (WBTC)</Label>
                   <Input
-                    id="deposit-amount"
+                    id={depositAmountId}
                     type="number"
                     step="0.00000001"
                     placeholder="0.00000000"
@@ -437,11 +443,11 @@ export function BondDepositWithdrawModal({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="custom-lock-period" className="text-sm">
+                      <Label htmlFor={customLockPeriodId} className="text-sm">
                         Or Custom Lock Period (seconds)
                       </Label>
                       <Input
-                        id="custom-lock-period"
+                        id={customLockPeriodId}
                         type="number"
                         placeholder="Enter custom lock period in seconds"
                         value={customLockPeriod}
@@ -520,9 +526,9 @@ export function BondDepositWithdrawModal({
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="withdraw-amount" className="text-sm">Amount (WBTC)</Label>
+                  <Label htmlFor={withdrawAmountId} className="text-sm">Amount (WBTC)</Label>
                   <Input
-                    id="withdraw-amount"
+                    id={withdrawAmountId}
                     type="number"
                     step="0.00000001"
                     placeholder="0.00000000"

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useWalletStatus } from '@/hooks/use-wallet'
 import { useWallet } from '@/hooks/use-wallet'
 import { useConnect } from '@starknet-react/core'
-import { StarknetkitConnector, useStarknetkitConnectModal } from 'starknetkit'
+import { type StarknetkitConnector, useStarknetkitConnectModal } from 'starknetkit'
 
 export default function WalletConnector() {
   const pathname = usePathname()

@@ -96,7 +96,7 @@ function calculateCompoundInterest(
   const totalPeriods = periodsPerYear * years;
   
   // A = P * (1 + r/n)^(n*t)
-  return principal * Math.pow(1 + ratePerPeriod, totalPeriods);
+  return principal * (1 + ratePerPeriod) ** totalPeriods;
 }
 
 /**

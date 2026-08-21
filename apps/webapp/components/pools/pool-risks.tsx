@@ -31,8 +31,8 @@ export function PoolRisks({ pool }: PoolRisksProps) {
             <div>
               <h4 className="font-medium mb-2">Main Risks</h4>
               <ul className="list-disc pl-5 space-y-2">
-                {pool.risks.map((risk, index) => (
-                  <li key={index}>{risk}</li>
+                {pool.risks.map((risk) => (
+                  <li key={risk}>{risk}</li>
                 ))}
               </ul>
             </div>

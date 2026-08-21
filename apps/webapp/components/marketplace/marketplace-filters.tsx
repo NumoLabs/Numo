@@ -154,7 +154,7 @@ export function MarketplaceFilters({
           {selectedRisk !== "all" && (
             <Badge variant="secondary" className="gap-1">
               Risk: {selectedRisk}
-              <button
+              <button type="button"
                 onClick={() => onRiskChange("all")}
                 className="ml-1 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full p-0.5"
               >
@@ -165,7 +165,7 @@ export function MarketplaceFilters({
           {showVerifiedOnly && (
             <Badge variant="secondary" className="gap-1">
               Verified Only
-              <button
+              <button type="button"
                 onClick={() => onVerifiedOnlyChange(false)}
                 className="ml-1 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full p-0.5"
               >
@@ -176,7 +176,7 @@ export function MarketplaceFilters({
           {showFeaturedOnly && (
             <Badge variant="secondary" className="gap-1">
               Featured Only
-              <button
+              <button type="button"
                 onClick={() => onFeaturedOnlyChange(false)}
                 className="ml-1 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full p-0.5"
               >

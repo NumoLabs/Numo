@@ -3,7 +3,7 @@
 import type React from "react"
 import Link from "next/link"
 import { Info, Trash } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useId,useState, useEffect } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -50,6 +50,11 @@ const recommendedStrategies = [
 ]
 
 export function CreateVaultContent() {
+  // useId(): hardcoded ids collide when a component renders more than
+  // once on a page, which silently breaks label->input association.
+  const vaultDescriptionId = useId();
+  const vaultNameId = useId();
+
   const [vaultName, setVaultName] = useState("")
   const [vaultDescription, setVaultDescription] = useState("")
   const [pools, setPools] = useState(initialPools)
@@ -60,7 +65,7 @@ export function CreateVaultContent() {
   const totalAllocation = pools.reduce((sum, pool) => sum + pool.allocation, 0)
   const estimatedAPY = pools.reduce((sum, pool) => sum + (pool.apy * pool.allocation) / 100, 0)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional in this context
   useEffect(() => {
     // Validate total allocation on pool changes
     if (totalAllocation !== 100) {
@@ -103,7 +108,7 @@ export function CreateVaultContent() {
 
       const updatedPool = prevPools.find((pool) => pool.id === id)
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: intentional in this context
       return [...adjustedPools, { ...updatedPool!, allocation }].sort((a, b) => {
         const indexA = prevPools.findIndex((p) => p.id === a.id)
         const indexB = prevPools.findIndex((p) => p.id === b.id)
@@ -228,9 +233,9 @@ export function CreateVaultContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="vault-name">Vault Name</Label>
+                  <Label htmlFor={vaultNameId}>Vault Name</Label>
                   <Input
-                    id="vault-name"
+                    id={vaultNameId}
                     placeholder="Ex: My BTC Strategy"
                     value={vaultName}
                     onChange={handleVaultNameChange}
@@ -238,9 +243,9 @@ export function CreateVaultContent() {
                   {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vault-description">Description (optional)</Label>
+                  <Label htmlFor={vaultDescriptionId}>Description (optional)</Label>
                   <Input
-                    id="vault-description"
+                    id={vaultDescriptionId}
                     placeholder="Ex: Balanced strategy for long-term returns"
                     value={vaultDescription}
                     onChange={handleVaultDescriptionChange}
@@ -263,6 +268,7 @@ export function CreateVaultContent() {
                       <div className="flex justify-between items-center">
                         <div className="font-medium">{pool.name}</div>
                         <Button
+                          type="button"
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
@@ -350,6 +356,7 @@ export function CreateVaultContent() {
                     <p className="text-sm font-medium">{strategy.name}</p>
                     <p className="text-xs text-muted-foreground">{strategy.description}</p>
                     <Button
+                      type="button"
                       variant="outline"
                       size="sm"
                       className="w-full"

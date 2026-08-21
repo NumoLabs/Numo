@@ -7,7 +7,10 @@ import { Button } from "../ui/button"
 import { useWalletStatus } from "@/hooks/use-wallet"
 import { useWallet } from "@/hooks/use-wallet"
 import { useConnect } from '@starknet-react/core'
-import { StarknetkitConnector, useStarknetkitConnectModal } from 'starknetkit'
+import { type StarknetkitConnector, useStarknetkitConnectModal } from 'starknetkit'
+
+// Fixed decorative rating; keyed by stable ids rather than array index.
+const STAR_KEYS = ['s1', 's2', 's3', 's4', 's5'] as const
 
 export function VaultCTA() {
   const [userCount, setUserCount] = useState<number | null>(null)
@@ -66,6 +69,7 @@ export function VaultCTA() {
   }, [])
 
   return (
+    // biome-ignore lint/correctness/useUniqueElementIds: in-page anchor target, referenced by href="#waitlist" in the header
     <section id="waitlist" className="w-full py-12 md:py-20 relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
       {/* Background decorative elements */}
       <motion.div 
@@ -153,8 +157,8 @@ export function VaultCTA() {
                     </span> already joined
                   </div>
                   <div className="flex items-center justify-center sm:justify-start gap-1 mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-2 h-2 sm:w-2.5 sm:h-2.5 fill-yellow-400 text-yellow-400" />
+                    {STAR_KEYS.map((k) => (
+                      <Star key={k} className="w-2 h-2 sm:w-2.5 sm:h-2.5 fill-yellow-400 text-yellow-400" />
                     ))}
                     <span className="text-[9px] sm:text-[10px] text-gray-400 ml-1">Trusted by users</span>
                   </div>

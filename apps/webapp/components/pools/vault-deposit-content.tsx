@@ -1,3 +1,4 @@
+import { useId } from 'react';
 "use client"
 
 import { useParams } from "next/navigation"
@@ -13,6 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PoolDetailChart } from "@/components/pools/pool-detail-chart"
 
 export function VaultDepositContent() {
+  // useId(): hardcoded ids collide when a component renders more than
+  // once on a page, which silently breaks label->input association.
+  const amountId = useId();
+
   const params = useParams()
   const vaultSlug = Array.isArray(params?.vault) ? params.vault[0] : (params?.vault as string | undefined)
 
@@ -81,8 +86,8 @@ export function VaultDepositContent() {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount (BTC)</Label>
-                  <Input id="amount" type="number" placeholder="0.00" step="0.001" min={vaultData.minDeposit} />
+                  <Label htmlFor={amountId}>Amount (BTC)</Label>
+                  <Input id={amountId} type="number" placeholder="0.00" step="0.001" min={vaultData.minDeposit} />
                   <p className="text-sm text-muted-foreground">Minimum deposit: {vaultData.minDeposit}</p>
                 </div>
 
@@ -199,8 +204,8 @@ export function VaultDepositContent() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {vaultData.pools.map((pool, index) => (
-                    <div key={index} className="space-y-3 p-4 rounded-lg border">
+                  {vaultData.pools.map((pool) => (
+                    <div key={pool.name} className="space-y-3 p-4 rounded-lg border">
                       <div className="flex justify-between items-center">
                         <h4 className="font-medium">{pool.name}</h4>
                         <div className="flex gap-2">

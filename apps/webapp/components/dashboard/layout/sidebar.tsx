@@ -52,10 +52,17 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
     <>
       {/* Mobile sidebar */}
       <div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
-        <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
+        {/* A button, not a div: the backdrop dismisses the menu, so it has to be
+            reachable and activatable from the keyboard like any other control. */}
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="fixed inset-0 bg-gray-900/80"
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="fixed inset-y-0 left-0 z-50 w-64 bg-black shadow-xl flex flex-col">
           <div className="flex h-16 items-center justify-between px-6 border-b border-gray-800 shrink-0">
-            <button onClick={handleLogoClick} className="flex items-center group cursor-pointer">
+            <button type="button" onClick={handleLogoClick} className="flex items-center group cursor-pointer">
               <Image
                 src="/numo-logo.png"
                 alt="Numo Logo"
@@ -146,7 +153,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black border-r border-gray-800/50 shadow-xl">
           <div className="flex h-16 shrink-0 items-center px-6 border-b border-gray-800/50">
-            <button onClick={handleLogoClick} className="flex items-center group cursor-pointer">
+            <button type="button" onClick={handleLogoClick} className="flex items-center group cursor-pointer">
               <Image
                 src="/numo-logo.png"
                 alt="Numo Logo"
@@ -158,13 +165,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             </button>
           </div>
           <nav className="flex flex-1 flex-col px-4">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
+            <ul className="flex flex-1 flex-col gap-y-7">
               {navigation.map((section, sectionIndex) => (
                 <li key={section.section} className={sectionIndex === navigation.length - 1 ? "mb-4" : ""}>
                   <div className="text-xs font-semibold leading-6 text-bitcoin-gold uppercase tracking-wider mb-2">
                     {section.section}
                   </div>
-                  <ul role="list" className="-mx-2 space-y-1">
+                  <ul className="-mx-2 space-y-1">
                     {section.items.map((item) => (
                       <li key={item.href}>
                         <Link

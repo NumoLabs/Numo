@@ -40,12 +40,18 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, type, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        // A <button> with no type is type="submit". Inside a form that means
+        // every unmarked action button submits it — in create-vault-content the
+        // "remove pool" and "apply strategy" buttons were creating the vault.
+        // Default to "button"; submit buttons already say type="submit".
+        // Not forwarded when asChild, where the child may not be a <button>.
+        {...(asChild ? {} : { type: type ?? "button" })}
         {...props}
       />
     )

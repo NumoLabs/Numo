@@ -314,7 +314,7 @@ export function VaultHero() {
                       <div className="w-1 h-4 bg-white rounded-sm"></div>
                     </div>
                     <div className="w-4 h-4">
-                      <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
+                      <svg aria-hidden="true" viewBox="0 0 24 24" className="w-full h-full fill-current">
                         <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z" />
                       </svg>
                     </div>
@@ -361,23 +361,23 @@ export function VaultHero() {
 
                 {/* Action buttons */}
                 <div className="flex pl-2 pr-5 mt-6 space-x-4">
-                  <button className="flex-2 min-w-[115px] bg-gray-800 rounded-full py-3 flex items-center justify-center">
+                  <button type="button" className="flex-2 min-w-[115px] bg-gray-800 rounded-full py-3 flex items-center justify-center">
                     <Plus className="w-5 h-5 mr-2" />
                     <span>Deposit</span>
                   </button>
-                  <button className="flex-2 min-w-[115px] bg-gray-800 rounded-full py-3 flex items-center justify-center">
+                  <button type="button" className="flex-2 min-w-[115px] bg-gray-800 rounded-full py-3 flex items-center justify-center">
                     <Download className="w-5 h-5 mr-2" />
                     <span>Withdraw</span>
                   </button>
-                  <button className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
+                  <button type="button" className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
                     <MoreVertical className="w-5 h-5" />
                   </button>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex border-b border-gray-800 mt-6">
-                  <button className="flex-1 text-center py-3 border-b-2 border-orange-500 font-medium text-white">Strategies</button>
-                  <button className="flex-1 text-center py-3 text-gray-400">History</button>
+                  <button type="button" className="flex-1 text-center py-3 border-b-2 border-orange-500 font-medium text-white">Strategies</button>
+                  <button type="button" className="flex-1 text-center py-3 text-gray-400">History</button>
                 </div>
 
                 {/* Strategies list */}
@@ -411,7 +411,7 @@ export function VaultHero() {
                   <div className="bg-gray-800 rounded-lg p-4 mb-3">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3">
-                        <svg viewBox="0 0 24 24" className="w-6 h-6 text-white">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" className="w-6 h-6 text-white">
                           <path
                             fill="currentColor"
                             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"
@@ -439,7 +439,7 @@ export function VaultHero() {
                     </div>
                   </div>
 
-                  <button className="w-full py-3 border border-dashed border-gray-700 rounded-lg text-gray-400 mt-2 flex items-center justify-center">
+                  <button type="button" className="w-full py-3 border border-dashed border-gray-700 rounded-lg text-gray-400 mt-2 flex items-center justify-center">
                     <Plus className="w-4 h-4 mr-2" />
                     Add New Strategy
                   </button>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useId,useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,11 @@ import { useVaultForecastStats } from "@/hooks/use-vault-forecast-stats"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function YieldSimulator() {
+  // useId(): hardcoded ids collide when a component renders more than
+  // once on a page, which silently breaks label->input association.
+  const amountId = useId();
+  const daysId = useId();
+
   const [amount, setAmount] = useState<string>("1")
   const [days, setDays] = useState<string>("30")
   
@@ -111,9 +116,9 @@ export default function YieldSimulator() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-white">Amount of BTC</Label>
+            <Label htmlFor={amountId} className="text-white">Amount of BTC</Label>
             <Input
-              id="amount"
+              id={amountId}
               type="number"
               step="0.00000001"
               min="0"
@@ -126,9 +131,9 @@ export default function YieldSimulator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="days" className="text-white">Number of Days</Label>
+            <Label htmlFor={daysId} className="text-white">Number of Days</Label>
             <Input
-              id="days"
+              id={daysId}
               type="number"
               placeholder="30"
               value={days}

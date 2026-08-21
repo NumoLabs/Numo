@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useId,useState } from "react"
 import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,11 @@ interface PoolSelectorProps {
  * y la asignación inicial que tendrá dentro de un vault personalizado.
  */
 export function PoolSelector({ onAddPool }: PoolSelectorProps) {
+  // useId() rather than hardcoded strings: a duplicated id breaks the
+  // label->input association if this component ever renders twice.
+  const poolId = useId();
+  const allocationId = useId();
+
   const [open, setOpen] = useState(false)
   const [selectedPool, setSelectedPool] = useState("")
   const [allocation, setAllocation] = useState("20")
@@ -73,9 +78,9 @@ export function PoolSelector({ onAddPool }: PoolSelectorProps) {
         <div className="grid gap-4 py-4">
           {/* Pool selector */}
           <div className="space-y-2">
-            <Label htmlFor="pool">Pool</Label>
+            <Label htmlFor={poolId}>Pool</Label>
             <Select value={selectedPool} onValueChange={setSelectedPool}>
-              <SelectTrigger id="pool">
+              <SelectTrigger id={poolId}>
                 <SelectValue placeholder="Select a pool" />
               </SelectTrigger>
               <SelectContent>
@@ -90,9 +95,9 @@ export function PoolSelector({ onAddPool }: PoolSelectorProps) {
 
           {/* Allocation percentage */}
           <div className="space-y-2">
-            <Label htmlFor="allocation">Allocation (%)</Label>
+            <Label htmlFor={allocationId}>Allocation (%)</Label>
             <Input
-              id="allocation"
+              id={allocationId}
               type="number"
               min="1"
               max="100"

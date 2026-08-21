@@ -11,6 +11,7 @@ export function VaultStats() {
   const { ref: statsRef, controls: statsControls } = useScrollAnimation(0.2)
 
   return (
+    // biome-ignore lint/correctness/useUniqueElementIds: in-page anchor target, referenced by href="#stats" in the header
     <section className="w-full py-12 md:py-24 lg:py-32" id="stats" style={{ backgroundColor: '#000000' }}>
       <div className="container px-4 md:px-6">
         <motion.div 

@@ -30,7 +30,7 @@ const wallet =
 		: undefined;
 const chainId = wallet ? wallet?.chainId : 'SN_MAIN';
 const BASE_URL =
-	// biome-ignore lint/suspicious/noDoubleEquals: <explanation>
+	// biome-ignore lint/suspicious/noDoubleEquals: loose compare is deliberate: value may be a string or number
 	chainId == 'SN_MAIN'
 		? 'https://mainnet-api.ekubo.org'
 		: 'https://mainnet-api.ekubo.org';
@@ -143,13 +143,9 @@ const extractPositionMetadata = (input: string): TokenMetadata => {
 	return {
 		token0,
 		token1,
-		// biome-ignore lint/style/useNumberNamespace: <explanation>
 		price1: parseFloat(price1),
-		// biome-ignore lint/style/useNumberNamespace: <explanation>
 		price2: parseFloat(price2),
-		// biome-ignore lint/style/useNumberNamespace: <explanation>
 		percentage1: parseFloat(percentage1.replace('%', '')),
-		// biome-ignore lint/style/useNumberNamespace: <explanation>
 		percentage2: parseFloat(percentage2.replace('%', '')),
 	};
 };
@@ -228,9 +224,9 @@ export async function fetchPoolByAddress(
 	}
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 const sortPoolsByFees = (pools: any) => {
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 	return pools.sort((a: any, b: any) => {
 		const sumA = BigInt(a.pool.fees0_24h) + BigInt(a.pool.fees1_24h);
 		const sumB = BigInt(b.pool.fees0_24h) + BigInt(b.pool.fees1_24h);
@@ -246,7 +242,7 @@ const limit = pLimit(5);
 
 export async function fetchTopPools(): Promise<EkuboPoolsDisplay[]> {
 	try {
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 		const pools: Array<any> = [];
 		const tokens = await fetchTokens();
 
@@ -255,7 +251,6 @@ export async function fetchTopPools(): Promise<EkuboPoolsDisplay[]> {
 				const { data } = await axios.get(
 					`${BASE_URL}/pair/${pair.token0}/${pair.token1}/pools`
 				);
-				// biome-ignore lint/complexity/noForEach: <explanation>
 				data.topPools.forEach((pool: Pool) => {
 					const t0 = tokens.find(
 						(token: Token) =>
@@ -280,7 +275,7 @@ export async function fetchTopPools(): Promise<EkuboPoolsDisplay[]> {
 		const sortedPools = sortPoolsByFees(pools).slice(0, 20);
 
 		const updatedPools = await Promise.all(
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 			sortedPools.map((pool: any) =>
 				limit(async () => {
 					pool.totalFees = await valToUsd(
@@ -308,21 +303,20 @@ export async function fetchTopPools(): Promise<EkuboPoolsDisplay[]> {
 }
 
 export async function fetchUserFavPools(
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 	favPools: any[]
 ): Promise<EkuboPoolsDisplay[]> {
 	try {
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 		const pools: Array<any> = [];
 		const tokens = await fetchTokens();
 
 		await Promise.all(
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 			favPools.map(async (pool: any) => {
 				const { data } = await axios.get(
 					`${BASE_URL}/pair/${pool.token0}/${pool.token1}/pools`
 				);
-				// biome-ignore lint/complexity/noForEach: <explanation>
 				data.topPools.forEach((poolData: Pool) => {
 					const t0 = tokens.find(
 						(token: Token) =>
@@ -335,9 +329,9 @@ export async function fetchUserFavPools(
 							pool.token1.toLowerCase()
 					);
 					if (
-						// biome-ignore lint/suspicious/noDoubleEquals: <explanation>
+						// biome-ignore lint/suspicious/noDoubleEquals: loose compare is deliberate: value may be a string or number
 						poolData.tick_spacing == pool.tickSpacing &&
-						// biome-ignore lint/suspicious/noDoubleEquals: <explanation>
+						// biome-ignore lint/suspicious/noDoubleEquals: loose compare is deliberate: value may be a string or number
 						poolData.fee == pool.fee
 					) {
 						pools.push({
@@ -354,7 +348,7 @@ export async function fetchUserFavPools(
 		const sortedPools = sortPoolsByFees(pools).slice(0, 20);
 
 		const updatedPools = await Promise.all(
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 			sortedPools.map((pool: any) =>
 				limit(async () => {
 					pool.totalFees = await valToUsd(
@@ -439,7 +433,6 @@ export async function fetchLiquidityInRange(
 	liquidityData: LiquidityData[]
 ): Promise<number | null> {
 	let liquidity = 0;
-	// biome-ignore lint/complexity/noForEach: <explanation>
 	liquidityData.forEach(({ tick, liquidity_net }) => {
 		if (minPrice <= Number(tick) && Number(tick) <= maxPrice) {
 			liquidity += Number(liquidity_net);
@@ -471,7 +464,7 @@ export async function fetchPosition(address: string): Promise<EkuboPosition[]> {
 		const { data } = await axios.get(`${BASE_URL}/positions/${address}`);
 
 		const positions = await Promise.all(
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: external API response, shape not under our control
 			data.data.map(async (position: any) => {
 				const metadata = await fetchPositionMetadata(position.id);
 				const extractedValues = extractPositionMetadata(metadata.name);
@@ -617,7 +610,7 @@ export async function fetchLiquidityData(
 					limit(async () => {
 						const index = {
 							mag: Math.abs(tick),
-							// biome-ignore lint/complexity/noUselessTernary: <explanation>
+							// biome-ignore lint/complexity/noUselessTernary: intentional in this context
 							sign: tick > 0 ? false : true,
 						};
 						const liquidity =

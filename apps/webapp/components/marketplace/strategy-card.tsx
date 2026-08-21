@@ -96,8 +96,8 @@ export function StrategyCard({ strategy, onFollow, isFollowing = false }: Strate
           <div className="flex justify-between text-sm">
             <span className="font-medium">Strategy Allocation</span>
           </div>
-          {strategy.allocation.map((allocation, index) => (
-            <div key={index} className="space-y-1">
+          {strategy.allocation.map((allocation) => (
+            <div key={`${allocation.protocol}-${allocation.pool}`} className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span>
                   {allocation.protocol} - {allocation.pool}

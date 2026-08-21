@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useId,useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
@@ -10,7 +10,66 @@ import { useVaultForecastStats } from "@/hooks/use-vault-forecast-stats"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
 
+// Defined at module scope, not inside PerformanceChart. A component declared
+// inside another is a brand-new type on every render, so React unmounts and
+// remounts the whole tooltip subtree each time the chart re-renders.
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey?: string; name?: string; value?: number; color?: string; payload?: any }>; label?: string }) => {
+  if (active && payload && payload.length) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vaultEntry = payload.find((p: any) => p.dataKey === 'vaultBalance' || p.name === 'BTC Vault')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hodlEntry = payload.find((p: any) => p.dataKey === 'hodlBalance' || p.name === 'HODL')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const advantageEntry = payload.find((p: any) => p.dataKey === 'advantage' || p.name === 'Vault Advantage')
+    
+    // Get actual values from the data point (not amplified)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dataPoint = vaultEntry?.payload as any
+    const actualVaultBalance = dataPoint?.vaultBalanceActual ?? vaultEntry?.value
+    const actualAdvantage = dataPoint?.advantageActual ?? advantageEntry?.value
+    
+    return (
+      <div className="bg-gradient-to-br from-gray-900 to-black text-white p-4 border border-orange-500/30 rounded-lg shadow-2xl backdrop-blur-sm">
+        <p className="font-bold mb-3 text-orange-300">{`Day ${label}`}</p>
+        <div className="space-y-2">
+          {vaultEntry && actualVaultBalance !== undefined && (
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500"></div>
+              <p className="text-sm font-semibold">
+                <span className="text-orange-300">BTC Vault:</span> <span className="text-white">{actualVaultBalance.toFixed(6)} BTC</span>
+              </p>
+            </div>
+          )}
+          {hodlEntry && hodlEntry.value !== undefined && (
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gray-500 border-2 border-dashed border-gray-400"></div>
+              <p className="text-sm font-semibold">
+                <span className="text-gray-300">HODL:</span> <span className="text-white">{hodlEntry.value.toFixed(6)} BTC</span>
+              </p>
+            </div>
+          )}
+          {advantageEntry && actualAdvantage !== undefined && (
+            <div className="mt-3 pt-3 border-t border-orange-500/30">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <p className="text-sm font-bold text-green-400">
+                  Advantage: <span className="text-white">+{actualAdvantage.toFixed(6)} BTC</span> <span className="text-green-300">({((actualAdvantage / 1) * 100).toFixed(2)}%)</span>
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+  return null
+}
+
 export default function PerformanceChart() {
+  // useId(): two charts on one page would otherwise share the same gradient
+  // id, and the second would reference the first one's definition.
+  const vaultGradientId = useId();
+
   const [timeframe, setTimeframe] = useState<number>(30)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -131,57 +190,6 @@ export default function PerformanceChart() {
   }, [yAxisDomain])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey?: string; name?: string; value?: number; color?: string; payload?: any }>; label?: string }) => {
-    if (active && payload && payload.length) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const vaultEntry = payload.find((p: any) => p.dataKey === 'vaultBalance' || p.name === 'BTC Vault')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const hodlEntry = payload.find((p: any) => p.dataKey === 'hodlBalance' || p.name === 'HODL')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const advantageEntry = payload.find((p: any) => p.dataKey === 'advantage' || p.name === 'Vault Advantage')
-      
-      // Get actual values from the data point (not amplified)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const dataPoint = vaultEntry?.payload as any
-      const actualVaultBalance = dataPoint?.vaultBalanceActual ?? vaultEntry?.value
-      const actualAdvantage = dataPoint?.advantageActual ?? advantageEntry?.value
-      
-      return (
-        <div className="bg-gradient-to-br from-gray-900 to-black text-white p-4 border border-orange-500/30 rounded-lg shadow-2xl backdrop-blur-sm">
-          <p className="font-bold mb-3 text-orange-300">{`Day ${label}`}</p>
-          <div className="space-y-2">
-            {vaultEntry && actualVaultBalance !== undefined && (
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500"></div>
-                <p className="text-sm font-semibold">
-                  <span className="text-orange-300">BTC Vault:</span> <span className="text-white">{actualVaultBalance.toFixed(6)} BTC</span>
-                </p>
-              </div>
-            )}
-            {hodlEntry && hodlEntry.value !== undefined && (
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-500 border-2 border-dashed border-gray-400"></div>
-                <p className="text-sm font-semibold">
-                  <span className="text-gray-300">HODL:</span> <span className="text-white">{hodlEntry.value.toFixed(6)} BTC</span>
-                </p>
-              </div>
-            )}
-            {advantageEntry && actualAdvantage !== undefined && (
-              <div className="mt-3 pt-3 border-t border-orange-500/30">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <p className="text-sm font-bold text-green-400">
-                    Advantage: <span className="text-white">+{actualAdvantage.toFixed(6)} BTC</span> <span className="text-green-300">({((actualAdvantage / 1) * 100).toFixed(2)}%)</span>
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )
-    }
-    return null
-  }
 
   return (
     <Card className="bg-black border border-white shadow-lg hover:shadow-xl transition-all duration-300">
@@ -309,7 +317,7 @@ export default function PerformanceChart() {
                     iconSize={isMobile ? 8 : 12}
                   />
                   <defs>
-                    <linearGradient id="vaultGradient" x1="0" y1="0" x2="1" y2="0">
+                    <linearGradient id={vaultGradientId} x1="0" y1="0" x2="1" y2="0">
                       <stop offset="0%" stopColor="#f59e0b" />
                       <stop offset="50%" stopColor="#fbbf24" />
                       <stop offset="100%" stopColor="#f59e0b" />
@@ -318,7 +326,7 @@ export default function PerformanceChart() {
                   <Line 
                     type="natural" 
                     dataKey="vaultBalance" 
-                    stroke="url(#vaultGradient)" 
+                    stroke={`url(#${vaultGradientId})`} 
                     strokeWidth={isMobile ? 2 : 2.5}
                     name="BTC Vault" 
                     dot={false}

@@ -58,7 +58,7 @@ export function ContentTabs() {
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id
             return (
-              <button
+              <button type="button"
                 key={`tab-button-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={`
